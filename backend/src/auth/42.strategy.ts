@@ -7,12 +7,12 @@ import { config } from 'dotenv';
 config();
 
 @Injectable()
-export class FortyTwoStrategy extends PassportStrategy(Strategy) {
+export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
   constructor(private authService: AuthService) {
     super({
       clientID: process.env.FORTYTWO_CLIENT_ID,
       clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/home',
+      callbackURL: 'http://localhost:3000/api/auth/redirect',
     });
   }
 
