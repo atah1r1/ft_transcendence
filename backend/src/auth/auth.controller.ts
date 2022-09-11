@@ -12,6 +12,7 @@ export class AuthController {
     @Get('redirect')
     @UseGuards(AuthGuard('42'))
     async fortyTwoAuthRedirect(@Req() req) {
+        console.log(req.user);
         return this.AuthService.Login();
     }
 
