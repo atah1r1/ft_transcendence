@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
-    Login(): string {
-        return 'Hello World!';
+    Login(user: object): object {
+        // const { id, username, name, photos } = user;
+        return user;
     }
 }

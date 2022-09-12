@@ -7,13 +7,12 @@ export class AuthController {
     constructor(private AuthService: AuthService) {}
     @Get('login')
     @UseGuards(AuthGuard('42'))
-    async fortyTwoAuth(@Req() req) {}
+    async fortyTwoAuth(@Req() req: any) {}
 
     @Get('redirect')
     @UseGuards(AuthGuard('42'))
-    async fortyTwoAuthRedirect(@Req() req) {
-        console.log(req.user);
-        return this.AuthService.Login();
+    async fortyTwoAuthRedirect(@Req() req: any) {
+        return this.AuthService.Login(req.user);
     }
 
 }
