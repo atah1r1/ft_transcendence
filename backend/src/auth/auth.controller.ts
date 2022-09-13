@@ -5,8 +5,8 @@ import { AuthService } from './auth.service';
 @Controller('auth')
 export class AuthController {
     constructor(private AuthService: AuthService) {}
-    @Get('login')
     @UseGuards(AuthGuard('42'))
+    @Get('login')
     async fortyTwoAuth(@Req() req: any) {}
 
     @Get('redirect')
