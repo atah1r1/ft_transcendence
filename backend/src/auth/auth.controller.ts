@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 
@@ -11,9 +11,18 @@ export class AuthController {
 
     @Get('redirect')
     @UseGuards(AuthGuard('42'))
-    async fortyTwoAuthRedirect(@Req() req: any) {
+    async fortyTwoAuthRedirect(@Req() req: any, @Res({passthrough: true}) res: any) {
         const { username, name, photos} = req.user;
-        return this.AuthService.Login(username, name, photos);
+        const jwt = await this.AuthService.Login(username, name, photos);
+        // return jwt;
+        res.cookie('jwt', jwt);
+        return {jwt};
+    }
+
+    @Get('me')
+    @UseGuards(AuthGuard('jwt'))
+    async me(@Req() req: any) {
+        return req.user;
     }
 
 }
