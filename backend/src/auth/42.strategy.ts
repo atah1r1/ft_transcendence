@@ -12,7 +12,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     super({
       clientID: process.env.FORTYTWO_CLIENT_ID,
       clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-      callbackURL: 'http://localhost:9000/api/auth/redirect',
+      callbackURL: 'http://localhost:9000/api/auth/redirect'
     });
   }
 

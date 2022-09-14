@@ -16,6 +16,7 @@ export class AuthController {
         const jwt = await this.AuthService.Login(username, name, photos);
         // return jwt;
         res.cookie('jwt', jwt);
+        console.log(res);
         return {jwt};
     }
 
