@@ -16,14 +16,6 @@ export class AuthController {
         const jwt = await this.AuthService.Login(username, name, photos);
         // return jwt;
         res.cookie('jwt', jwt);
-        console.log(res);
         return {jwt};
     }
-
-    @Get('me')
-    @UseGuards(AuthGuard('jwt'))
-    async me(@Req() req: any) {
-        return req.user;
-    }
-
 }
