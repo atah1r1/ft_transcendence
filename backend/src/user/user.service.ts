@@ -3,6 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UserService {
     getUsers(): object {
-        return {"error": 'object'};
+        return {"data": ["data1", "data1", "data1", "data1", "data1", "data1"]};
     }
 }
