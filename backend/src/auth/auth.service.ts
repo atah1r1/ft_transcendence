@@ -21,7 +21,7 @@ export class AuthService {
                 username: username,
                 first_name: name['givenName'],
                 last_name: name['familyName'],
-                avatar: photos[0]['value'],
+                avatar: photos[0]['value']
             },
         });
         return this.SignToken(user_created.id);
