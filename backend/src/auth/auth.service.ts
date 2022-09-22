@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { config } from 'dotenv';
+import { authenticator } from 'otplib';
+
 
 config();
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwt: JwtService) {}
+    constructor(private prisma: PrismaService, private jwt: JwtService) { }
     async Login(username: string, name: object, photos: object): Promise<String> {
         const user = await this.prisma.user.findUnique({
-            where: {username: username},
+            where: { username: username },
         });
         if (user?.username === username) {
             return this.SignToken(user.id);
@@ -21,14 +22,15 @@ export class AuthService {
                 username: username,
                 first_name: name['givenName'],
                 last_name: name['familyName'],
-                avatar: photos[0]['value']
+                avatar: photos[0]['value'],
+                two_factor_auth_key: authenticator.generateSecret()
             },
         });
         return this.SignToken(user_created.id);
     }
 
     async SignToken(id: String): Promise<string> {
-        const payload = {id: id};
+        const payload = { id: id };
         return this.jwt.signAsync(payload, {
             expiresIn: '3d',
             secret: process.env.JWT_SECRET,
