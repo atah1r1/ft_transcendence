@@ -26,4 +26,12 @@ export class UserService {
         });
         return { message: '2FA deactivated' };
     }
+
+    async verify2fa(user: any, code: string) {
+        const isValid = authenticator.verify({ token: code, secret: user.two_factor_auth_key });
+        if (isValid) {
+            return true;
+        }
+        return false;
+    }
 }
