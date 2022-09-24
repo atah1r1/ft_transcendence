@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor, UploadedFile } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { VerifyCodeDto } from './dto/verify2fa.dto';
 import { UserEntity } from './entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { storage } from './config/storage.config';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
@@ -13,6 +15,14 @@ export class UserController {
     @Get('me')
     async me(@Req() req: any): Promise<UserEntity> {
         return new UserEntity(req.user);
+    }
+
+    @UseInterceptors(
+        FileInterceptor('image', { storage }),
+    )
+    @Post('upload')
+    async uploadedImage(@UploadedFile() file: Express.Multer.File, @Res() res) {
+        return res.sendFile(file.path, { root: '.' });
     }
 
     @Post('2fa/activate')
