@@ -9,9 +9,15 @@ import { AuthService } from './auth/auth.service';
 import { PrismaService } from './prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [UserModule, AuthModule, MulterModule.register({ dest: './uploads' })],
+  imports: [UserModule, AuthModule, MulterModule.register({ dest: './uploads' }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+    }),
+  ],
   controllers: [UserController, AuthController],
   providers: [UserService, AuthService, PrismaService, JwtService],
 })

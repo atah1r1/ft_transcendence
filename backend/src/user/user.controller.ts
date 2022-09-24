@@ -21,8 +21,8 @@ export class UserController {
         FileInterceptor('image', { storage }),
     )
     @Post('upload')
-    async uploadedImage(@UploadedFile() file: Express.Multer.File, @Res() res) {
-        return res.sendFile(file.path, { root: '.' });
+    async uploadedImage(@UploadedFile() file: Express.Multer.File) {
+        return file;
     }
 
     @Post('2fa/activate')
