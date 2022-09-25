@@ -10,7 +10,7 @@ config();
 @Injectable()
 export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService) { }
-    async Login(username: string, name: object, photos: object): Promise<String> {
+    async Login(username: string, name: object, photos: object): Promise<any> {
         const user = await this.prisma.user.findUnique({
             where: { username: username },
         });
@@ -35,5 +35,15 @@ export class AuthService {
             expiresIn: '3d',
             secret: process.env.JWT_SECRET,
         });
+    }
+
+    async checkUserTwoFactor(username: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { username: username },
+        });
+        if (user?.two_factor_auth) {
+            return true;
+        }
+        return false;
     }
 }
