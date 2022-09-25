@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor, UploadedFile, BadRequestException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -6,11 +6,12 @@ import { VerifyCodeDto } from './dto/verify2fa.dto';
 import { UserEntity } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storage } from './config/storage.config';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
 export class UserController {
-    constructor(private prisma: PrismaService, private UserService: UserService) { }
+    constructor(private prisma: PrismaService, private UserService: UserService, private cloudinary: CloudinaryService) { }
     @UseInterceptors(ClassSerializerInterceptor)
     @Get('me')
     async me(@Req() req: any): Promise<UserEntity> {
@@ -18,11 +19,13 @@ export class UserController {
     }
 
     @UseInterceptors(
-        FileInterceptor('image', { storage }),
+        FileInterceptor('image'),
     )
     @Post('upload')
     async uploadedImage(@UploadedFile() file: Express.Multer.File) {
-        return file;
+        return await this.cloudinary.uploadImage(file).catch(() => {
+            throw new BadRequestException('Invalid file type.');
+        });
     }
 
     @Post('2fa/activate')
