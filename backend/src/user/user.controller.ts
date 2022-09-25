@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { VerifyCodeDto } from './dto/verify2fa.dto';
 import { UserEntity } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { storage } from './config/storage.config';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('user')
@@ -19,7 +18,20 @@ export class UserController {
     }
 
     @UseInterceptors(
-        FileInterceptor('image'),
+        FileInterceptor('image', {
+            limits: {
+                fileSize: 1024 * 1024 * 1,
+                fieldSize: 1024 * 1024 * 1,
+            },
+            fileFilter: (req, file, cb) => {
+                if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+                    cb(null, true);
+                } else {
+                    cb(null, false);
+                    return cb(new BadRequestException('Only .png, .jpg and .jpeg format allowed!'), false);
+                }
+            }
+        }),
     )
     @Post('upload')
     async uploadedImage(@UploadedFile() file: Express.Multer.File) {

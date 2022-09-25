@@ -13,7 +13,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Module({
-  imports: [UserModule, AuthModule, MulterModule.register({ dest: './uploads' })],
+  imports: [UserModule, AuthModule],
   controllers: [UserController, AuthController],
   providers: [UserService, AuthService, PrismaService, JwtService, CloudinaryService],
 })
