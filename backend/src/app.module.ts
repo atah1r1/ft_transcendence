@@ -8,8 +8,6 @@ import { FortyTwoStrategy } from './auth/42.strategy';
 import { AuthService } from './auth/auth.service';
 import { PrismaService } from './prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { MulterModule } from '@nestjs/platform-express';
-import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Module({
