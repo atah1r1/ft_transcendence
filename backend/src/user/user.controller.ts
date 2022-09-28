@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor, UploadedFile, BadRequestException, Patch } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -6,6 +6,7 @@ import { VerifyCodeDto } from './dto/verify2fa.dto';
 import { UserEntity } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdateProfileDto } from './dto/updateProfile.dto';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
@@ -16,6 +17,12 @@ export class UserController {
     async me(@Req() req: any): Promise<UserEntity> {
         return new UserEntity(req.user);
     }
+
+    @Patch('profile')
+    async updateProfile(@Req() req: any, @Body() body: UpdateProfileDto) {
+        return await this.UserService.updateProfile(req.user, body);
+    }
+
 
     @UseInterceptors(
         FileInterceptor('image', {
