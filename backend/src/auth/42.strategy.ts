@@ -1,18 +1,17 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-42';
 import { Injectable } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { config } from 'dotenv';
 
 config();
 
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
-  constructor(private authService: AuthService) {
+  constructor() {
     super({
       clientID: process.env.FORTYTWO_CLIENT_ID,
       clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-      callbackURL: 'http://localhost:9000/api/auth/redirect'
+      callbackURL: 'http://localhost:9000/api/auth/redirect',
     });
   }
 

@@ -28,7 +28,7 @@ export class UserController {
         FileInterceptor('image', {
             limits: {
                 fileSize: 1024 * 1024 * 1,
-                fieldSize: 1024 * 1024 * 1,
+                fieldSize: 1024 * 1024 * 1
             },
             fileFilter: (req, file, cb) => {
                 if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
@@ -41,10 +41,19 @@ export class UserController {
         }),
     )
     @Post('upload')
-    async uploadedImage(@UploadedFile() file: Express.Multer.File) {
-        return await this.cloudinary.uploadImage(file).catch(() => {
-            throw new BadRequestException('Invalid file type.');
-        });
+    async uploadedImage(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
+        try {
+            const { secure_url } = await this.cloudinary.uploadImage(file);
+            return await this.prisma.user.update({
+                where: { id: req.user.id },
+                data: { avatar: secure_url }
+            })
+        } catch {
+            throw new BadRequestException('Error uploading image');
+        }
+        // return await this.cloudinary.uploadImage(file).catch(() => {
+        //     throw new BadRequestException('Invalid file type.');
+        // });
     }
 
     @Post('2fa/activate')
