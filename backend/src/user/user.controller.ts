@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor, UploadedFile, BadRequestException, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Req, UseGuards, Res, Body, UseInterceptors, ClassSerializerInterceptor, UploadedFile, BadRequestException, Patch, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -44,10 +44,11 @@ export class UserController {
     async uploadedImage(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
         try {
             const { secure_url } = await this.cloudinary.uploadImage(file);
-            return await this.prisma.user.update({
+            const user = await this.prisma.user.update({
                 where: { id: req.user.id },
                 data: { avatar: secure_url }
             })
+            return { avatar: user.avatar };
         } catch {
             throw new BadRequestException('Error uploading image');
         }
@@ -67,12 +68,12 @@ export class UserController {
     }
 
     @Post('2fa/verify')
-    async verify2fa(@Req() req: any, @Res() res: any, @Body() body: VerifyCodeDto) {
+    async verify2fa(@Req() req: any, @Body() body: VerifyCodeDto) {
         const { code } = body;
         const user = await this.UserService.verify2fa(req.user, code);
         if (user) {
-            return res.json({ success: true });
+            throw new HttpException('2FA code correct', HttpStatus.OK);
         }
-        return res.json({ success: false });
+        throw new HttpException('Invalid code', HttpStatus.BAD_REQUEST);
     }
 }
