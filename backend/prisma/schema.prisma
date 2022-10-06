@@ -20,4 +20,5 @@ model User {
   avatar              String?  @db.VarChar(255)
   two_factor_auth     Boolean  @default(false)
   two_factor_auth_key String?  @db.VarChar(255)
+  two_factor_auth_uri String?  @db.VarChar(255)
 }

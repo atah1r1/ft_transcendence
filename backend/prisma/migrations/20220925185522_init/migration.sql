@@ -9,6 +9,7 @@ CREATE TABLE "User" (
     "avatar" VARCHAR(255),
     "two_factor_auth" BOOLEAN NOT NULL DEFAULT false,
     "two_factor_auth_key" VARCHAR(255),
+    "two_factor_auth_uri" VARCHAR(255),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );

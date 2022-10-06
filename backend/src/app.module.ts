@@ -8,10 +8,11 @@ import { FortyTwoStrategy } from './auth/42.strategy';
 import { AuthService } from './auth/auth.service';
 import { PrismaService } from './prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Module({
   imports: [UserModule, AuthModule],
   controllers: [UserController, AuthController],
-  providers: [UserService, AuthService, PrismaService, JwtService],
+  providers: [UserService, AuthService, PrismaService, JwtService, CloudinaryService],
 })
-export class AppModule {}
+export class AppModule { }
