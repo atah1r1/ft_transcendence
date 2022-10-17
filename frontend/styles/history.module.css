@@ -1,0 +1,88 @@
+.history {
+  overflow-y: scroll;
+  padding: 4.2rem 2.6rem;
+}
+
+.history::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history::-webkit-scrollbar-thumb {
+  background: #783483;
+  border-radius: 1rem;
+}
+
+.history_box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 1.8rem;
+  text-align: center;
+  letter-spacing: 1.2px;
+  border-radius: 1rem;
+}
+
+.history_avatar {
+  position: relative;
+}
+
+.history_numberGame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  width: 2.4rem;
+  height: 2.4rem;
+  position: absolute;
+  bottom: 4%;
+  right: -0.6rem;
+  background-color: #fff;
+  border-radius: 50%;
+  font-family: "Pixeboy";
+  font-weight: bold;
+}
+
+.history_avatar img {
+  width: 5.4rem;
+  height: 5.4rem;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid #fff;
+}
+
+.history_achievements {
+  width: 15rem;
+  margin: 0 6.4rem;
+}
+
+.history_achievements img {
+  width: 32%;
+}
+
+.history_score_points {
+  width: 16rem;
+  font-family: "Phosphate";
+  margin-left: 4rem;
+}
+
+.history_victory_defeat_box {
+  font-size: 3rem;
+  width: 15rem;
+  font-family: "Pixeboy";
+  margin-right: 8rem;
+}
+
+.victory_defeat_box {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.history_gameMode_time {
+  text-align: right;
+  width: 26rem;
+  font-family: "Phosphate";
+}
