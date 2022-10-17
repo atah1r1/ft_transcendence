@@ -3,8 +3,30 @@ import styles from "../../../styles/profile.module.css";
 import styles_box from "../../../styles/style_box.module.css";
 import styles_s_l from "../../../styles/style_settings_nav.module.css";
 import SettingsNav from "../../../components/settings_nav";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const Profile = () => {
+  const [user, setUser] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`,
+        {
+          withCredentials: true,
+        }
+      );
+      setUser(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div className={styles_box.container}>
       <SettingsNav selected={"profile"} />

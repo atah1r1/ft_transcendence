@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "../styles/login_page.module.css";
 
 const loginPage = () => {
@@ -6,7 +7,9 @@ const loginPage = () => {
       <p className={styles.welcom}>WELCOME TO</p>
       <p className={styles.pongify}>PONGIFY</p>
       <div>
-        <button className={styles.loginBtn}>Login with</button>
+        <Link href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`}>
+          <button className={styles.loginBtn}>Login with</button>
+        </Link>
       </div>
     </div>
   );
