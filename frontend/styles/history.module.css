@@ -45,8 +45,6 @@
 }
 
 .history_avatar img {
-  width: 5.4rem;
-  height: 5.4rem;
   object-fit: cover;
   border-radius: 50%;
   border: 1px solid #fff;
@@ -55,10 +53,6 @@
 .history_achievements {
   width: 15rem;
   margin: 0 6.4rem;
-}
-
-.history_achievements img {
-  width: 32%;
 }
 
 .history_score_points {

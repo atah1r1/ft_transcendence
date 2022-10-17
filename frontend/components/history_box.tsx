@@ -1,11 +1,12 @@
 import styles from "../styles/history.module.css";
+import Image from "next/image";
 
 const HistoryBox = ({ history }: any) => {
-  return history.map((ele: any) => {
+  return history.map((ele: any, i: any) => {
     return (
-      <div className={styles.history_box}>
+      <div className={styles.history_box} key={i}>
         <div className={styles.history_avatar}>
-          <img src={ele.avatar} />
+          <Image src={ele.avatar} alt={"avatar"} width={54} height={54} />
           <div className={styles.history_numberGame}>{ele.numberGame}</div>
         </div>
         <div className={styles.history_score_points}>
@@ -21,9 +22,24 @@ const HistoryBox = ({ history }: any) => {
           </div>
         </div>
         <div className={styles.history_achievements}>
-          <img src={ele.achievements} />
-          <img src={ele.achievements} />
-          <img src={ele.achievements} />
+          <Image
+            src={ele.achievements}
+            alt={"achivement"}
+            width={"40%"}
+            height={"40%"}
+          />
+          <Image
+            src={ele.achievements}
+            alt={"achivement"}
+            width={"40%"}
+            height={"40%"}
+          />
+          <Image
+            src={ele.achievements}
+            alt={"achivement"}
+            width={"40%"}
+            height={"40%"}
+          />
         </div>
         <div className={styles.history_victory_defeat}>
           <div className={styles.history_victory_defeat_box}>
