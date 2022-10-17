@@ -1,27 +1,29 @@
 .history {
+  height: 100%;
+  width: 100%;
   overflow-y: scroll;
-  padding: 4.2rem 2.6rem;
+  padding-right: 1rem;
 }
 
 .history::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .history::-webkit-scrollbar-thumb {
-  background: #783483;
+  background: #aaa;
   border-radius: 1rem;
 }
 
 .history_box {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
   padding: 1.2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   font-size: 1.8rem;
   text-align: center;
   letter-spacing: 1.2px;
-  border-radius: 1rem;
 }
 
 .history_avatar {
@@ -52,20 +54,17 @@
 
 .history_achievements {
   width: 15rem;
-  margin: 0 6.4rem;
 }
 
 .history_score_points {
   width: 16rem;
   font-family: "Phosphate";
-  margin-left: 4rem;
 }
 
 .history_victory_defeat_box {
   font-size: 3rem;
   width: 15rem;
   font-family: "Pixeboy";
-  margin-right: 8rem;
 }
 
 .victory_defeat_box {

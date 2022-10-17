@@ -40,7 +40,7 @@
 
 /* Handle */
 .l_part_two::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
+  background: #aaa;
   border-radius: 10px;
 }
 
@@ -58,7 +58,7 @@
 
 /* Handle */
 .l_part_tree::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
+  background: #aaa;
   border-radius: 10px;
 }
 
@@ -234,7 +234,7 @@
 
 /* Handle */
 .message_part_content::-webkit-scrollbar-thumb {
-  background: #777;
+  background: #aaa;
   border-radius: 10px;
 }
 

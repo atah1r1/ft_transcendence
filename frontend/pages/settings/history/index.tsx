@@ -124,8 +124,10 @@ const History = () => {
   return (
     <div className={styles_box.container}>
       <SettingsNav selected={"history"} />
-      <div className={cn(styles_box.profile_details, styles_h.history)}>
-        <HistoryBox history={history}></HistoryBox>
+      <div className={styles_box.profile_details}>
+        <div className={styles_h.history}>
+          <HistoryBox history={history}></HistoryBox>
+        </div>
       </div>
     </div>
   );
