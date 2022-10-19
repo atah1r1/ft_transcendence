@@ -1,0 +1,50 @@
+.profile_info {
+  color: #fff;
+  text-align: center;
+}
+
+.profile_image {
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-bottom: 1.2rem;
+}
+
+.profile_info_login,
+.profile_info_full_name {
+  font-family: "Phosphate";
+  font-size: 1.6rem;
+}
+
+.setting_btn {
+  font-family: "Pixeboy";
+  background-color: #d9d9d9;
+  border-radius: 1.6rem;
+  padding: 2rem 6.6rem;
+  text-align: center;
+  font-size: 2.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.setting_btn:hover {
+  background-color: #c6c6c6;
+}
+
+.current_btn {
+  background-color: #dc465e;
+  color: #fff;
+}
+
+.current_btn:hover {
+  background-color: #da3e58;
+}
+
+.setting_btn:active,
+.current_btn:active {
+  transform: translateY(1.5px);
+}
+
+.setting_btn:not(:last-child) {
+  margin-bottom: 1.8rem;
+}
