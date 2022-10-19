@@ -37,6 +37,12 @@ export class AuthService {
         });
     }
 
+    async verifyToken(token: string) {
+        return this.jwt.verifyAsync(token, {
+            secret: process.env.JWT_SECRET,
+        });
+    }
+
     async checkUserTwoFactor(username: string) {
         const user = await this.prisma.user.findUnique({
             where: { username: username },

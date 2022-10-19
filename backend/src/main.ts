@@ -19,7 +19,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('FT_TRANSCENDENCE API')
-    .setDescription('The ft_transcendence API documentation')
+    .setDescription('ft_transcendence API documentation')
     .setVersion('1.0')
     .build();
 
