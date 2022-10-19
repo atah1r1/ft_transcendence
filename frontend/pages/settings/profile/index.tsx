@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const Profile = () => {
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState({});
 
   const fetchData = async () => {
     try {
@@ -23,6 +23,7 @@ const Profile = () => {
     }
   };
 
+  console.log(user);
   useEffect(() => {
     fetchData();
   }, []);

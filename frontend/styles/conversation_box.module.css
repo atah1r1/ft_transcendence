@@ -18,12 +18,16 @@
   transform: translateY(1.5px);
 }
 
-.conversation_img img {
+.conversation_img {
+  justify-self: center;
   width: 4.2rem;
   height: 4.2rem;
   border-radius: 50%;
   border: 1px solid #fff;
-  object-fit: cover;
+}
+
+.conversation_img img {
+  border-radius: 50%;
 }
 
 .conversation_name {

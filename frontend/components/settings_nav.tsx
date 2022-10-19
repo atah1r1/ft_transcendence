@@ -10,13 +10,15 @@ const SettingsNav = ({ selected }: any) => {
   return (
     <div className={styles_box.profile_setting}>
       <div className={styles_s_l.profile_info}>
-        <Image
-          src="https://cdn.intra.42.fr/users/yhadari.jpg"
-          alt="avatar"
-          width={90}
-          height={90}
-          className={styles_s_l.profile_image}
-        ></Image>
+        <div className={styles_s_l.profile_image_wrap}>
+          <Image
+            src="https://cdn.intra.42.fr/users/yhadari.jpg"
+            alt="avatar"
+            width={"80%"}
+            height={"80%"}
+            className={styles_s_l.profile_image}
+          ></Image>
+        </div>
         <p className={styles_s_l.profile_info_login}>YHADARI</p>
         <p className={styles_s_l.profile_info_full_name}>YACINE HADARI</p>
       </div>

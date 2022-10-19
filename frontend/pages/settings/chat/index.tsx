@@ -7,6 +7,7 @@ import SettingsNav from "../../../components/settings_nav";
 import ConversationBox from "../../../components/conversation_box";
 import styles_c_b from "../../../styles/conversation_box.module.css";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 const Chat = () => {
   const [conversationsBox, setConversationsBox] = useState([
@@ -46,13 +47,6 @@ const Chat = () => {
       messageNumber: "3",
     },
     {
-      image: "https://cdn.intra.42.fr/users/ehakam.jpeg",
-      fullName: "Elkbir HAKAM",
-      lastMessage: "wa fin a sat bikher",
-      lastTime: "5:34PM",
-      messageNumber: "1",
-    },
-    {
       image: "https://cdn.intra.42.fr/users/ojoubout.jpg",
       fullName: "Oussama JOUBOUTI",
       lastMessage: "ach daro m3ak mazal",
@@ -60,15 +54,15 @@ const Chat = () => {
       messageNumber: "6",
     },
     {
-      image: "https://cdn.intra.42.fr/users/ehakam.jpeg",
-      fullName: "Elkbir HAKAM",
-      lastMessage: "wa fin a sat bikher",
-      lastTime: "5:34PM",
-      messageNumber: "1",
+      image: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
+      fullName: "Ismail BOUHIRI",
+      lastMessage: "ach daro m3ak mazal",
+      lastTime: "11:34PM",
+      messageNumber: "6",
     },
     {
-      image: "https://cdn.intra.42.fr/users/ojoubout.jpg",
-      fullName: "Oussama JOUBOUTI",
+      image: "https://cdn.intra.42.fr/users/atahiri.jpg",
+      fullName: "Amine tahiri",
       lastMessage: "ach daro m3ak mazal",
       lastTime: "11:34PM",
       messageNumber: "6",
@@ -257,28 +251,76 @@ const Chat = () => {
               </div>
               <div className={styles.l_part_tree}>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/yhadari.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/atahiri.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/atahiri.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/mbrija.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/mbrija.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/bsanaoui.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/ojoubout.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/yhadari.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/yhadari.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
                 <div className={styles.online}>
-                  <img src="https://cdn.intra.42.fr/users/yhadari.jpg"></img>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    alt="online_friend_img"
+                    width={"40px"}
+                    height={"40px"}
+                    layout={"fixed"}
+                  ></Image>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import styles from "../styles/conversation_box.module.css";
 import cn from "classnames";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const ConversationBox = ({ conversations, getSenderInfo, messages }: any) => {
   const [currentConv, setCurrentConv] = useState(conversations[0]?.fullName);
@@ -31,7 +32,12 @@ const ConversationBox = ({ conversations, getSenderInfo, messages }: any) => {
           )}
         >
           <div className={styles.conversation_img}>
-            <img src={conv.image}></img>
+            <Image
+              src={conv.image}
+              alt="conversation_image"
+              width={"42px"}
+              height={"42px"}
+            ></Image>
           </div>
           <div>
             <p className={styles.conversation_name}>{conv.fullName}</p>
