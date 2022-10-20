@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ConnectdUser } from './models/connectd-user.interface';
 import { Message } from './models/message.interface';
 import { RoomUser } from './models/room-user.interface';
 import { Room } from './models/room.interface';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class ChatService {
@@ -17,7 +17,7 @@ export class ChatService {
 	private roCounter = 0;
 
 	// NOTE: userId -> [socketId]
-	private connectedUsers: Map<number, string[]> = new Map();
+	private connectedUsers: Map<string, string[]> = new Map();
 
 	// NOTE: SHOULD BE SAVED IN DB
 	private users: User[] = [];
@@ -25,7 +25,7 @@ export class ChatService {
 	private rooms: Room[] = [];
 	private roomUsers: RoomUser[] = [];
 
-	addConnectedUser(userId: number, socketId: string) {
+	addConnectedUser(userId: string, socketId: string) {
 		const socketIds = this.connectedUsers.get(userId);
 		if (socketIds) {
 			socketIds.push(socketId);
@@ -34,7 +34,7 @@ export class ChatService {
 		}
 	}
 
-	removeConnectedUser(userId: number, socketId: string) {
+	removeConnectedUser(userId: string, socketId: string) {
 		const socketIds = this.connectedUsers.get(userId);
 		if (!socketIds) return;
 		const newSocketIds = socketIds.filter((id) => id !== socketId);
@@ -45,6 +45,18 @@ export class ChatService {
 		}
 	}
 
+	// NOTE: move this chat.gateway.ts
+	// - this service should not be responsible for socket.io
+	connectUserToJoinedRooms(userId: string, socket: Socket) {
+		// NOTE: we assume User has list of roomUser objects
+		// NOTE: For now we simulate this by filtering roomUsers
+		// this should be done by Prisma
+		const _roomUsers: RoomUser[] = this.roomUsers.filter((ru) => ru.user.id === userId);
+		_roomUsers.forEach((ru) => {
+			socket.join(ru.room.roomId);
+		});
+	}
+
 	// NOTE: Replace id: string with id: number
 	// NOTE: Replace userId: string with user: User
 	// NOTE: find user outside of this service using UserService
@@ -53,18 +65,22 @@ export class ChatService {
 		const room: Room = this.rooms.find((r) => r.roomId === roomId);
 		if (!room) throw new Error('Room does not exist');
 
+		const _existingRoomUser: RoomUser = room.members.find((ru) => ru.user.id === userId);
+		if (_existingRoomUser) throw new Error('User already in room');
+
 		if (!room.requiresPassword && room.password !== password)
 			throw new Error('Incorrect room password');
 
+		// NOTE: should be done by Prisma
 		const roomUser: RoomUser = {
 			id: this.ruCounter++,
-			roomId: roomId,
+			room: room,
 			user: this.users.filter((user) => user.id === userId)[0],
 			isAdmin: false,
+			isBanned: false,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		}
-
 		this.roomUsers.push(roomUser);
 	}
 }
