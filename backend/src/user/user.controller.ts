@@ -23,7 +23,6 @@ export class UserController {
         return await this.UserService.updateProfile(req.user, body);
     }
 
-
     @UseInterceptors(
         FileInterceptor('image', {
             limits: {
