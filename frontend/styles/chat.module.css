@@ -187,6 +187,7 @@
   font-size: 1.4rem;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
+
 .message_send {
   cursor: pointer;
   display: flex;
@@ -273,10 +274,7 @@
 }
 
 .message_avatar img {
-  width: 4.2rem;
-  height: 4.2rem;
   border-radius: 50%;
-  object-fit: cover;
 }
 
 .message_nametime_box {
@@ -302,10 +300,6 @@
   gap: 1.6rem;
   border-radius: 1rem;
   z-index: 1;
-}
-
-.treepoints_box img {
-  width: 2.6rem;
 }
 
 .treepoints_box_row {

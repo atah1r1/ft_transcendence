@@ -31,16 +31,35 @@ const ConversationBox = ({ conversations, getSenderInfo, messages }: any) => {
             currentConv === conv.fullName && styles.current_conv
           )}
         >
-          <div className={styles.conversation_img}>
-            <Image
-              src={conv.image}
-              alt="conversation_image"
-              width={"42px"}
-              height={"42px"}
-            ></Image>
-          </div>
+          {conv.hasOwnProperty("group") ? (
+            <div className={styles.conversation_group_img}>
+              {conv.group_user.map((conv: any, i: number) => {
+                return (
+                  <div key={i}>
+                    <Image
+                      src={conv.image}
+                      alt="conversation_image"
+                      width={"30px"}
+                      height={"30px"}
+                    ></Image>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={styles.conversation_img}>
+              <Image
+                src={conv.image}
+                alt="conversation_image"
+                width={"42px"}
+                height={"42px"}
+              ></Image>
+            </div>
+          )}
           <div>
-            <p className={styles.conversation_name}>{conv.fullName}</p>
+            <p className={styles.conversation_name}>
+              {conv.hasOwnProperty("group") ? conv.group_name : conv.fullName}
+            </p>
             <p className={styles.conversation_text}>{conv.lastMessage}</p>
           </div>
           <div>

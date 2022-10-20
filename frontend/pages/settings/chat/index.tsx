@@ -12,11 +12,26 @@ import Image from "next/image";
 const Chat = () => {
   const [conversationsBox, setConversationsBox] = useState([
     {
-      image: "https://cdn.intra.42.fr/users/mokellat.jpg",
-      fullName: "Mohammed Ali KELLATI",
+      group_user: [
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali KELLATI",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/yhadari.jpg",
+          fullName: "Yassine HADARI",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/atahiri.jpg",
+          fullName: "Amine TAHIRI",
+        },
+      ],
+      group_name: "Group TRANDANDANE",
+      group_image: "https://cdn.intra.42.fr/users/yhadari.jpg",
       lastMessage: "wa fin a sat",
       lastTime: "3:16PM",
       messageNumber: "2",
+      group: true,
     },
     {
       image: "https://cdn.intra.42.fr/users/yhadari.jpg",
@@ -241,7 +256,7 @@ const Chat = () => {
                   conversations={
                     searchInput
                       ? conversationsBox.filter((conv) =>
-                          conv.fullName.toLowerCase().includes(searchInput)
+                          conv.fullName?.toLowerCase().includes(searchInput)
                         )
                       : conversationsBox
                   }
@@ -254,8 +269,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -263,8 +278,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/atahiri.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -272,8 +287,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/mbrija.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -281,8 +296,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -290,8 +305,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/ojoubout.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -299,8 +314,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -308,8 +323,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -317,8 +332,8 @@ const Chat = () => {
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={"40px"}
-                    height={"40px"}
+                    width={"34px"}
+                    height={"34px"}
                     layout={"fixed"}
                   ></Image>
                 </div>
@@ -329,19 +344,39 @@ const Chat = () => {
                 <div className={styles.treepoints_box}>
                   <div className={styles.treepoints_box_row}>
                     <p>invite player</p>
-                    <img src="/invete_player.svg" />
+                    <Image
+                      src="/invete_player.svg"
+                      alt="invete_player_icon"
+                      width={"26px"}
+                      height={"26px"}
+                    />
                   </div>
                   <div className={styles.treepoints_box_row}>
                     <p>unfriend</p>
-                    <img src="/unfriend.svg" />
+                    <Image
+                      src="/unfriend.svg"
+                      alt="unfriend_icon"
+                      width={"26px"}
+                      height={"26px"}
+                    />
                   </div>
                   <div className={styles.treepoints_box_row}>
                     <p>block user</p>
-                    <img src="/block_user.svg" />
+                    <Image
+                      src="/block_user.svg"
+                      alt="block_user_icon"
+                      width={"26px"}
+                      height={"26px"}
+                    />
                   </div>
                   <div className={styles.treepoints_box_row}>
                     <p>view profile</p>
-                    <img src="/view_profile.svg" />
+                    <Image
+                      src="/view_profile.svg"
+                      alt="view_profile_icon"
+                      width={"26px"}
+                      height={"26px"}
+                    />
                   </div>
                 </div>
               )}
@@ -368,7 +403,12 @@ const Chat = () => {
                       <div className={styles.message_left} key={i}>
                         <div className={styles.message_box}>
                           <div className={styles.message_avatar}>
-                            <img src={message.avatar} alt="" />
+                            <Image
+                              src={message.avatar}
+                              alt="message_avatar"
+                              width={"42px"}
+                              height={"42px"}
+                            />
                           </div>
                           <div style={{ width: "100%" }}>
                             <div className={styles.message_nametime_box}>
@@ -406,7 +446,12 @@ const Chat = () => {
                     className={styles.message_send}
                     onClick={handleSubmitMessages}
                   >
-                    <img src="/send_icon.svg"></img>
+                    <Image
+                      src="/send_icon.svg"
+                      alt="send_message_icon"
+                      width={"20%"}
+                      height={"20%"}
+                    ></Image>
                   </div>
                 </div>
               </div>

@@ -18,6 +18,23 @@
   transform: translateY(1.5px);
 }
 
+.conversation_group_img {
+  width: 80%;
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.conversation_group_img img {
+  border-radius: 50%;
+}
+
+.conversation_group_img div {
+  margin-right: -0.4rem;
+}
+
 .conversation_img {
   justify-self: center;
   width: 4.2rem;
