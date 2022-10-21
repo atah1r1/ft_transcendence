@@ -3,7 +3,12 @@ import cn from "classnames";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-const ConversationBox = ({ conversations, getSenderInfo, messages }: any) => {
+const ConversationBox = ({
+  conversations,
+  getSenderInfo,
+  messages,
+  setCurrent_conv,
+}: any) => {
   const [currentConv, setCurrentConv] = useState(conversations[0]?.fullName);
 
   const [newMessage, setNewMessage] = useState(
@@ -20,11 +25,16 @@ const ConversationBox = ({ conversations, getSenderInfo, messages }: any) => {
             setNewMessage(newMessage);
             messages.forEach((msg: any) => {
               if (!msg.sender) {
-                msg.avatar = conv.image;
-                msg.fullName = conv.fullName;
+                msg.avatar = conv.hasOwnProperty("group")
+                  ? conv.group_image
+                  : conv.image;
+                msg.fullName = conv.hasOwnProperty("group")
+                  ? conv.group_name
+                  : conv.fullName;
               }
             });
             getSenderInfo([...messages]);
+            setCurrent_conv(conv);
           }}
           className={cn(
             styles.conversation,
@@ -35,14 +45,16 @@ const ConversationBox = ({ conversations, getSenderInfo, messages }: any) => {
             <div className={styles.conversation_group_img}>
               {conv.group_user.map((conv: any, i: number) => {
                 return (
-                  <div key={i}>
-                    <Image
-                      src={conv.image}
-                      alt="conversation_image"
-                      width={"30px"}
-                      height={"30px"}
-                    ></Image>
-                  </div>
+                  i < 3 && (
+                    <div key={i}>
+                      <Image
+                        src={conv.image}
+                        alt="conversation_image"
+                        width={"30px"}
+                        height={"30px"}
+                      ></Image>
+                    </div>
+                  )
                 );
               })}
             </div>

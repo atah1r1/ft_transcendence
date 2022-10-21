@@ -8,18 +8,22 @@ import ConversationBox from "../../../components/conversation_box";
 import styles_c_b from "../../../styles/conversation_box.module.css";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 
 const Chat = () => {
+  const [currentConv, setCurrentConv] = useState({});
+
   const [conversationsBox, setConversationsBox] = useState([
     {
       group_user: [
         {
           image: "https://cdn.intra.42.fr/users/mokellat.jpg",
-          fullName: "Mohammed Ali KELLATI",
+          fullName: "Mohammed Ali",
         },
         {
           image: "https://cdn.intra.42.fr/users/yhadari.jpg",
           fullName: "Yassine HADARI",
+          me: true,
         },
         {
           image: "https://cdn.intra.42.fr/users/atahiri.jpg",
@@ -93,16 +97,16 @@ const Chat = () => {
       sender: false,
       message: "..",
       time: "Today at 17:15",
-      avatar: conversationsBox[0].image,
-      fullName: conversationsBox[0].fullName,
+      avatar: "",
+      fullName: "",
     },
     {
       sender: false,
       message:
         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum unde exceptuchite",
       time: "Today at 17:15",
-      avatar: conversationsBox[0].image,
-      fullName: conversationsBox[0].fullName,
+      avatar: "",
+      fullName: "",
     },
   ]);
 
@@ -144,6 +148,7 @@ const Chat = () => {
   const [searchInput, setSearchInput] = useState("");
 
   const [treePoints, setTreePoints] = useState(false);
+
   return (
     <div>
       {chat_room && (
@@ -255,13 +260,21 @@ const Chat = () => {
                 <ConversationBox
                   conversations={
                     searchInput
-                      ? conversationsBox.filter((conv) =>
-                          conv.fullName?.toLowerCase().includes(searchInput)
-                        )
+                      ? conversationsBox.filter((conv) => {
+                          if (conv.hasOwnProperty("group"))
+                            return conv.group_name
+                              ?.toLowerCase()
+                              .includes(searchInput);
+                          else
+                            return conv.fullName
+                              ?.toLowerCase()
+                              .includes(searchInput);
+                        })
                       : conversationsBox
                   }
                   getSenderInfo={getSenderInfo}
                   messages={messages}
+                  setCurrent_conv={setCurrentConv}
                 />
               </div>
               <div className={styles.l_part_tree}>
@@ -340,46 +353,84 @@ const Chat = () => {
               </div>
             </div>
             <div className={styles.chat_right}>
-              {treePoints && (
-                <div className={styles.treepoints_box}>
-                  <div className={styles.treepoints_box_row}>
-                    <p>invite player</p>
-                    <Image
-                      src="/invete_player.svg"
-                      alt="invete_player_icon"
-                      width={"26px"}
-                      height={"26px"}
-                    />
-                  </div>
-                  <div className={styles.treepoints_box_row}>
-                    <p>unfriend</p>
-                    <Image
-                      src="/unfriend.svg"
-                      alt="unfriend_icon"
-                      width={"26px"}
-                      height={"26px"}
-                    />
-                  </div>
-                  <div className={styles.treepoints_box_row}>
-                    <p>block user</p>
-                    <Image
-                      src="/block_user.svg"
-                      alt="block_user_icon"
-                      width={"26px"}
-                      height={"26px"}
-                    />
-                  </div>
-                  <div className={styles.treepoints_box_row}>
-                    <p>view profile</p>
-                    <Image
-                      src="/view_profile.svg"
-                      alt="view_profile_icon"
-                      width={"26px"}
-                      height={"26px"}
-                    />
-                  </div>
-                </div>
-              )}
+              <ClickOutsidePoints
+                setTreePoints={setTreePoints}
+                content={
+                  treePoints && !currentConv.hasOwnProperty("group") ? (
+                    <div className={styles.treepoints_box}>
+                      <div className={styles.treepoints_box_row}>
+                        <p>invite player</p>
+                        <Image
+                          src="/invete_player.svg"
+                          alt="invete_player_icon"
+                          width={"26px"}
+                          height={"26px"}
+                        />
+                      </div>
+                      <div className={styles.treepoints_box_row}>
+                        <p>unfriend</p>
+                        <Image
+                          src="/unfriend.svg"
+                          alt="unfriend_icon"
+                          width={"26px"}
+                          height={"26px"}
+                        />
+                      </div>
+                      <div className={styles.treepoints_box_row}>
+                        <p>block user</p>
+                        <Image
+                          src="/block_user.svg"
+                          alt="block_user_icon"
+                          width={"26px"}
+                          height={"26px"}
+                        />
+                      </div>
+                      <div className={styles.treepoints_box_row}>
+                        <p>view profile</p>
+                        <Image
+                          src="/view_profile.svg"
+                          alt="view_profile_icon"
+                          width={"26px"}
+                          height={"26px"}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    treePoints &&
+                    currentConv.hasOwnProperty("group") && (
+                      <div className={styles.treepoints_box}>
+                        {currentConv.group_user.map((user: any, i: number) => {
+                          return (
+                            !user.hasOwnProperty("me") && (
+                              <div
+                                key={i}
+                                className={styles.treepoints_box_row}
+                              >
+                                <div className={styles.treePoints_box_avatar}>
+                                  <Image
+                                    src={user.image}
+                                    alt="friend_avatar"
+                                    width={"40px"}
+                                    height={"40px"}
+                                    className={styles.treePoints_box_avatar}
+                                  />
+                                </div>
+                                <p>{user.fullName}</p>
+                                <Image
+                                  src="/settings_icon.svg"
+                                  alt="invete_player_icon"
+                                  width={"22px"}
+                                  height={"22px"}
+                                />
+                              </div>
+                            )
+                          );
+                        })}
+                      </div>
+                    )
+                  )
+                }
+              />
               <div className={styles.conversation_head}>
                 <p
                   className={cn(

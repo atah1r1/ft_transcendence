@@ -157,19 +157,6 @@
   padding: 0 0.6rem;
 }
 
-.conversation_head_treepoints {
-  cursor: pointer;
-  position: absolute;
-  top: -22%;
-  right: 3%;
-  font-size: 4rem;
-  color: #fff;
-  transition: all 0.3s;
-}
-.conversation_head_treepoints:active {
-  transform: translateY(1.2px);
-}
-
 .message_box {
   width: 90%;
 }
@@ -285,6 +272,22 @@
   margin-left: 1rem;
 }
 
+/* Tree Points ----------------------- */
+
+.conversation_head_treepoints {
+  cursor: pointer;
+  position: absolute;
+  top: -22%;
+  right: 3%;
+  font-size: 4rem;
+  color: #fff;
+  transition: all 0.3s;
+}
+
+.conversation_head_treepoints:active {
+  transform: translateY(1.2px);
+}
+
 .treepoints_box {
   position: absolute;
   right: 8%;
@@ -292,7 +295,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 24rem;
+  width: 28rem;
+  max-height: 56rem;
   background-color: #0f3460;
   padding: 1.8rem;
   font-family: "Pixeboy";
@@ -300,6 +304,17 @@
   gap: 1.6rem;
   border-radius: 1rem;
   z-index: 1;
+  overflow-y: scroll;
+}
+
+.treepoints_box::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Handle */
+.treepoints_box::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 10px;
 }
 
 .treepoints_box_row {
@@ -312,4 +327,15 @@
 
 .treepoints_box_row:active {
   transform: translateY(1.2px);
+}
+
+.treePoints_box_avatar {
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
+
+.treePoints_box_avatar img {
+  border-radius: 50%;
 }
