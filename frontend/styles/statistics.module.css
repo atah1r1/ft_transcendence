@@ -1,0 +1,102 @@
+.statistics_box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3.2rem;
+}
+
+.part_one {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  gap: 2rem;
+}
+
+.right {
+  font-size: 3.2rem;
+  font-family: "Pixeboy";
+  text-align: center;
+}
+
+.level_line {
+  width: 22rem;
+  height: 1.2rem;
+  background-color: #d9d9d9;
+  border-radius: 1rem;
+  margin-bottom: 0.6rem;
+  position: relative;
+}
+
+.level_line::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  background-color: #dc465e;
+  width: 15rem;
+  height: 1.2rem;
+  border-radius: 1rem;
+}
+
+.level_number_box {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.3rem;
+}
+
+.defeat_text {
+  color: rgb(234, 67, 53);
+}
+
+.victory_text {
+  color: rgb(59, 166, 88);
+}
+
+.def_vic_box {
+  display: flex;
+  border-top: 1px solid #fff;
+  gap: 3rem;
+  padding: 0.6rem 3rem;
+}
+
+.avatar {
+  width: 10rem;
+  height: 10rem;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.avatar img {
+  border-radius: 50%;
+}
+
+.user_name {
+  font-family: "Phosphate";
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.part_two {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6rem;
+}
+
+.ach_text {
+  font-family: "Pixeboy";
+  font-size: 3.6rem;
+}
+
+.ach_medal {
+  display: flex;
+}

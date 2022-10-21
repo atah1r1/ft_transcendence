@@ -46,9 +46,9 @@ const Profile = () => {
             <p>YHADARI</p>
           </div>
           <div className={styles.details_medals}>
-            <img src="/medal.png" width="12%"></img>
-            <img src="/medal.png" width="12%"></img>
-            <img src="/medal.png" width="12%"></img>
+            <img src="/medal.svg" width="12%"></img>
+            <img src="/medal.svg" width="12%"></img>
+            <img src="/medal.svg" width="12%"></img>
           </div>
         </div>
         <div className={styles.details_info}>
