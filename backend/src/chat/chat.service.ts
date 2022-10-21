@@ -84,20 +84,23 @@ export class ChatService {
 		room.members = room.members.filter((ru) => ru.user.id !== user.id);
 	}
 
-	banUserFromRoom(user: User, other: User, roomId: string) {
+	banUserFromRoom(userId: string, otherId: string, roomId: string, banned: boolean) {
 		const room: Room = this.chatProvider.getRoomByRoomId(roomId);
 		if (!room)
 			throw new Error('Room does not exist');
 
-		const _adminRoomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, user.id);
-		const _existingRoomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, other.id);
+		const _adminRoomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, userId);
+		const _existingRoomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, otherId);
 		if (!_adminRoomUser || !_existingRoomUser)
 			throw new Error('User not in room');
 
 		if (!_adminRoomUser.isAdmin)
 			throw new Error('You are not an admin');
 
-		this.chatProvider.updateRoomUser({ ..._existingRoomUser, isBanned: true });
+		if (_existingRoomUser.isBanned === banned)
+			throw new Error(`User is already${!banned ? ' not banned' : 'banned'}`);
+
+		this.chatProvider.updateRoomUser({ ..._existingRoomUser, isBanned: banned });
 	}
 
 	createDm(user: User, other: User): Room {
@@ -106,8 +109,8 @@ export class ChatService {
 			roomId: `dm_${user.id}_${other.id}`,
 			name: null,
 			image: null,
-			requiresPassword: false,
 			password: null,
+			requiresPassword: false,
 			isDm: true,
 			members: [],
 			createdAt: new Date(),
@@ -163,5 +166,28 @@ export class ChatService {
 				wasRead: _wasRead,
 			};
 		});
+	}
+
+	updateSeen(userId: string, roomId: string, seen: boolean) {
+		const _roomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, userId);
+		this.chatProvider.updateRoomUser({ ..._roomUser, hasRead: seen });
+	}
+
+	// Messages
+	getMessagesByRoomId(roomId: string): Message[] {
+		return this.chatProvider.getMessagesByRoomId(roomId);
+	}
+
+	createMessage(user: User, roomId: string, message: string): Message {
+		const _message: Message = {
+			id: `${this.chatProvider.mesCounter++}`,
+			room: this.chatProvider.getRoomByRoomId(roomId),
+			roomUser: this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, user.id),
+			message: message,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
+		this.chatProvider.createMessage(_message);
+		return _message;
 	}
 }
