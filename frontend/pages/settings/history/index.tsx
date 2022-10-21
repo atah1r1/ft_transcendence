@@ -11,17 +11,6 @@ import { useState } from "react";
 const History = () => {
   const [history, setHistory] = useState([
     {
-      avatar: "https://cdn.intra.42.fr/users/ehakam.jpeg",
-      numberGame: "5",
-      score: "1250",
-      points: "+15",
-      achievements: "/medal.svg",
-      victory: "10",
-      defeat: "2",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
       avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
       numberGame: "2",
       score: "1250",
@@ -99,13 +88,13 @@ const History = () => {
       time: "17:06PM 06/10/2022",
     },
     {
-      avatar: "https://cdn.intra.42.fr/users/ehakam.jpeg",
-      numberGame: "5",
+      avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
+      numberGame: "2",
       score: "1250",
-      points: "+15",
+      points: "-15",
       achievements: "/medal.svg",
-      victory: "10",
-      defeat: "2",
+      victory: "2",
+      defeat: "10",
       gameMode: "game Mode",
       time: "17:06PM 06/10/2022",
     },

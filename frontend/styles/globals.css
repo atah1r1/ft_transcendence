@@ -42,7 +42,7 @@ a {
   }
 }
 
-@media (max-width: 100em) {
+@media (max-width: 102em) {
   html {
     font-size: 46%;
   }

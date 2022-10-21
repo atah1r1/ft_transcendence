@@ -4,7 +4,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3.2rem;
+  padding: 2rem;
+  padding-bottom: 0;
 }
 
 .part_one {
@@ -19,7 +20,7 @@
 }
 
 .right {
-  font-size: 3.2rem;
+  font-size: 3.4rem;
   font-family: "Pixeboy";
   text-align: center;
 }
@@ -62,7 +63,7 @@
   display: flex;
   border-top: 1px solid #fff;
   gap: 3rem;
-  padding: 0.6rem 3rem;
+  padding: 0.6rem 3.8rem;
 }
 
 .avatar {
@@ -89,7 +90,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 6rem;
+  gap: 3rem;
 }
 
 .ach_text {
@@ -99,4 +100,8 @@
 
 .ach_medal {
   display: flex;
+}
+
+.ach_medal div:not(:last-child) {
+  margin-right: -12rem;
 }
