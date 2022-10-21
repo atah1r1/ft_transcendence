@@ -1,7 +1,7 @@
 import { RoomUser } from "./room-user.interface";
 
 export interface Room {
-	id: number;
+	id: string;
 	roomId: string;
 	name: string;
 	requiresPassword: boolean;

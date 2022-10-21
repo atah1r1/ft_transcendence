@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import { Room } from "./room.interface";
 
 export interface RoomUser {
-	id: number;
+	id: string;
 	room: Room;
 	user: User;
 	isAdmin: boolean;
