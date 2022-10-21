@@ -37,6 +37,11 @@ export class ChatFakeProvider {
     return this.messages.filter((m) => m.room.id === roomId);
   }
 
+  getLastMessageByRoomId(roomId: string): Message {
+    const messages = this.getMessagesByRoomId(roomId);
+    return messages.length > 0 ? messages[messages.length - 1] : null;
+  }
+
   getRoomMembersByRoomId(roomId: string): RoomUser[] {
     return this.roomUsers.filter((ru) => ru.room.id === roomId);
   }

@@ -5,6 +5,8 @@ import { RoomUser } from './models/room-user.interface';
 import { Room } from './models/room.interface';
 import { ChatFakeProvider } from './chat.fake-provider';
 import { User } from '@prisma/client';
+import { Chat } from './models/chat.interface';
+import { Message } from './models/message.interface';
 
 @Injectable()
 export class ChatService {
@@ -59,24 +61,107 @@ export class ChatService {
 			user: user,
 			isAdmin: false,
 			isBanned: false,
+			hasRead: true,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		};
 
 		this.chatProvider.createRoomUser(_roomUser);
 		room.members.push(_roomUser);
-
 	}
 
 	removeUserFromRoom(user: User, roomId: string) {
 		const room: Room = this.chatProvider.getRoomByRoomId(roomId);
-		if (!room) throw new Error('Room does not exist');
+		if (!room)
+			throw new Error('Room does not exist');
 
 		const _existingRoomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, user.id);
-		if (!_existingRoomUser) throw new Error('User not in room');
+		if (!_existingRoomUser)
+			throw new Error('User not in room');
 
 		// NOTE: should be done by Prisma
 		this.chatProvider.deleteRoomUser(_existingRoomUser);
 		room.members = room.members.filter((ru) => ru.user.id !== user.id);
+	}
+
+	banUserFromRoom(user: User, other: User, roomId: string) {
+		const room: Room = this.chatProvider.getRoomByRoomId(roomId);
+		if (!room)
+			throw new Error('Room does not exist');
+
+		const _adminRoomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, user.id);
+		const _existingRoomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, other.id);
+		if (!_adminRoomUser || !_existingRoomUser)
+			throw new Error('User not in room');
+
+		if (!_adminRoomUser.isAdmin)
+			throw new Error('You are not an admin');
+
+		this.chatProvider.updateRoomUser({ ..._existingRoomUser, isBanned: true });
+	}
+
+	createDm(user: User, other: User): Room {
+		const _room: Room = {
+			id: `${this.chatProvider.roCounter++}`,
+			roomId: `dm_${user.id}_${other.id}`,
+			name: null,
+			image: null,
+			requiresPassword: false,
+			password: null,
+			isDm: true,
+			members: [],
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
+		this.chatProvider.createRoom(_room);
+		this.addUserToRoom(user, _room.id);
+		this.addUserToRoom(other, _room.id);
+		return _room;
+	}
+
+	createRoom(user: User, name: string, image: string, requiresPassword: boolean, password: string): Room {
+		const _room: Room = {
+			id: `${this.chatProvider.roCounter++}`,
+			roomId: `room_${name}_${this.chatProvider.roCounter}`,
+			name: name,
+			image: image,
+			requiresPassword: requiresPassword,
+			password: password,
+			isDm: false,
+			members: [],
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
+		this.chatProvider.createRoom(_room);
+		this.addUserToRoom(user, _room.id);
+		return _room;
+	}
+
+	getRoomsByUserId(userId: string): Room[] {
+		return this.chatProvider.getRoomsByUserId(userId);
+	}
+
+	// Chats
+	getChatsByUserId(userId: string): Chat[] {
+		const _rooms: Room[] = this.getRoomsByUserId(userId);
+
+		return _rooms.map((room) => {
+			const _name: string = room.isDm
+				? room.members.find((ru) => ru.user.id !== userId).user.username
+				: room.name;
+			const _image: string = room.isDm
+				? room.members.find((ru) => ru.user.id !== userId).user.avatar
+				: room.image;
+			const _lastMessage: Message = this.chatProvider.getLastMessageByRoomId(room.id);
+			const _wasRead: boolean = this.chatProvider.getRoomUserByRoomIdAndUserId(room.id, userId).hasRead;
+
+			return {
+				room: room,
+				name: _name,
+				image: _image,
+				lastMessage: _lastMessage,
+				wasRead: _wasRead,
+			};
+		});
 	}
 }

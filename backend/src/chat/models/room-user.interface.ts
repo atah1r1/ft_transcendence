@@ -7,6 +7,7 @@ export interface RoomUser {
 	user: User;
 	isAdmin: boolean;
 	isBanned: boolean;
+	hasRead: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
