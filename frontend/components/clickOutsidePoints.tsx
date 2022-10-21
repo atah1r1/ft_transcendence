@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import styles from "../styles/chat.module.css";
 
-function useOutsideAlerter(ref: any, setTreePoints: any) {
+function useOutsideAlerter(ref: any, setTreePoints: any, setGroupBox: any) {
   useEffect(() => {
     /**
      * Alert if clicked on outside of element
      */
     function handleClickOutside(event: any) {
       if (ref.current && !ref.current.contains(event.target)) {
+        setGroupBox(false);
         setTreePoints(false);
-        // alert("cliked");
       }
     }
     // Bind the event listener
@@ -21,9 +20,13 @@ function useOutsideAlerter(ref: any, setTreePoints: any) {
   }, [ref]);
 }
 
-export default function ClickOutsidePoints({ setTreePoints, content }: any) {
+export default function ClickOutsidePoints({
+  setTreePoints,
+  setGroupBox,
+  content,
+}: any) {
   const wrapperRef = useRef(null);
-  useOutsideAlerter(wrapperRef, setTreePoints);
+  useOutsideAlerter(wrapperRef, setTreePoints, setGroupBox);
 
   return <div ref={wrapperRef}>{content}</div>;
 }
