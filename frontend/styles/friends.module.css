@@ -32,7 +32,7 @@
 .search input {
   width: inherit;
   height: 3.8rem;
-  border-radius: 2rem;
+  border-radius: 1.4rem;
   border: none;
   outline: none;
   padding: 1.6rem;
@@ -50,7 +50,7 @@
   width: 6.8rem;
   height: 6.8rem;
   border-radius: 50%;
-  border: 1.6px solid #fff;
+  border: 2px solid #d9d9d9;
 }
 
 .friends_avatar img {

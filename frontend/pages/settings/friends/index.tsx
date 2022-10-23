@@ -8,6 +8,8 @@ import Friends_box from "../../../components/friend_box";
 import { useState } from "react";
 
 const History = () => {
+  const [inputForm, setInputForm] = useState("");
+
   const [friends, setFriends] = useState([
     {
       avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
@@ -81,10 +83,21 @@ const History = () => {
             e.preventDefault();
           }}
         >
-          <input type="search" placeholder="Search..."></input>
+          <input
+            type="search"
+            placeholder="Search..."
+            onChange={(e) => {
+              setInputForm(e.target.value);
+            }}
+            value={inputForm}
+          ></input>
         </form>
         <div className={styles.friends}>
-          <Friends_box friends={friends}></Friends_box>
+          <Friends_box
+            friends={friends.filter((ele) => {
+              return ele.userName.toLowerCase().includes(inputForm);
+            })}
+          ></Friends_box>
         </div>
       </div>
     </div>

@@ -6,7 +6,6 @@
 .chat_left {
   width: 30%;
   height: 100%;
-  text-align: center;
   border-right: 2px solid rgba(255, 255, 255, 0.25);
   padding-right: 2rem;
 }
@@ -23,6 +22,7 @@
 .l_part_one {
   height: 15%;
 }
+
 .l_part_two {
   display: flex;
   flex-direction: column;
@@ -94,9 +94,9 @@
 
 .search input {
   width: 100%;
-  border-radius: 1.2rem;
+  border-radius: 1.4rem;
   border: none;
-  height: 3rem;
+  height: 3.8rem;
   outline: none;
   padding: 1.6rem;
   font-size: 1.4rem;
