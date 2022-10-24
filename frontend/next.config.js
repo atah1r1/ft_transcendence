@@ -7,18 +7,6 @@ const nextConfig = {
 module.exports = nextConfig;
 
 module.exports = {
-  async redirects() {
-    return [
-      {
-        source: "/settings",
-        destination: "/settings/profile",
-        permanent: true,
-      },
-    ];
-  },
-};
-
-module.exports = {
   images: {
     remotePatterns: [
       {

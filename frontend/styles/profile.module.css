@@ -22,8 +22,12 @@
 }
 
 .profile_box {
-  display: flex;
-  justify-content: center;
+  margin: 0 auto;
+  width: 18rem;
+  height: 18rem;
+  border: 3px solid #d9d9d9;
+  margin-bottom: 1.2rem;
+  border-radius: 50%;
 }
 
 .profile_box:hover .profile_slide {
@@ -52,13 +56,15 @@
 
 .details_avatar img {
   border-radius: 50%;
-  border: 2px solid #fff;
-  margin-bottom: 1.2rem;
-  width: 16.6rem;
 }
 
 .details_medals {
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.details_medals div:not(:last-child) {
+  margin-right: -4rem;
 }
 
 .details_info {

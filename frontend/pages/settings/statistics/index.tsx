@@ -51,7 +51,7 @@ const History = () => {
             <div className={styles.ach_medal}>
               <div>
                 <Image
-                  src="/medal.svg"
+                  src="/silver.svg"
                   alt="medal_img"
                   width="400%"
                   height="400%"
@@ -59,7 +59,7 @@ const History = () => {
               </div>
               <div>
                 <Image
-                  src="/medal.svg"
+                  src="/gold.svg"
                   alt="medal_img"
                   width="400%"
                   height="400%"
@@ -67,15 +67,7 @@ const History = () => {
               </div>
               <div>
                 <Image
-                  src="/medal.svg"
-                  alt="medal_img"
-                  width="400%"
-                  height="400%"
-                ></Image>
-              </div>
-              <div>
-                <Image
-                  src="/medal.svg"
+                  src="/bronze.svg"
                   alt="medal_img"
                   width="400%"
                   height="400%"
