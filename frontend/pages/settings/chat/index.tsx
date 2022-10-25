@@ -186,6 +186,28 @@ const Chat = () => {
   const [treePoints, setTreePoints] = useState(false);
   const [group_box, setGroupBox] = useState(false);
 
+
+  // logic for the tree points 
+
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: Event) => {
+    if (
+      wrapperRef.current &&
+      !wrapperRef.current.contains(event.target as Node)
+    ) {
+      setIsDropdownVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  });
+
   return (
     <div>
       {chat_room && (
@@ -298,15 +320,15 @@ const Chat = () => {
                   conversations={
                     searchInput
                       ? conversationsBox.filter((conv) => {
-                          if (conv.hasOwnProperty("group"))
-                            return conv.group_name
-                              ?.toLowerCase()
-                              .includes(searchInput);
-                          else
-                            return conv.fullName
-                              ?.toLowerCase()
-                              .includes(searchInput);
-                        })
+                        if (conv.hasOwnProperty("group"))
+                          return conv.group_name
+                            ?.toLowerCase()
+                            .includes(searchInput);
+                        else
+                          return conv.fullName
+                            ?.toLowerCase()
+                            .includes(searchInput);
+                      })
                       : conversationsBox
                   }
                   getSenderInfo={getSenderInfo}
@@ -390,68 +412,63 @@ const Chat = () => {
               </div>
             </div>
             <div className={styles.chat_right}>
-              <ClickOutsidePoints
-                setTreePoints={setTreePoints}
-                setGroupBox={setGroupBox}
-                content={
-                  treePoints && !currentConv.hasOwnProperty("group") ? (
-                    <TreePointsBox />
-                  ) : (
-                    treePoints &&
-                    currentConv.hasOwnProperty("group") && (
-                      <div>
-                        <div className={styles_tree_p.treepoints_box}>
-                          {currentConv.group_user?.map(
-                            (user: any, i: number) => {
-                              return (
-                                !user.hasOwnProperty("me") && (
-                                  <div
-                                    key={i}
-                                    className={styles_tree_p.treepoints_box_row}
-                                    onClick={() => {
-                                      setGroupBox(true);
-                                      set_g_b_i(i);
-                                    }}
-                                  >
-                                    <div
-                                      className={
-                                        styles_tree_p.treePoints_box_avatar
-                                      }
-                                    >
-                                      <Image
-                                        src={user.image}
-                                        alt="friend_avatar"
-                                        width={"40px"}
-                                        height={"40px"}
-                                        className={
-                                          styles_tree_p.treePoints_box_avatar
-                                        }
-                                      />
-                                    </div>
-                                    <p>{user.fullName}</p>
-                                    <Image
-                                      src="/settings_icon.svg"
-                                      alt="invete_player_icon"
-                                      width={"22px"}
-                                      height={"22px"}
-                                    />
-                                  </div>
-                                )
-                              );
-                            }
-                          )}
-                        </div>
-                        {group_box && (
-                          <TreePointsBox
-                            group_box={group_box}
-                            group_box_i={group_box_index}
-                          />
-                        )}
-                      </div>
-                    )
-                  )
-                }
-              />
+              {isDropdownVisible && !currentConv.hasOwnProperty("group") ?
+                <TreePointsBox />
+                :
+                isDropdownVisible &&
+                currentConv.hasOwnProperty("group") && (
+                  <div>
+                    <div className={styles_tree_p.treepoints_box}>
+                      {currentConv.group_user?.map(
+                        (user: any, i: number) => {
+                          return (
+                            !user.hasOwnProperty("me") && (
+                              <div
+                                key={i}
+                                className={styles_tree_p.treepoints_box_row}
+                                onClick={() => {
+                                  setGroupBox(true);
+                                  set_g_b_i(i);
+                                }}
+                              >
+                                <div
+                                  className={
+                                    styles_tree_p.treePoints_box_avatar
+                                  }
+                                >
+                                  <Image
+                                    src={user.image}
+                                    alt="friend_avatar"
+                                    width={"40px"}
+                                    height={"40px"}
+                                    className={
+                                      styles_tree_p.treePoints_box_avatar
+                                    }
+                                  />
+                                </div>
+                                <p>{user.fullName}</p>
+                                <Image
+                                  src="/settings_icon.svg"
+                                  alt="invete_player_icon"
+                                  width={"22px"}
+                                  height={"22px"}
+                                />
+                              </div>
+                            )
+                          );
+                        }
+                      )}
+                    </div>
+                    {group_box && (
+                      <TreePointsBox
+                        group_box={group_box}
+                        group_box_i={group_box_index}
+                      />
+                    )}
+                  </div>
+                )
+
+              }
               <div className={styles.conversation_head}>
                 <p
                   className={cn(
@@ -463,7 +480,8 @@ const Chat = () => {
                 </p>
                 <div
                   className={styles_tree_p.conversation_head_treepoints}
-                  onClick={() => setTreePoints(true)}
+                  // onClick={() => setTreePoints(!treePoints)}
+                  ref={wrapperRef} onClick={() => setIsDropdownVisible(true)}
                 >
                   ...
                 </div>

@@ -11,7 +11,7 @@ const TreePointsBox = ({ group_box, group_box_i }: any) => {
         group_box && styles.treepoints_box_group
       )}
       style={{
-        top: `calc(4.6rem + ${group_box_i * 4 + group_box_i * 1.6}rem)`,
+        top: `calc(4.6rem + ${group_box_i * 4 + group_box_i * 1.6}rem)`
       }}
     >
       <div className={styles.treepoints_box_row}>

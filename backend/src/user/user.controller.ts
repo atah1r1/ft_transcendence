@@ -15,6 +15,7 @@ export class UserController {
     @UseInterceptors(ClassSerializerInterceptor)
     @Get('me')
     async me(@Req() req: any): Promise<UserEntity> {
+        delete req.user.two_factor_auth_key;
         return new UserEntity(req.user);
     }
 
