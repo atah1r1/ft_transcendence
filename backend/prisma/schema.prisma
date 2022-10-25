@@ -21,13 +21,53 @@ model User {
   two_factor_auth     Boolean  @default(false)
   two_factor_auth_key String?  @db.VarChar(255)
   two_factor_auth_uri String?  @db.VarChar(255)
-  friend              Friend?
+  friends             User[]   @relation("Friends")
+  friendsRelations    User[]   @relation("Friends")
 }
 
-model Friend {
+model RoomUser {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
+  isAdmin   Boolean  @default(false)
+  isBanned  Boolean  @default(false)
+  hasRead   Boolean  @default(false)
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    String
+  messages  Message[]
 }
+
+model Room {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  name      String     @db.VarChar(50)
+  roomId    String     @default(uuid())
+  image     String?    @db.VarChar(255)
+  password  String?    @db.VarChar(255)
+  isDm      Boolean    @default(false)
+  members   RoomUser[]
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  message   String
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    String
+  roomUser  RoomUser @relation(fields: [roomUserId], references: [id])
+  roomUserId String
+}
+
+
+
+// export interface Message {
+// 	id: string;
+// 	room: Room;
+// 	roomUser: RoomUser;
+// 	message: string;
+// 	createdAt: Date;
+// 	updatedAt: Date;
+// }
