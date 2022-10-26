@@ -41,16 +41,17 @@ model RoomUser {
 }
 
 model Room {
-  id        String     @id @default(uuid())
-  roomId    String     @default(uuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  name      String     @db.VarChar(50)
-  image     String?    @db.VarChar(255)
-  password  String?    @db.VarChar(255)
-  isDm      Boolean    @default(false)
-  members   RoomUser[]
-  messages  Message[]
+  id                 String     @id @default(uuid())
+  roomId             String     @default(uuid())
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  name               String     @db.VarChar(50)
+  image              String?    @db.VarChar(255)
+  password           String?    @db.VarChar(255)
+  isPasswordRequired Boolean    @default(false)
+  isDm               Boolean    @default(false)
+  members            RoomUser[]
+  messages           Message[]
 }
 
 model Message {

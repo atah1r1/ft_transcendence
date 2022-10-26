@@ -1,23 +1,35 @@
-import { User } from '@prisma/client';
-import { Message } from './models/message.interface';
-import { RoomUser } from './models/room-user.interface';
-import { Room } from './models/room.interface';
+/* eslint-disable prettier/prettier */
+import { User, Room, RoomUser, Message } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+// import { Message } from './models/message.interface';
+// import { RoomUser } from './models/room-user.interface';
+// import { Room } from './models/room.interface';
 
 export class ChatFakeProvider {
+  constructor(private prisma: PrismaService) { }
   // NOTE: Temporary
-  ruCounter = 0;
-  mesCounter = 0;
-  roCounter = 0;
+  // ruCounter = 0;
+  // mesCounter = 0;
+  // roCounter = 0;
 
-  // NOTE: SHOULD BE SAVED IN DB
-  users: User[] = [];
-  messages: Message[] = [];
-  rooms: Room[] = [];
-  roomUsers: RoomUser[] = [];
+  // // NOTE: SHOULD BE SAVED IN DB
+  // users: User[] = [];
+  // messages: Message[] = [];
+  // rooms: Room[] = [];
+  // roomUsers: RoomUser[] = [];
 
   // CREATE
-  createMessage(message: Message) {
-    this.messages.push(message);
+  async createMessage(message: any) {
+    this.prisma.message.create({
+      data: {
+        ...message,
+        room: {
+          create: {
+            
+          }
+        },
+      },
+    });
   }
 
   createRoom(room: Room) {
