@@ -23,7 +23,7 @@ export class AuthService {
                 first_name: name['givenName'],
                 last_name: name['familyName'],
                 avatar: photos[0]['value'],
-                two_factor_auth_key: authenticator.generateSecret()
+                two_factor_auth_key: authenticator.generateSecret(),
             },
         });
         return this.SignToken(user_created.id);
@@ -33,6 +33,12 @@ export class AuthService {
         const payload = { id: id };
         return this.jwt.signAsync(payload, {
             expiresIn: '3d',
+            secret: process.env.JWT_SECRET,
+        });
+    }
+
+    async verifyToken(token: string) {
+        return this.jwt.verifyAsync(token, {
             secret: process.env.JWT_SECRET,
         });
     }

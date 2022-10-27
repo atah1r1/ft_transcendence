@@ -1,0 +1,31 @@
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  gap: 7rem;
+  /* padding: 26rem 0; */
+  align-items: center;
+}
+
+.profile_setting,
+.profile_details {
+  height: 75rem;
+  background-color: rgba(255, 255, 255, 0.26);
+  border-radius: 2.6rem;
+  backdrop-filter: blur(2.6rem);
+}
+
+.profile_setting {
+  width: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4.2rem;
+}
+
+.profile_details {
+  width: 106rem;
+  padding: 2.6rem;
+  color: #fff;
+}

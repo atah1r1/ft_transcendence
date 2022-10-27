@@ -1,9 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+
+@font-face {
+  font-family: Pixeboy;
+  src: url("../public/Pixeboy.ttf");
+}
+
 html,
 body {
-  padding: 0;
-  margin: 0;
+  font-size: 62.5%;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+body {
+  background-size: cover;
+  background-image: url("../public/Background_Layout.png");
+  background-color: rgba(0, 0, 0, 0.8);
+  background-attachment: fixed;
 }
 
 a {
@@ -12,15 +25,202 @@ a {
 }
 
 * {
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (max-height: 20rem) {
   html {
-    color-scheme: dark;
+    font-size: 48%;
   }
-  body {
-    color: white;
-    background: black;
+}
+
+@media (max-width: 75em) {
+  html {
+    font-size: 50%;
+  }
+}
+@media (max-width: 60em) {
+  html {
+    font-size: 40%;
+  }
+}
+
+/* Loading css */
+
+.spinner {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.spinner .ball-container {
+  width: 40px;
+  transform: translate(130px, -140px);
+}
+
+.spinner .ball {
+  width: 40px;
+  transform-origin: bottom;
+  animation: bounce 500ms infinite alternate cubic-bezier(0.35, 0.5, 0.65, 0.5);
+}
+
+.spinner .ball circle {
+  fill: #fff;
+}
+
+.spinner .raquet {
+  transform-origin: bottom;
+  width: 85px;
+  height: 142px;
+}
+
+.spinner .raquet #sor-1 {
+  fill: rgba(0, 0, 0, 0.2);
+  animation: shadow 500ms infinite 500ms alternate
+    cubic-bezier(0.35, 0.5, 0.65, 0.5);
+}
+
+.spinner .raquet #sor-2 {
+  fill: rgba(0, 0, 0, 0.2);
+  animation: shadow 500ms infinite alternate cubic-bezier(0.35, 0.5, 0.65, 0.5);
+}
+
+.spinner .raquet#r-1 {
+  transform: translateX(70px) rotateZ(45deg);
+  animation: hit-1 1000ms infinite 300ms ease-in-out;
+}
+
+.spinner .raquet#r-2 {
+  transform: translateX(-70px) rotateZ(-45deg);
+  animation: hit-2 1000ms infinite -200ms ease-in-out;
+}
+
+.spinner .raquet .front {
+  fill: #222;
+}
+
+.spinner .raquet .middle {
+  fill: #070;
+}
+
+.spinner .raquet .back {
+  fill: #d00;
+}
+
+.spinner .raquet .handle.outer {
+  fill: #a8712a;
+}
+
+.spinner .raquet .handle.inner {
+  fill: #e0973e;
+}
+
+.spinner .shadow {
+  transform: translateY(-150px);
+  -webkit-filter: blur(2px);
+}
+
+.spinner .shadow ellipse {
+  fill: rgba(0, 0, 0, 0.1);
+}
+
+.spinner .shadow #sr-1,
+.spinner .shadow #sr-2,
+.spinner .shadow #sb {
+  transform-origin: center;
+}
+
+.spinner .shadow #sr-1 {
+  animation: grow 1000ms infinite -200ms ease-in-out;
+}
+
+.spinner .shadow #sr-2 {
+  animation: grow 1000ms infinite 300ms ease-in-out;
+}
+
+.spinner .shadow #sb {
+  animation: swing 500ms infinite alternate cubic-bezier(0.35, 0.5, 0.65, 0.5);
+}
+
+@keyframes bounce {
+  0% {
+    transform: rotateZ(45deg);
+  }
+
+  100% {
+    transform: rotateZ(-45deg);
+  }
+}
+
+@keyframes swing {
+  0% {
+    opacity: 0;
+    transform: translateX(70px) scale(1.2);
+  }
+
+  25%,
+  75% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(0px) scale(0.9);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-70px) scale(1.2);
+  }
+}
+
+@keyframes hit-1 {
+  0%,
+  50%,
+  100% {
+    transform: translate(70px, 3px) rotateZ(45deg);
+  }
+
+  75% {
+    transform: translate(69px, -2px) rotateZ(42deg);
+  }
+}
+
+@keyframes hit-2 {
+  0%,
+  50%,
+  100% {
+    transform: translate(-70px, 3px) rotateZ(-45deg);
+  }
+
+  75% {
+    transform: translate(-69px, -2px) rotateZ(-42deg);
+  }
+}
+
+@keyframes grow {
+  0%,
+  50%,
+  100% {
+    transform: scale(1);
+  }
+
+  75% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes shadow {
+  0%,
+  40% {
+    transform: translate(25px, 200px) scale(0.5);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
   }
 }

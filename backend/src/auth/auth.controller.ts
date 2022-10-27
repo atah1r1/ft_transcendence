@@ -18,6 +18,7 @@ export class AuthController {
         // }
         const jwt = await this.AuthService.Login(username, name, photos);
         res.cookie('jwt', jwt);
+        // return res.redirect('http://localhost:3000/settings/profile');
         return { jwt };
     }
 
