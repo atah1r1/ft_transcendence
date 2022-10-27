@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { config } from 'dotenv';
 import { authenticator } from 'otplib';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -54,6 +55,14 @@ export class UserService {
             where: { id: user.id },
             data,
         });
+    }
+
+    async getUserById(id: string): Promise<User> {
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (user) {
+            return user;
+        }
+        return null;
     }
 
 }

@@ -13,25 +13,25 @@ services:
             - POSTGRES_USER=admin
             - POSTGRES_PASSWORD=admin
         ports:
-            - 5432:5432
+            - 5555:5432
         networks:
             - back-network
-    api:
-        build:
-            context: .
-            dockerfile: ./deployments/backend/Dockerfile
-            target: development
-        depends_on:
-            - backendDB
-        volumes:
-            - .:/app
-        env_file:
-            - ./backend/.env
-        command: npm run start:dev
-        ports:
-            - 9000:9000
-        networks:
-            - back-network
+    # api:
+    #     build:
+    #         context: .
+    #         dockerfile: ./deployments/backend/Dockerfile
+    #         target: development
+    #     depends_on:
+    #         - backendDB
+    #     volumes:
+    #         - .:/app
+    #     env_file:
+    #         - ./backend/.env
+    #     command: npm run start:dev
+    #     ports:
+    #         - 9000:9000
+    #     networks:
+    #         - back-network
 
 volumes:
     database: {}
