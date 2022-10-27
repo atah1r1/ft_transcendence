@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-// import { ChatFakeProvider } from './chat.fake-provider';
 import { User, Room, RoomUser, Message } from '@prisma/client';
 import { Chat } from './models/chat.interface';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatService {
@@ -40,137 +40,232 @@ export class ChatService {
     }
   }
 
-  // Rooms/RoomUsers
-  addUserToRoom(user: User, roomId: string, password?: string) {
-    // const room: Room = this.chatProvider.getRoomByRoomId(roomId);
-    if (!room) throw new Error('Room does not exist');
 
-    const _existingRoomUser: RoomUser = room.members.find(
-      (ru) => ru.user.id === user.id,
-    );
+  // Rooms
+  async createDm(userId: string, otherUserId: string): Promise<Room> {
+    const _room = await this.prisma.room.create({
+      data: {
+        name: null,
+        image: null,
+        password: null,
+        isPasswordRequired: false,
+        isDm: true,
+      }
+    });
+
+    this.addUserToRoom(userId, _room.id, null, true);
+    this.addUserToRoom(otherUserId, _room.id, null, true);
+
+    return _room;
+  }
+
+  async createRoom(creatorId: string, name: string, image: string, isPasswordRequired: boolean, password: string): Promise<Room> {
+
+    let _hashed: string = null;
+
+    if (isPasswordRequired) {
+      _hashed = await this.encryptRoomPassword(password);
+    }
+
+    const _room = await this.prisma.room.create({
+      data: {
+        name: name,
+        image: image,
+        isPasswordRequired: isPasswordRequired,
+        password: _hashed,
+        isDm: false,
+      },
+    });
+
+    this.addUserToRoom(creatorId, _room.id, password, true);
+
+    return _room;
+  }
+
+  async getRoomsByUserId(userId: string): Promise<Room[]> {
+    const _rooms = await this.prisma.room.findMany({
+      where: {
+        members: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    });
+
+    return _rooms;
+  }
+
+  async encryptRoomPassword(password: string): Promise<string> {
+    const _saltRounds = 10;
+    const _hashed = await bcrypt.hash(password, _saltRounds);
+    return _hashed;
+  }
+
+  async validateRoomPassword(password: string, hashed: string): Promise<boolean> {
+    const _isValid = await bcrypt.compare(password, hashed);
+    return _isValid;
+  }
+
+  // Rooms/RoomUsers
+  private async addUserToRoom(userId: string, roomId: string, password?: string, isAdmin: boolean = false): Promise<RoomUser> {
+    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    if (!_room) throw new Error('Room does not exist');
+
+    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
     if (_existingRoomUser) throw new Error('User already in room');
 
-    if (!room.isPasswordRequired && room.password !== password)
+    if (_room.isPasswordRequired && this.validateRoomPassword(password, _room.password))
       throw new Error('Incorrect room password');
 
-    // NOTE: should be done by Prisma
-    const _roomUser: RoomUser = {
-      room: room,
-      user: user,
-      isAdmin: false,
-      isBanned: false,
-      hasRead: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const _roomUser = await this.prisma.roomUser.create({
+      data: {
+        isAdmin: isAdmin,
+        isBanned: false,
+        hasRead: true,
+        roomId: roomId,
+        userId: userId,
+      }
+    });
 
-    //this.chatProvider.createRoomUser(_roomUser);
-    room.members.push(_roomUser);
+    return _roomUser;
   }
 
-  removeUserFromRoom(user: User, roomId: string) {
-    //const room: Room = this.chatProvider.getRoomByRoomId(roomId);
-    if (!room) throw new Error('Room does not exist');
+  async addUserToRoomByAdmin(adminId: string, userToAddId: string, roomId: string, password?: string, isAdmin: boolean = false): Promise<RoomUser> {
+    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    if (!_room) throw new Error('Room does not exist');
 
-    const _existingRoomUser: RoomUser =
-      //this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, user.id);
+    const _adminRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(adminId, roomId);
+    if (!_adminRoomUser) throw new Error('User not in room');
+    if (!_adminRoomUser.isAdmin) throw new Error('You are not an admin');
+
+    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(userToAddId, roomId);
+    if (_existingRoomUser) throw new Error('User already in room');
+
+    if (_room.isPasswordRequired && this.validateRoomPassword(password, _room.password))
+      throw new Error('Incorrect room password');
+
+    const _roomUser = await this.prisma.roomUser.create({
+      data: {
+        isAdmin: isAdmin,
+        isBanned: false,
+        hasRead: true,
+        roomId: roomId,
+        userId: userToAddId,
+      }
+    });
+
+    return _roomUser;
+  }
+
+  async removeUserFromRoom(adminId: string, userToRemoveId: string, roomId: string): Promise<boolean> {
+    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    if (!_room) throw new Error('Room does not exist');
+
+    const _adminRoomUser = await this.getRoomUserByUserIdAndRoomId(adminId, roomId);
+    if (!_adminRoomUser) throw new Error('User not in room');
+    if (!_adminRoomUser.isAdmin) throw new Error('You are not an admin');
+
+    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(userToRemoveId, roomId);
     if (!_existingRoomUser) throw new Error('User not in room');
 
-    // NOTE: should be done by Prisma
-    //this.chatProvider.deleteRoomUser(_existingRoomUser);
-    room.members = room.members.filter((ru) => ru.user.id !== user.id);
+    if (_room.isDm) throw new Error('Cannot leave DM');
+
+    const _deletedRu = await this.prisma.roomUser.delete({
+      where: {
+        userId: userToRemoveId,
+      }
+    });
+
+    return _deletedRu ? true : false;
   }
 
-  banUserFromRoom(
-    userId: string,
-    otherId: string,
-    roomId: string,
-    banned: boolean,
-  ) {
-    //const room: Room = this.chatProvider.getRoomByRoomId(roomId);
-    if (!room) throw new Error('Room does not exist');
+  async banUserFromRoom(adminId: string, bannedUserId: string, roomId: string, ban: boolean) {
+    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    if (!_room) throw new Error('Room does not exist');
 
-    // const _adminRoomUser: RoomUser =
-    //   this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, userId);
-    // const _existingRoomUser: RoomUser =
-    //   this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, otherId);
-    if (!_adminRoomUser || !_existingRoomUser)
-      throw new Error('User not in room');
+    const _adminRoomUser = await this.getRoomUserByUserIdAndRoomId(adminId, roomId);
+    if (!_adminRoomUser) throw new Error('You are not in room');
+    if (!_adminRoomUser.isAdmin) throw new Error('You are not an admin');
+
+    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(bannedUserId, roomId);
+    if (!_existingRoomUser) throw new Error('User not in room');
 
     if (!_adminRoomUser.isAdmin) throw new Error('You are not an admin');
 
-    if (_existingRoomUser.isBanned === banned)
-      throw new Error(`User is already${!banned ? ' not banned' : 'banned'}`);
+    if (_existingRoomUser.isBanned === ban)
+      throw new Error(`User is already${!ban ? ' not banned' : 'banned'}`);
 
-    // this.chatProvider.updateRoomUser({
-    //   ..._existingRoomUser,
-    //   isBanned: banned,
-    // });
+    this.prisma.roomUser.update({
+      where: {
+        userId: bannedUserId,
+      },
+      data: {
+        isBanned: ban,
+      },
+    });
   }
 
-  createDm(user: User, other: User): Room {
-    const _room: Room = {
-      roomId: `dm_${user.id}_${other.id}`,
-      name: null,
-      image: null,
-      password: null,
-      isPasswordRequired: false,
-      isDm: true,
-      members: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    // this.chatProvider.createRoom(_room);
-    this.addUserToRoom(user, _room.id);
-    this.addUserToRoom(other, _room.id);
-    return _room;
+  async getRoomUsersByRoomId(roomId: string, includeUser?: boolean, includeRoom?: boolean): Promise<any[]> {
+    const _roomUsers = await this.prisma.roomUser.findMany({
+      where: {
+        roomId: roomId,
+      },
+      include: {
+        user: includeUser,
+        room: includeRoom,
+      }
+    });
+    return _roomUsers;
   }
 
-  createRoom(
-    user: User,
-    name: string,
-    image: string,
-    isPasswordRequired: boolean,
-    password: string,
-  ): Room {
-    const _room: Room = {
-      //roomId: `room_${name}_${this.chatProvider.roCounter}`,
-      name: name,
-      image: image,
-      isPasswordRequired: isPasswordRequired,
-      password: password,
-      isDm: false,
-      members: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    //this.chatProvider.createRoom(_room);
-    this.addUserToRoom(user, _room.id);
-    return _room;
+  async getRoomUsersByUserId(userId: string, includeUser?: boolean, includeRoom?: boolean): Promise<any[]> {
+    const _roomUsers = await this.prisma.roomUser.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        user: includeUser,
+        room: includeRoom,
+      }
+    });
+    return _roomUsers;
   }
 
-  getRoomsByUserId(userId: string): Room[] {
-    //return this.chatProvider.getRoomsByUserId(userId);
+  async getRoomUserByUserIdAndRoomId(userId: string, roomId: string, includeUser?: boolean, includeRoom?: boolean): Promise<any> {
+    const _roomUser = await this.prisma.roomUser.findUnique({
+      where: {
+        userId: userId,
+        roomId: roomId,
+      },
+      include: {
+        user: includeUser,
+        room: includeRoom,
+      }
+    });
+    return _roomUser;
   }
 
   // Chats
-  getChatsByUserId(userId: string): Chat[] {
-    const _rooms: Room[] = this.getRoomsByUserId(userId);
+  async getChatsByUserId(userId: string): Promise<any[]> {
+    const _rooms: Room[] = await this.getRoomsByUserId(userId);
 
-    return _rooms.map((room) => {
-      const _name: string = room.isDm
-        ? room.members.find((ru) => ru.user.id !== userId).user.username
-        : room.name;
-      const _image: string = room.isDm
-        ? room.members.find((ru) => ru.user.id !== userId).user.avatar
-        : room.image;
-      // const _lastMessage: Message = this.chatProvider.getLastMessageByRoomId(
-      //   room.id,
-      // );
-      // const _wasRead: boolean = this.chatProvider.getRoomUserByRoomIdAndUserId(
-      //   room.id,
-      //   userId,
-      // ).hasRead;
+    return _rooms.map(async (room) => {
+      let _name: string = null;
+      let _image: string = null;
+
+      if (room.isDm) {
+        const _roomUsers = await this.getRoomUsersByRoomId(room.id, true, false);
+        _name = _roomUsers.find((ru) => ru.userId !== userId).user.username;
+      }
+
+      if (room.isDm) {
+        const _roomUsers = await this.getRoomUsersByRoomId(room.id, true, false);
+        _image = _roomUsers.find((ru) => ru.userId !== userId).user.avatar;
+      }
+
+      const _lastMessage: any = this.getLastMessageByRoomId(room.id);
+      const _wasRead: boolean = (await this.getRoomUserByUserIdAndRoomId(userId, room.id)).hasRead;
 
       return {
         room: room,
@@ -182,28 +277,60 @@ export class ChatService {
     });
   }
 
-  updateSeen(userId: string, roomId: string, seen: boolean) {
-    //const _roomUser: RoomUser = this.chatProvider.getRoomUserByRoomIdAndUserId(
-    //   roomId,
-    //   userId,
-    // );
-    // this.chatProvider.updateRoomUser({ ..._roomUser, hasRead: seen });
+  async updateSeen(userId: string, roomId: string, seen: boolean) {
+    await this.prisma.roomUser.update({
+      where: {
+        userId: userId,
+        roomId: roomId,
+      },
+      data: {
+        hasRead: seen,
+      },
+    });
   }
 
   // Messages
-  getMessagesByRoomId(roomId: string): Message[] {
-    //return this.chatProvider.getMessagesByRoomId(roomId);
-  }
+  async createMessage(roomUserId: string, roomId: string, message: string): Promise<Message> {
+    const _message: Message = await this.prisma.message.create({
+      data: {
+        message: message,
+        roomUserId: roomUserId,
+        roomId: roomId,
+      }
+    });
 
-  createMessage(user: User, roomId: string, message: string): Message {
-    const _message: Message = {
-      // room: this.chatProvider.getRoomByRoomId(roomId),
-      // roomUser: this.chatProvider.getRoomUserByRoomIdAndUserId(roomId, user.id),
-      message: message,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    //this.chatProvider.createMessage(_message);
     return _message;
   }
+
+  async getMessagesByRoomId(roomId: string, includeRoomUser?: boolean, includeRoom?: boolean): Promise<any[]> {
+    return await this.prisma.message.findMany({
+      where: {
+        roomId: roomId,
+      },
+      include: {
+        roomUser: includeRoomUser,
+        room: includeRoom,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+  }
+
+  async getLastMessageByRoomId(roomId: string, includeRoomUser?: boolean, includeRoom?: boolean): Promise<any> {
+    return await this.prisma.message.findFirst({
+      where: {
+        roomId: roomId,
+      },
+      include: {
+        roomUser: includeRoomUser,
+        room: includeRoom,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  
 }
