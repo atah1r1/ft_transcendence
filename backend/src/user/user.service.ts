@@ -77,5 +77,4 @@ export class UserService {
         });
         return friends;
     }
-
 }

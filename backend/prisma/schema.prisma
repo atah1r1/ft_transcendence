@@ -36,7 +36,7 @@ model RoomUser {
   room      Room      @relation(fields: [roomId], references: [id])
   roomId    String    @unique
   user      User      @relation(fields: [userId], references: [id])
-  userId    String    @unique
+  userId    String
   messages  Message[]
 }
 
