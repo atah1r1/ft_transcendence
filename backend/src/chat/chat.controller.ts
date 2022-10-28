@@ -22,7 +22,7 @@ export class ChatController {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
+ 
   @Get('messages/:roomId')
   async getMessages(@Req() req: any) {
     try {

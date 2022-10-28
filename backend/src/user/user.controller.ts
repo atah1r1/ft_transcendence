@@ -85,7 +85,6 @@ export class UserController {
     async getUser(@Param('id') id: string): Promise<User> {
         const user = await this.UserService.getUserById(id);
         if (user) {
-            delete user.two_factor_auth_key;
             return user;
         }
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);

@@ -104,6 +104,11 @@ export class ChatService {
     return _rooms;
   }
 
+  async getRoomById(roomId: string): Promise<Room> {
+    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    return _room;
+  }
+
   private async encryptRoomPassword(password: string): Promise<string> {
     const _saltRounds = 10;
     const _hashed = await bcrypt.hash(password, _saltRounds);
@@ -220,7 +225,8 @@ export class ChatService {
 
     const _deletedRu = await this.prisma.roomUser.delete({
       where: {
-        userId: userToRemoveId,
+        id: _existingRoomUser.id,
+        roomId: roomId,
       },
     });
 
@@ -256,7 +262,8 @@ export class ChatService {
 
     this.prisma.roomUser.update({
       where: {
-        userId: bannedUserId,
+        id: _existingRoomUser.id,
+        roomId: roomId,
       },
       data: {
         isBanned: ban,
@@ -266,8 +273,8 @@ export class ChatService {
 
   async getRoomUsersByRoomId(
     roomId: string,
-    includeUser?: boolean,
-    includeRoom?: boolean,
+    includeUser: boolean = false,
+    includeRoom: boolean = false,
   ): Promise<any[]> {
     const _roomUsers = await this.prisma.roomUser.findMany({
       where: {
@@ -283,8 +290,8 @@ export class ChatService {
 
   async getRoomUsersByUserId(
     userId: string,
-    includeUser?: boolean,
-    includeRoom?: boolean,
+    includeUser: boolean = false,
+    includeRoom: boolean = false,
   ): Promise<any[]> {
     const _roomUsers = await this.prisma.roomUser.findMany({
       where: {
@@ -301,10 +308,10 @@ export class ChatService {
   async getRoomUserByUserIdAndRoomId(
     userId: string,
     roomId: string,
-    includeUser?: boolean,
-    includeRoom?: boolean,
+    includeUser: boolean = false,
+    includeRoom: boolean = false,
   ): Promise<any> {
-    const _roomUser = await this.prisma.roomUser.findUnique({
+    const _roomUser = await this.prisma.roomUser.findFirst({
       where: {
         userId: userId,
         roomId: roomId,
@@ -321,7 +328,7 @@ export class ChatService {
   async getChatsByUserId(userId: string): Promise<any[]> {
     const _rooms: Room[] = await this.getRoomsByUserId(userId);
 
-    return _rooms.map(async (room) => {
+    const _chats = _rooms.map(async (room) => {
       let _name: string = null;
       let _image: string = null;
 
@@ -332,36 +339,41 @@ export class ChatService {
           false,
         );
         _name = _roomUsers.find((ru) => ru.userId !== userId).user.username;
-      }
-
-      if (room.isDm) {
-        const _roomUsers = await this.getRoomUsersByRoomId(
-          room.id,
-          true,
-          false,
-        );
         _image = _roomUsers.find((ru) => ru.userId !== userId).user.avatar;
+      } else {
+        _name = room.name;
+        _image = room.image;
       }
 
-      const _lastMessage: any = this.getLastMessageByRoomId(room.id);
-      const _wasRead: boolean = (
-        await this.getRoomUserByUserIdAndRoomId(userId, room.id)
-      ).hasRead;
+      const _lastMessage: any = await this.getLastMessageByRoomId(room.id);
+      const _wasRead: boolean = (await this.getRoomUserByUserIdAndRoomId(userId, room.id)).hasRead;
 
       return {
-        room: room,
+        roomId: room.id,
         name: _name,
         image: _image,
         lastMessage: _lastMessage,
         wasRead: _wasRead,
       };
     });
+
+    const _sortedChats = (await Promise.all(_chats)).sort(
+      (a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt,
+    );
+    return _sortedChats;
   }
 
   async updateSeen(userId: string, roomId: string, seen: boolean) {
+    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
+      userId,
+      roomId,
+    );
+    if (!_existingRoomUser) throw new Error('User not in room');
+    if (_existingRoomUser.userId !== userId) throw new Error('You don\'t have permission');
+
     await this.prisma.roomUser.update({
       where: {
-        userId: userId,
+        id: _existingRoomUser.id,
         roomId: roomId,
       },
       data: {
@@ -389,9 +401,13 @@ export class ChatService {
 
   async getMessagesByRoomId(
     roomId: string,
-    includeRoomUser?: boolean,
-    includeRoom?: boolean,
+    includeRoomUser: boolean = false,
+    includeRoom: boolean = false,
   ): Promise<any[]> {
+
+    const room = await this.getRoomById(roomId);
+    if (!room) throw new Error('Room does not exist');
+
     return await this.prisma.message.findMany({
       where: {
         roomId: roomId,
@@ -408,8 +424,8 @@ export class ChatService {
 
   private async getLastMessageByRoomId(
     roomId: string,
-    includeRoomUser?: boolean,
-    includeRoom?: boolean,
+    includeRoomUser: boolean = false,
+    includeRoom: boolean = false,
   ): Promise<any> {
     return await this.prisma.message.findFirst({
       where: {
