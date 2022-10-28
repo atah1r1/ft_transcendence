@@ -60,9 +60,21 @@ export class UserService {
     async getUserById(id: string): Promise<User> {
         const user = await this.prisma.user.findUnique({ where: { id } });
         if (user) {
+            delete user.two_factor_auth_key;
             return user;
         }
         return null;
+    }
+
+    async getFriends(id: string) {
+        const friends = await this.prisma.user.findUnique(
+            { where: { id }, include: { friends: true } }
+        ).friends().then(friends => {
+            return friends.map(friend => {
+                delete friend.two_factor_auth_key;
+            })
+        });
+        return friends;
     }
 
 }
