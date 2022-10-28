@@ -72,6 +72,7 @@ export class UserService {
         ).friends().then(friends => {
             return friends.map(friend => {
                 delete friend.two_factor_auth_key;
+                return friend;
             })
         });
         return friends;
