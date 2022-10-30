@@ -77,4 +77,25 @@ export class UserService {
         });
         return friends;
     }
+
+    async searchUser(username: string) {
+        const users = await this.prisma.user.findMany({
+            where: {
+                username: {
+                    contains: username,
+                    mode: 'insensitive',
+                }
+            }
+        });
+        return users;
+    }
+
+    async getAllUsers() {
+        const users = await this.prisma.user.findMany();
+        users.map(user => {
+            delete user.two_factor_auth_key;
+            return user;
+        })
+        return users;
+    }
 }

@@ -81,7 +81,7 @@ export class UserController {
     }
 
     // get friends by id
-    @Get('/friends')
+    @Get('friends')
     async getFriends(@Req() req: any): Promise<User[]> {
         try {
             console.log(req.user);
@@ -93,8 +93,29 @@ export class UserController {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
     }
+    
+    // get All users
+    @Get('all')
+    async getAllUsers(): Promise<User[]> {
+        const users = await this.userService.getAllUsers();
+        if (users) {
+            return users;
+        }
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
 
-    // get user by id
+    
+    // search user by username
+    @Get('/search/:username')
+    async searchUser(@Param('username') username: string): Promise<User[]> {
+        const users = await this.userService.searchUser(username);
+        if (users) {
+            return users;
+        }
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    
+    // get user by id ``` keep this the last route ```
     @Get('/:id')
     async getUser(@Param('id') id: string): Promise<User> {
         const user = await this.userService.getUserById(id);
@@ -103,5 +124,4 @@ export class UserController {
         }
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
 }
