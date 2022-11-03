@@ -9,10 +9,22 @@ import { AuthService } from './auth/auth.service';
 import { PrismaService } from './prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
+import { ChatService } from './chat/chat.service';
+import { ChatGateway } from './chat/chat.gateway';
+import { ChatController } from './chat/chat.controller';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [UserModule, AuthModule],
-  controllers: [UserController, AuthController],
-  providers: [UserService, AuthService, PrismaService, JwtService, CloudinaryService],
+  imports: [UserModule, AuthModule, ChatModule],
+  controllers: [UserController, AuthController, ChatController],
+  providers: [
+    UserService,
+    AuthService,
+    PrismaService,
+    JwtService,
+    CloudinaryService,
+    ChatService,
+    ChatGateway,
+  ],
 })
-export class AppModule { }
+export class AppModule {}

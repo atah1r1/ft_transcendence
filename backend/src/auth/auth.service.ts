@@ -23,7 +23,7 @@ export class AuthService {
                 first_name: name['givenName'],
                 last_name: name['familyName'],
                 avatar: photos[0]['value'],
-                two_factor_auth_key: authenticator.generateSecret()
+                two_factor_auth_key: authenticator.generateSecret(),
             },
         });
         return this.SignToken(user_created.id);
