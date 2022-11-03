@@ -14,6 +14,7 @@ import { RoomUser } from './models/room-user.interface';
 
 const EV_CHAT_LIST = 'chat_list';
 const EV_MESSAGE = 'message';
+const EV_ONLINE_FRIENDS = 'online_friends';
 
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -32,10 +33,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  private async sendChats(client: Socket) {
-    // Send the user the list of chats.
+  private async sendChatsToClient(client: Socket) {
+    // Send the list of chats to user.
     const chats = await this.chatService.getChatsByUserId(client.data.id);
     client.emit(EV_CHAT_LIST, chats);
+  }
+
+  private async sendChatsToRoomMembers(roomId: string) {
+    // Send the list of chats to all users in roomId.
+    const memebers: any[] = await this.chatService.getRoomUsersByRoomId(roomId);
+    memebers.forEach((member) => {
+      const socketIds = this.chatService.getConnectedUserById(member.userId);
+      if (!socketIds || socketIds.length === 0) return;
+
+      const chats = this.chatService.getChatsByUserId(member.userId);
+
+      socketIds.forEach((socketId) => {
+        this.server.to(socketId).emit(EV_CHAT_LIST, chats);
+      });
+    });
+  }
+
+  private async sendOnlineFriendsOfUserId(userId: string) {
+    const friends = this.chatService.getConnectedFriends(client.data.id);
+    client.emit(EV_ONLINE_FRIENDS, friends);
+  }
+
+  private async sendOnlineFriendsToClient(client: Socket) {
+    const friends = this.chatService.getConnectedFriends(client.data.id);
+    client.emit(EV_ONLINE_FRIENDS, friends);
   }
 
   private async verifyAndSave(client: Socket) {
@@ -64,7 +90,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Add user to connectedUsers map.
       this.chatService.addConnectedUser(client.data.id, client.id);
       this.joinRooms(client);
-      this.sendChats(client);
+      this.sendChatsToClient(client);
     } catch (err) {
       client.disconnect();
     }
@@ -79,7 +105,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.validateMessage(payload);
     try {
       const ms = await this.chatService.createMessage(
-        client.data.id + 'fdsf',
+        client.data.id,
         payload.roomId,
         payload.message,
       );

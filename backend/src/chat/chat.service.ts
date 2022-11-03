@@ -16,8 +16,22 @@ export class ChatService {
   private connectedUsers: Map<string, string[]> = new Map();
 
   // Connected Users
-  getConnectedUsers(): any[] {
+  getConnectedUsersIds(): string[] {
     return [...this.connectedUsers.keys()];
+  }
+
+  async getConnectedFriendsIds(userId: string): Promise<string[]> {
+    const friends = await this.userService.getFriends(userId);
+    const connectedFriendsIds = friends.map((friend) => friend.id);
+    return connectedFriendsIds;
+  }
+
+  async getConnectedFriends(userId: string): Promise<any[]> {
+    const friends = await this.userService.getFriends(userId);
+    const connectedUsers = friends.filter((friend) =>
+      this.connectedUsers.has(friend.id)
+    );
+    return connectedUsers;
   }
 
   getConnectedUserById(userId: string): string[] {
@@ -105,8 +119,11 @@ export class ChatService {
     return _rooms;
   }
 
-  async getRoomById(roomId: string): Promise<Room> {
-    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+  async getRoomById(roomId: string, includeMembers = false): Promise<Room> {
+    const _room = await this.prisma.room.findUnique({
+      where: { id: roomId },
+      include: { members: includeMembers },
+    });
     return _room;
   }
 
@@ -345,7 +362,9 @@ export class ChatService {
       }
 
       const _lastMessage: any = await this.getLastMessageByRoomId(room.id);
-      const _wasRead: boolean = (await this.getRoomUserByUserIdAndRoomId(userId, room.id)).hasRead;
+      const _wasRead: boolean = (
+        await this.getRoomUserByUserIdAndRoomId(userId, room.id)
+      ).hasRead;
 
       return {
         roomId: room.id,
@@ -368,7 +387,8 @@ export class ChatService {
       roomId,
     );
     if (!_existingRoomUser) throw new Error('User not in room');
-    if (_existingRoomUser.userId !== userId) throw new Error('You don\'t have permission');
+    if (_existingRoomUser.userId !== userId)
+      throw new Error("You don't have permission");
 
     await this.prisma.roomUser.update({
       where: {
@@ -390,7 +410,7 @@ export class ChatService {
     if (!_room) throw new Error('Room not found');
 
     const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
-    if (!_roomUser) throw new Error( 'User not in room');
+    if (!_roomUser) throw new Error('User not in room');
 
     if (_roomUser.isBanned) throw new Error('User is banned');
 
