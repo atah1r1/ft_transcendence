@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { config } from 'dotenv';
 import { authenticator } from 'otplib';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -56,4 +57,45 @@ export class UserService {
         });
     }
 
+    async getUserById(id: string): Promise<User> {
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (user) {
+            delete user.two_factor_auth_key;
+            return user;
+        }
+        return null;
+    }
+
+    async getFriends(id: string) {
+        const friends = await this.prisma.user.findUnique(
+            { where: { id } }
+        ).friends().then(friends => {
+            return friends.map(friend => {
+                delete friend.two_factor_auth_key;
+                return friend;
+            })
+        });
+        return friends;
+    }
+
+    async searchUser(username: string) {
+        const users = await this.prisma.user.findMany({
+            where: {
+                username: {
+                    contains: username,
+                    mode: 'insensitive',
+                }
+            }
+        });
+        return users;
+    }
+
+    async getAllUsers() {
+        const users = await this.prisma.user.findMany();
+        users.map(user => {
+            delete user.two_factor_auth_key;
+            return user;
+        })
+        return users;
+    }
 }
