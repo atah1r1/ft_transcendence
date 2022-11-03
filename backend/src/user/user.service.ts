@@ -68,7 +68,7 @@ export class UserService {
 
     async getFriends(id: string) {
         const friends = await this.prisma.user.findUnique(
-            { where: { id }, include: { friends: true } }
+            { where: { id } }
         ).friends().then(friends => {
             return friends.map(friend => {
                 delete friend.two_factor_auth_key;

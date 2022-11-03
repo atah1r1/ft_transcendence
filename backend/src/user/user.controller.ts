@@ -68,7 +68,7 @@ export class UserController {
         return await this.UserService.deactivate2fa(req.user);
     }
 
-    
+
     // verify 2fa code
     @Post('2fa/verify')
     async verify2fa(@Req() req: any, @Body() body: VerifyCodeDto) {
@@ -80,6 +80,19 @@ export class UserController {
         throw new HttpException('Invalid code', HttpStatus.BAD_REQUEST);
     }
 
+    // get friends by id
+    @Get('/friends')
+    async getFriends(@Req() req: any): Promise<User[]> {
+        try {
+            const friends = await this.UserService.getFriends(req.user.id);
+            if (friends) {
+                return friends;
+            }
+        } catch (error) {
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+    }
+
     // get user by id
     @Get('/:id')
     async getUser(@Param('id') id: string): Promise<User> {
@@ -89,4 +102,5 @@ export class UserController {
         }
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
+
 }
