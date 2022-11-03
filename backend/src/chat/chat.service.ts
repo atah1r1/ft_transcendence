@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Room, RoomUser, Message } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class ChatService {
@@ -226,7 +227,6 @@ export class ChatService {
     const _deletedRu = await this.prisma.roomUser.delete({
       where: {
         id: _existingRoomUser.id,
-        roomId: roomId,
       },
     });
 
@@ -263,7 +263,6 @@ export class ChatService {
     this.prisma.roomUser.update({
       where: {
         id: _existingRoomUser.id,
-        roomId: roomId,
       },
       data: {
         isBanned: ban,
@@ -374,7 +373,6 @@ export class ChatService {
     await this.prisma.roomUser.update({
       where: {
         id: _existingRoomUser.id,
-        roomId: roomId,
       },
       data: {
         hasRead: seen,
@@ -384,14 +382,22 @@ export class ChatService {
 
   // Messages
   async createMessage(
-    roomUserId: string,
+    userId: string,
     roomId: string,
     message: string,
   ): Promise<Message> {
+    const _room = await this.getRoomById(roomId);
+    if (!_room) throw new Error('Room not found');
+
+    const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
+    if (!_roomUser) throw new Error( 'User not in room');
+
+    if (_roomUser.isBanned) throw new Error('User is banned');
+
     const _message: Message = await this.prisma.message.create({
       data: {
         message: message,
-        roomUserId: roomUserId,
+        roomUserId: _roomUser.id,
         roomId: roomId,
       },
     });
@@ -400,13 +406,16 @@ export class ChatService {
   }
 
   async getMessagesByRoomId(
+    userId: string,
     roomId: string,
     includeRoomUser: boolean = false,
     includeRoom: boolean = false,
   ): Promise<any[]> {
-
     const room = await this.getRoomById(roomId);
     if (!room) throw new Error('Room does not exist');
+
+    const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
+    if (!_roomUser) throw new Error('You are not in room');
 
     return await this.prisma.message.findMany({
       where: {

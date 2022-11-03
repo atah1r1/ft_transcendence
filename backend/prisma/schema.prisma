@@ -34,7 +34,7 @@ model RoomUser {
   isBanned  Boolean   @default(false)
   hasRead   Boolean   @default(false)
   room      Room      @relation(fields: [roomId], references: [id])
-  roomId    String    @unique
+  roomId    String
   user      User      @relation(fields: [userId], references: [id])
   userId    String
   messages  Message[]

@@ -8,25 +8,28 @@ export class WsGuard implements CanActivate {
   constructor(private userService: UserService, private jwt: JwtService) {}
 
   canActivate(context: ExecutionContext): Promise<boolean> {
-    const bearerToken = context.switchToWs().getClient().handshake.auth.token;
+    const bearerToken = context.switchToWs().getClient().handshake.headers.token ?? '';
+    console.log('bearerToken: ', bearerToken);
+
     try {
       const decoded = this.jwt.verifyAsync(bearerToken, {
         secret: process.env.JWT_SECRET,
       }) as any;
 
-      return new Promise((resolve, _) => {
-        return this.userService.getUserById(decoded.id).then((user) => {
-          if (user) {
-            context.switchToWs().getData().id = user.id;
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        });
+      return new Promise(async (resolve, _) => {
+        const user = await this.userService.getUserById(decoded.id);
+        console.log('user: ', user);
+        if (user) {
+          context.switchToWs().getData().id = user.id;
+          resolve(true);
+        } else {
+          resolve(false);
+        }
       });
     } catch (err) {
       console.log('JWT VERIF FAILED: ', err);
-      throw new WsException(err.message);
+      return Promise.resolve(false);
+      //throw new WsException(err.message); 
     }
   }
 }

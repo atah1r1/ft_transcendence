@@ -26,7 +26,7 @@ export class ChatController {
   @Get('messages/:roomId')
   async getMessages(@Req() req: any) {
     try {
-      return await this.chatService.getMessagesByRoomId(req.params.roomId);
+      return await this.chatService.getMessagesByRoomId(req.user.id, req.params.roomId);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
