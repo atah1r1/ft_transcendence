@@ -90,7 +90,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 3rem;
+  padding: 6rem 0;
+  gap: 8rem;
 }
 
 .ach_text {
@@ -100,8 +101,42 @@
 
 .ach_medal {
   display: flex;
+  gap: 6.4rem;
 }
 
-.ach_medal div:not(:last-child) {
-  margin-right: -12rem;
+.ach_goal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #fff;
+  font-family: "Pixeboy";
+  border-radius: 1rem;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.26);
+  opacity: 0;
+  z-index: 1;
 }
+
+.ach_medal_box {
+  position: relative;
+  transition: all 1s;
+}
+
+.ach_medal_box:hover {
+  transform: translateY(-1.2rem);
+}
+
+.ach_medal_box:hover .ach_goal {
+  opacity: 1;
+}
+
+.ach_medal_box:hover img {
+  opacity: 0.4;
+}
+
+/* .ach_medal div:not(:last-child) {
+  margin-right: -12rem;
+} */

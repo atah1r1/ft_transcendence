@@ -1,8 +1,10 @@
-export default function Index() {
-  return <div></div>;
+export default function Index ()
+{
+  return <></>;
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps ()
+{
   return {
     redirect: {
       destination: "/settings/profile",

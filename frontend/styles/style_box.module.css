@@ -1,10 +1,8 @@
 .container {
   height: 100vh;
   display: flex;
-  justify-content: center;
-  gap: 7rem;
-  /* padding: 26rem 0; */
-  align-items: center;
+  gap: 10rem;
+  padding: 16rem;
 }
 
 .profile_setting,
@@ -16,7 +14,7 @@
 }
 
 .profile_setting {
-  width: 30rem;
+  min-width: 30rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,7 +23,7 @@
 }
 
 .profile_details {
-  width: 106rem;
-  padding: 2.6rem;
+  width: 100%;
+  padding: 3.8rem;
   color: #fff;
 }

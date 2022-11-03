@@ -7,10 +7,11 @@ import Image from "next/image";
 import Friends_box from "../../../components/friend_box";
 import { useState } from "react";
 
-const History = () => {
-  const [inputForm, setInputForm] = useState("");
+const History = () =>
+{
+  const [ inputForm, setInputForm ] = useState( "" );
 
-  const [friends, setFriends] = useState([
+  const [ friends, setFriends ] = useState( [
     {
       avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
       fullName: "HADARI YASSINE",
@@ -71,32 +72,36 @@ const History = () => {
       fullName: "ISMAIL BOUHIRI",
       userName: "IBOUHIRI",
     },
-  ]);
+  ] );
 
   return (
-    <div className={styles_box.container}>
-      <SettingsNav selected={"friends"} />
-      <div className={styles_box.profile_details}>
+    <div className={ styles_box.container }>
+      <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn ) }>logout</div>
+      <SettingsNav selected={ "friends" } />
+      <div className={ styles_box.profile_details }>
         <form
-          className={styles.search}
-          onSubmit={(e) => {
+          className={ styles.search }
+          onSubmit={ ( e ) =>
+          {
             e.preventDefault();
-          }}
+          } }
         >
           <input
             type="search"
             placeholder="Search..."
-            onChange={(e) => {
-              setInputForm(e.target.value);
-            }}
-            value={inputForm}
+            onChange={ ( e ) =>
+            {
+              setInputForm( e.target.value );
+            } }
+            value={ inputForm }
           ></input>
         </form>
-        <div className={styles.friends}>
+        <div className={ styles.friends }>
           <Friends_box
-            friends={friends.filter((ele) => {
-              return ele.userName.toLowerCase().includes(inputForm);
-            })}
+            friends={ friends.filter( ( ele ) =>
+            {
+              return ele.userName.toLowerCase().includes( inputForm );
+            } ) }
           ></Friends_box>
         </div>
       </div>
