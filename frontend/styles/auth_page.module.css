@@ -87,3 +87,32 @@
 .box .verify_btn:hover{
   background-color: #da3e58;
 }
+
+/* media --------------------------------- */
+
+@media (max-width: 900px) {
+  .auth_image{
+    width: 288px;
+    height: 256px;
+  }
+  .verify_box{
+    right: 7rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .auth_image{
+    display: none;
+  }
+  .container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: auto;
+    text-align: center;
+  }
+  .verify_box{
+    right: 50%;
+    transform: translate(50%);
+  }
+}

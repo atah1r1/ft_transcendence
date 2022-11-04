@@ -2,7 +2,6 @@ import cookie from 'cookie';
 
 
 export default function requireAuthentication(gssp: any) {
-    console.log('im here!');
     return async (ctx: any) => {
         const { req } = ctx;
         if (req.headers.cookie) {
