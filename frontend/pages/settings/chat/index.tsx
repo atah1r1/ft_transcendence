@@ -447,8 +447,8 @@ const Chat = () =>
                                     <Image
                                       src="/settings_icon.svg"
                                       alt="invete_player_icon"
-                                      width={ "22px" }
-                                      height={ "22px" }
+                                      width={ "20px" }
+                                      height={ "20px" }
                                     />
                                   </div>
                                 )

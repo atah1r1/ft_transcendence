@@ -19,13 +19,13 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 28rem;
-  max-height: 56rem;
+  width: 22rem;
+  /* max-height: 56rem; */
   background-color: #0f3460;
-  padding: 2rem;
+  padding: 1.6rem;
   font-family: "Pixeboy";
-  font-size: 2rem;
-  gap: 1.6rem;
+  font-size: 1.6rem;
+  gap: 1.2rem;
   border-radius: 1rem;
   z-index: 1;
   overflow-y: scroll;
@@ -55,8 +55,8 @@
 }
 
 .treePoints_box_avatar {
-  width: 4rem;
-  height: 4rem;
+  width: 3.6rem;
+  height: 3.6rem;
   border: 1px solid #fff;
   border-radius: 50%;
 }

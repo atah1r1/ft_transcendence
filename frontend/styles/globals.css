@@ -36,7 +36,7 @@ a {
   box-sizing: border-box;
 }
 
-@media (max-height: 20rem) {
+/* @media (max-height: 20rem) {
   html {
     font-size: 48%;
   }
@@ -58,7 +58,7 @@ a {
   html {
     font-size: 40%;
   }
-}
+} */
 
 /* Loading css */
 
