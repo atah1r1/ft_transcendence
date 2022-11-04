@@ -44,7 +44,7 @@ const AuthPage = () =>
           </form>
         </div>
         <div className={ styles.verify_box }>
-          <div className={ cn( styles_s_l.setting_btn, styles.verify_btn ) }>
+          <div className={ cn( styles_s_l.setting_btn, styles.verify_btn, `${ value.length !== 6 && styles.verify_unclick}`) }>
             Verify
           </div>
         </div>

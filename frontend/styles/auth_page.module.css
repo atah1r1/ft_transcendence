@@ -75,6 +75,11 @@
   right: 8rem;
 }
 
+.box .verify_unclick{
+  pointer-events: none;
+  background-color: #dd6176 !important;
+}
+
 .box .verify_btn{
   font-size: 1.6rem;
   font-weight: 600;
