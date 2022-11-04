@@ -6,9 +6,11 @@
 }
 
 .profile_image_wrap {
-  border: 1px solid #fff;
+  border: 2px solid #d9d9d9;
   margin-bottom: 1.2rem;
   border-radius: 50%;
+  width: 10rem;
+  height: 10rem;
 }
 
 .profile_image {
@@ -18,9 +20,15 @@
 .profile_info_login,
 .profile_info_full_name {
   font-family: "Phosphate";
-  font-size: 1.6rem;
 }
 
+.profile_info_login {
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+}
+.profile_info_full_name {
+  font-size: 1.6rem;
+}
 .setting_btn {
   font-family: "Pixeboy";
   background-color: #d9d9d9;
@@ -53,4 +61,11 @@
 
 .setting_btn:not(:last-child) {
   margin-bottom: 1.8rem;
+}
+
+.logout_btn {
+  z-index: 1;
+  position: absolute;
+  top: 1.2rem;
+  right: 16rem;
 }

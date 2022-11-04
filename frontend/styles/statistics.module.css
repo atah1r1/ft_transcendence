@@ -1,0 +1,142 @@
+.statistics_box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  padding-bottom: 0;
+}
+
+.part_one {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  gap: 2rem;
+}
+
+.right {
+  font-size: 3.4rem;
+  font-family: "Pixeboy";
+  text-align: center;
+}
+
+.level_line {
+  width: 22rem;
+  height: 1.2rem;
+  background-color: #d9d9d9;
+  border-radius: 1rem;
+  margin-bottom: 0.6rem;
+  position: relative;
+}
+
+.level_line::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  background-color: #dc465e;
+  width: 15rem;
+  height: 1.2rem;
+  border-radius: 1rem;
+}
+
+.level_number_box {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.3rem;
+}
+
+.defeat_text {
+  color: rgb(234, 67, 53);
+}
+
+.victory_text {
+  color: rgb(59, 166, 88);
+}
+
+.def_vic_box {
+  display: flex;
+  border-top: 1px solid #fff;
+  gap: 3rem;
+  padding: 0.6rem 3.8rem;
+}
+
+.avatar {
+  width: 10rem;
+  height: 10rem;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.avatar img {
+  border-radius: 50%;
+}
+
+.user_name {
+  font-family: "Phosphate";
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.part_two {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 6rem 0;
+  gap: 8rem;
+}
+
+.ach_text {
+  font-family: "Pixeboy";
+  font-size: 3.6rem;
+}
+
+.ach_medal {
+  display: flex;
+  gap: 6.4rem;
+}
+
+.ach_goal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #fff;
+  font-family: "Pixeboy";
+  border-radius: 1rem;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.26);
+  opacity: 0;
+  z-index: 1;
+}
+
+.ach_medal_box {
+  position: relative;
+  transition: all 1s;
+}
+
+.ach_medal_box:hover {
+  transform: translateY(-1.2rem);
+}
+
+.ach_medal_box:hover .ach_goal {
+  opacity: 1;
+}
+
+.ach_medal_box:hover img {
+  opacity: 0.4;
+}
+
+/* .ach_medal div:not(:last-child) {
+  margin-right: -12rem;
+} */

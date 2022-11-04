@@ -8,25 +8,15 @@ import Loader from "../../../components/Loading";
 import HistoryBox from "../../../components/history_box";
 import { useState } from "react";
 
-const History = () => {
-  const [history, setHistory] = useState([
-    {
-      avatar: "https://cdn.intra.42.fr/users/ehakam.jpeg",
-      numberGame: "5",
-      score: "1250",
-      points: "+15",
-      achievements: "/medal.png",
-      victory: "10",
-      defeat: "2",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
+const History = () =>
+{
+  const [ history, setHistory ] = useState( [
     {
       avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
       numberGame: "2",
       score: "1250",
       points: "-15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
       victory: "2",
       defeat: "10",
       gameMode: "game Mode",
@@ -37,7 +27,7 @@ const History = () => {
       numberGame: "5",
       score: "1250",
       points: "+15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png" ],
       victory: "10",
       defeat: "2",
       gameMode: "game Mode",
@@ -48,7 +38,7 @@ const History = () => {
       numberGame: "2",
       score: "1250",
       points: "-15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
       victory: "2",
       defeat: "10",
       gameMode: "game Mode",
@@ -59,7 +49,7 @@ const History = () => {
       numberGame: "5",
       score: "1250",
       points: "+15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png", "/ach2.png" ],
       victory: "10",
       defeat: "2",
       gameMode: "game Mode",
@@ -70,7 +60,7 @@ const History = () => {
       numberGame: "2",
       score: "1250",
       points: "-15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png", "/ach4.png" ],
       victory: "2",
       defeat: "10",
       gameMode: "game Mode",
@@ -81,7 +71,7 @@ const History = () => {
       numberGame: "5",
       score: "1250",
       points: "+15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png" ],
       victory: "10",
       defeat: "2",
       gameMode: "game Mode",
@@ -92,20 +82,9 @@ const History = () => {
       numberGame: "2",
       score: "1250",
       points: "-15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
       victory: "2",
       defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/ehakam.jpeg",
-      numberGame: "5",
-      score: "1250",
-      points: "+15",
-      achievements: "/medal.png",
-      victory: "10",
-      defeat: "2",
       gameMode: "game Mode",
       time: "17:06PM 06/10/2022",
     },
@@ -114,19 +93,31 @@ const History = () => {
       numberGame: "2",
       score: "1250",
       points: "-15",
-      achievements: "/medal.png",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
       victory: "2",
       defeat: "10",
       gameMode: "game Mode",
       time: "17:06PM 06/10/2022",
     },
-  ]);
+    {
+      avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
+      numberGame: "2",
+      score: "1250",
+      points: "-15",
+      achievements: [ "/ach1.png", "/ach2.png" ],
+      victory: "2",
+      defeat: "10",
+      gameMode: "game Mode",
+      time: "17:06PM 06/10/2022",
+    },
+  ] );
   return (
-    <div className={styles_box.container}>
-      <SettingsNav selected={"history"} />
-      <div className={styles_box.profile_details}>
-        <div className={styles_h.history}>
-          <HistoryBox history={history}></HistoryBox>
+    <div className={ styles_box.container }>
+      <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn ) }>logout</div>
+      <SettingsNav selected={ "history" } />
+      <div className={ styles_box.profile_details }>
+        <div className={ styles_h.history }>
+          <HistoryBox history={ history }></HistoryBox>
         </div>
       </div>
     </div>

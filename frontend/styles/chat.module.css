@@ -4,9 +4,8 @@
 }
 
 .chat_left {
-  width: 30%;
+  width: 30rem;
   height: 100%;
-  text-align: center;
   border-right: 2px solid rgba(255, 255, 255, 0.25);
   padding-right: 2rem;
 }
@@ -14,8 +13,8 @@
 .chat_right {
   display: flex;
   flex-direction: column;
-  gap: 2.2rem;
-  width: 70%;
+  /* gap: 2.2rem; */
+  width: 100%;
   height: 100%;
   padding-left: 2rem;
 }
@@ -23,6 +22,7 @@
 .l_part_one {
   height: 15%;
 }
+
 .l_part_two {
   display: flex;
   flex-direction: column;
@@ -94,9 +94,9 @@
 
 .search input {
   width: 100%;
-  border-radius: 1.2rem;
+  border-radius: 1.4rem;
   border: none;
-  height: 3rem;
+  height: 3.8rem;
   outline: none;
   padding: 1.6rem;
   font-size: 1.4rem;
@@ -149,9 +149,10 @@
 .conversation_body {
   display: flex;
   flex-direction: column;
+  margin-top: auto;
   border-radius: 1.2rem;
   background-color: rgba(255, 255, 255, 0.7);
-  min-height: 86%;
+  height: 90%;
   align-items: flex-end;
   column-gap: 1.2rem;
   padding: 0 0.6rem;
