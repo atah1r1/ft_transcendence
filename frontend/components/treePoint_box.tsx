@@ -19,8 +19,8 @@ const TreePointsBox = ({ group_box, group_box_i }: any) => {
         <Image
           src="/invete_player.svg"
           alt="invete_player_icon"
-          width={"26px"}
-          height={"26px"}
+          width={"22px"}
+          height={"22px"}
         />
       </div>
       <div className={styles.treepoints_box_row}>
@@ -28,8 +28,8 @@ const TreePointsBox = ({ group_box, group_box_i }: any) => {
         <Image
           src="/unfriend.svg"
           alt="unfriend_icon"
-          width={"26px"}
-          height={"26px"}
+          width={"22px"}
+          height={"22px"}
         />
       </div>
       <div className={styles.treepoints_box_row}>
@@ -37,8 +37,8 @@ const TreePointsBox = ({ group_box, group_box_i }: any) => {
         <Image
           src="/block_user.svg"
           alt="block_user_icon"
-          width={"26px"}
-          height={"26px"}
+          width={"22px"}
+          height={"22px"}
         />
       </div>
       <div className={styles.treepoints_box_row}>
@@ -46,8 +46,8 @@ const TreePointsBox = ({ group_box, group_box_i }: any) => {
         <Image
           src="/view_profile.svg"
           alt="view_profile_icon"
-          width={"26px"}
-          height={"26px"}
+          width={"22px"}
+          height={"22px"}
         />
       </div>
     </div>

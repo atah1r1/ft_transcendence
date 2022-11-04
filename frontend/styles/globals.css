@@ -36,7 +36,15 @@ a {
   box-sizing: border-box;
 }
 
-@media (max-height: 20rem) {
+/* media queries ----------------------- */
+
+@media (max-width: 900px) {
+  html {
+    font-size: 52%;
+  }
+}
+
+/* @media (max-height: 20rem) {
   html {
     font-size: 48%;
   }
@@ -58,7 +66,7 @@ a {
   html {
     font-size: 40%;
   }
-}
+} */
 
 /* Loading css */
 
