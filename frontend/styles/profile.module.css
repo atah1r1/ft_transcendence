@@ -84,13 +84,18 @@
   margin-bottom: 8rem;
 }
 
+.details_form div{
+  padding: 1rem;
+  text-align: left;
+}
+
 .details_form input:focus {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 2px 15px;
 }
 
 .details_form input {
-  width: 28rem;
-  height: 3.6rem;
+  width: 24rem;
+  height: 3.2rem;
   border-radius: 1rem;
   border: none;
   background-color: #d9d9d9;
@@ -107,7 +112,6 @@
   font-family: "Pixeboy";
   font-size: 1.8rem;
   display: block;
-  text-align: left;
   margin-bottom: 0.8rem;
 }
 
@@ -122,6 +126,11 @@
 
 .save_box .save_btn:hover {
   background-color: #da3e58;
+}
+
+.save_unclick{
+  pointer-events: none;
+  background-color: #dd6176 !important;
 }
 
 .details_two_factor_aut {
@@ -142,6 +151,7 @@
   font-size: 1.4rem;
   letter-spacing: 1px;
 }
+
 
 /* Swich Botton ---------------*/
 
@@ -204,4 +214,21 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .details_form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+    position: relative;
+    top: -4rem;
+  }
+
+  .details_form input{
+    width: 28rem;
+  }
 }

@@ -276,9 +276,9 @@ const Chat = () =>
       <div
         className={ cn( styles_box.container, chat_room && styles_r_w.chat_room ) }
       >
-        <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn ) }>logout</div>
         <SettingsNav selected={ "chat" } />
         <div className={ styles_box.profile_details }>
+          <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
           <div className={ styles.chat_box }>
             <div className={ styles.chat_left }>
               <div className={ styles.l_part_one }>

@@ -113,9 +113,9 @@ const History = () =>
   ] );
   return (
     <div className={ styles_box.container }>
-      <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn ) }>logout</div>
       <SettingsNav selected={ "history" } />
       <div className={ styles_box.profile_details }>
+        <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
         <div className={ styles_h.history }>
           <HistoryBox history={ history }></HistoryBox>
         </div>

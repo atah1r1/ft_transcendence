@@ -63,10 +63,7 @@
   margin-bottom: 1.8rem;
 }
 
-.logout_btn {
-  z-index: 1;
-  position: absolute;
-  top: 1.2rem;
-  right: 18rem;
-  padding: 1.2rem 3.6rem;
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
 }

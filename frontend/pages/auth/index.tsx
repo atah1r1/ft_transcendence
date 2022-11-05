@@ -38,7 +38,7 @@ const AuthPage = () =>
           <form className={ styles.details_form }>
             <div>
               <label>Code</label>
-              <input type="text" placeholder="****" maxLength={ 6 } value={ value }
+              <input type="text" placeholder="******" maxLength={ 6 } value={ value }
                 onChange={ handleChange } ></input>
             </div>
           </form>

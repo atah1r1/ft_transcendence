@@ -4,12 +4,8 @@ import styles_box from "../../../styles/style_box.module.css";
 import styles_s_l from "../../../styles/style_settings_nav.module.css";
 import SettingsNav from "../../../components/settings_nav";
 import { useEffect, useState, useContext } from "react";
-import { UserContext } from "../../_app";
 import axios from "axios";
 import Image from "next/image";
-import Loader from "../../../components/Loading";
-import { useRouter } from "next/router";
-import cookie from 'cookie';
 import requireAuthentication from "../../../hooks/requiredAuthentication";
 
 const Profile = () => {
@@ -27,9 +23,21 @@ const Profile = () => {
     }
   );
   const [loader, setLoader] = useState(true);
-  const [saveBtn, setSaveBtn] = useState(false);
   const [s_witch, setSwitch] = useState(false);
+  const [ value, setValue ] = useState( {firstName: '', lastName: '', username: ''} );
 
+  const handleFirstName = ( e: any ) =>
+  {
+    setValue( { ...value, firstName: e.target.value } );
+  };
+  const handleLastName = ( e: any ) =>
+  {
+    setValue( { ...value, lastName: e.target.value } );
+  };
+  const handleUsername = ( e: any ) =>
+  {
+    setValue( { ...value, username: e.target.value } );
+  };
 
   const fetchData = async () => {
     try {
@@ -54,12 +62,15 @@ const Profile = () => {
 
   return (
     <div className={styles_box.container}>
-      <div className={cn(styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn)}>logout</div>
-      <SettingsNav selected={"profile"} />
+      {
+        !loader &&
+        <SettingsNav selected={"profile"} />
+      }
       <div className={styles_box.profile_details}>
         {
-          loader ? <Loader /> :
+          !loader &&
           <div>
+            <div className={cn(styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn)}>logout</div>
             <div className={styles.details_up}>
               <div className={styles.details_level}>
                 <p>LEVEL</p>
@@ -125,15 +136,18 @@ const Profile = () => {
               <form className={styles.details_form}>
                 <div>
                   <label>FIRST NAME</label>
-                  <input type="text" placeholder={data.first_name} maxLength={12} onChange={() => setSaveBtn(true)}></input>
+                  <input type="text" placeholder={data.first_name} maxLength={12} value={ value.firstName }
+                onChange={ handleFirstName }></input>
                 </div>
                 <div>
                   <label>LAST NAME</label>
-                  <input type="text" placeholder={data.last_name} maxLength={12} onChange={() => setSaveBtn(true)}></input>
+                  <input type="text" placeholder={data.last_name} maxLength={12} value={ value.lastName }
+                onChange={ handleLastName }></input>
                 </div>
                 <div>
                   <label>USERNAME</label>
-                  <input type="text" placeholder={data.username} maxLength={12} onChange={() => setSaveBtn(true)}></input>
+                  <input type="text" placeholder={data.username} maxLength={12} value={ value.username }
+                onChange={ handleUsername }></input>
                 </div>
               </form>
             </div>
@@ -152,14 +166,11 @@ const Profile = () => {
               </label>
               {s_witch && <img src="/QR.png" width="15%" />}
             </div>
-            {
-              saveBtn &&
-              <div className={styles.save_box}>
-                <div className={cn(styles_s_l.setting_btn, styles.save_btn)}>
-                  SAVE
-                </div>
+            <div className={styles.save_box}>
+                <div className={ cn( styles_s_l.setting_btn, styles.save_btn, `${!value.firstName && !value.lastName && !value.username && styles.save_unclick }`)}>
+                SAVE
               </div>
-            }
+            </div>
           </div>
         }
       </div>

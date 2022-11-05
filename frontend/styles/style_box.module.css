@@ -1,8 +1,9 @@
 .container {
   height: 100vh;
   display: flex;
-  gap: 10rem;
-  padding: 18rem;
+  justify-content: center;
+  gap: 8rem;
+  padding: 18rem 3.2rem;
 }
 
 .profile_setting,
@@ -14,16 +15,34 @@
 }
 
 .profile_setting {
-  min-width: 30rem;
+  width: 30rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4.2rem;
+  padding: 0 4.2rem;
 }
 
 .profile_details {
-  width: 100%;
+  position: relative;
+  width: 120rem;
   padding: 3.8rem;
   color: #fff;
+}
+
+.logout_btn {
+  z-index: 1;
+  position: absolute;
+  top: -16rem;
+  right: 0;
+  padding: 1.2rem 3.6rem !important;
+}
+
+/* media q--------------------- */
+
+@media (max-width: 1000px) {
+  .profile_setting {
+    display: none;
+  }
 }

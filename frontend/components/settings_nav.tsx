@@ -35,15 +35,15 @@ const SettingsNav = ( { selected }: any ) =>
       <div className={ styles_s_l.profile_info }>
         <div className={ styles_s_l.profile_image_wrap }>
           <Image
-            src={ data?.avatar }
+            src={ data.avatar }
             alt="avatar"
             width="100px"
             height="100px"
             className={ styles_s_l.profile_image }
           ></Image>
         </div>
-        <p className={ styles_s_l.profile_info_login }>{ data?.username }</p>
-        <p className={ styles_s_l.profile_info_full_name }>{ `${ data?.last_name } ${ data?.first_name }` }</p>
+        <p className={ styles_s_l.profile_info_login }>{ data.username }</p>
+        <p className={ styles_s_l.profile_info_full_name }>{ `${ data.last_name } ${ data.first_name }` }</p>
       </div>
       <div className={ styles_s_l.setting_btns }>
         { sections.map( ( section, i ) =>
