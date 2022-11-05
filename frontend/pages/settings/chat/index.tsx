@@ -11,14 +11,14 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
-import { useContext } from "react";
-import { UserContext } from "../../_app";
+// import { useContext } from "react";
+// import { UserContext } from "../../_app";
 
 const Chat = () =>
 {
-  const context = useContext( UserContext );
+  // const context = useContext( UserContext );
 
-  console.log( "chat: ", context?.data );
+  // console.log( "chat: ", context?.data );
 
   const [ group_box_index, set_g_b_i ] = useState( 0 );
 

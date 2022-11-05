@@ -1,7 +1,12 @@
 import styles from "../styles/friends.module.css";
 import Image from "next/image";
+import { useContext } from "react";
+import { SocketContext } from "../pages/_app";
 
 const Friends_box = ({ friends }: any) => {
+
+  const socket = useContext(SocketContext);
+
   return friends.map((ele: any, i: any) => {
     return (
       <div className={styles.friends_box} key={i}>
@@ -9,10 +14,10 @@ const Friends_box = ({ friends }: any) => {
           <Image src={ele.avatar} alt="avatar" width="68" height="68" />
         </div>
         <div className={styles.friends_userName}>
-          <p>{ele.userName}</p>
+          <p>{ele.username}</p>
         </div>
         <div className={styles.friends_fullName}>
-          <p>{ele.fullName}</p>
+          <p>{`${ele.first_name} ${ele.last_name}`}</p>
         </div>
         <div className={styles.friends_options}>
           <div>
@@ -23,7 +28,9 @@ const Friends_box = ({ friends }: any) => {
               height={"26px"}
             />
           </div>
-          <div>
+          <div onClick={() => {
+            socket?.emit("create_dm", { otherUserId: ele.id });
+          }}>
             <Image
               src="/unfriend.svg"
               alt="invete_player_icon"

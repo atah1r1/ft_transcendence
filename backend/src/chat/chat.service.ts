@@ -57,7 +57,7 @@ export class ChatService {
     const _existingDm = await this.getDmByUserIds(userId, otherUserId);
     if (_existingDm) throw new Error('DM already exists');
 
-    const otherUser = this.userService.getUserById(otherUserId);
+    const otherUser = await this.userService.getUserById(otherUserId);
     if (!otherUser) throw new Error('Other User does not exist');
 
     const _room = await this.prisma.room.create({

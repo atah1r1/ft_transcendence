@@ -90,8 +90,14 @@ export class UserService {
         return users;
     }
 
-    async getAllUsers() {
-        const users = await this.prisma.user.findMany();
+    async getAllUsers(id: string) {
+        const users = await this.prisma.user.findMany({
+            where: {
+                NOT: {
+                    id
+                }
+            }
+        });
         users.map(user => {
             delete user.two_factor_auth_key;
             return user;

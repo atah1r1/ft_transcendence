@@ -5,13 +5,27 @@ import styles_s_l from "../../../styles/style_settings_nav.module.css";
 import SettingsNav from "../../../components/settings_nav";
 import Image from "next/image";
 import Friends_box from "../../../components/friend_box";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-const History = () =>
-{
-  const [ inputForm, setInputForm ] = useState( "" );
+const History = () => {
+  const [inputForm, setInputForm] = useState("");
 
-  const [ friends, setFriends ] = useState( [
+
+  const [friends1, setFriends1] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:9000/api/user/all", {
+      withCredentials: true,
+    }).then((res) => {
+      setFriends1(res.data);
+      console.log(res.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, []);
+
+  const [friends, setFriends] = useState([
     {
       avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
       fullName: "HADARI YASSINE",
@@ -72,36 +86,34 @@ const History = () =>
       fullName: "ISMAIL BOUHIRI",
       userName: "IBOUHIRI",
     },
-  ] );
+  ]);
 
   return (
-    <div className={ styles_box.container }>
-      <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn ) }>logout</div>
-      <SettingsNav selected={ "friends" } />
-      <div className={ styles_box.profile_details }>
+    <div className={styles_box.container}>
+      <div className={cn(styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn)}>logout</div>
+      <SettingsNav selected={"friends"} />
+      <div className={styles_box.profile_details}>
         <form
-          className={ styles.search }
-          onSubmit={ ( e ) =>
-          {
+          className={styles.search}
+          onSubmit={(e) => {
             e.preventDefault();
-          } }
+          }}
         >
           <input
             type="search"
             placeholder="Search..."
-            onChange={ ( e ) =>
-            {
-              setInputForm( e.target.value );
-            } }
-            value={ inputForm }
+            onChange={(e) => {
+              setInputForm(e.target.value);
+            }}
+            value={inputForm}
           ></input>
         </form>
-        <div className={ styles.friends }>
+        <div className={styles.friends}>
           <Friends_box
-            friends={ friends.filter( ( ele ) =>
-            {
-              return ele.userName.toLowerCase().includes( inputForm );
-            } ) }
+            // friends={friends.filter((ele) => {
+            //   return ele.userName.toLowerCase().includes(inputForm);
+            // })}
+            friends={friends1}
           ></Friends_box>
         </div>
       </div>

@@ -44,7 +44,7 @@ model Room {
   id                 String     @id @default(uuid())
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
-  name               String     @db.VarChar(50)
+  name               String?    @db.VarChar(255)
   image              String?    @db.VarChar(255)
   password           String?    @db.VarChar(255)
   isPasswordRequired Boolean    @default(false)

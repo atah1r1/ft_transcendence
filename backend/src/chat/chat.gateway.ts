@@ -25,7 +25,7 @@ const EV_REMOVE_MEMBER = 'remove_member';
 const EV_MAKE_ADMIN = 'make_admin';
 const EV_FIND_ROOM = 'find_room';
 
-@WebSocketGateway({ namespace: 'chat' })
+@WebSocketGateway({ namespace: 'chat', cors: true, origins: '*' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private authService: AuthService,
@@ -111,7 +111,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private async verifyAndSave(client: Socket) {
-    const token: string = client.handshake.headers.token as string;
+    const token: string = client.handshake.auth.token as string;
     console.log('token: ', token);
     const decoded = await this.authService.verifyToken(token);
     // save the user id in the socket
