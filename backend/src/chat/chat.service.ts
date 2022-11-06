@@ -13,7 +13,7 @@ export class ChatService {
   ) { }
 
   // NOTE: userId -> [socketId]
-  private connectedUsers: Map<string, Socket[]> = new Map();
+  connectedUsers: Map<string, Socket[]> = new Map();
 
   // Connected Users
   getConnectedUsersIds(): string[] {
@@ -55,7 +55,7 @@ export class ChatService {
   // Rooms
   async createDm(userId: string, otherUserId: string): Promise<Room> {
     const _existingDm = await this.getDmByUserIds(userId, otherUserId);
-    if (_existingDm) throw new Error('DM already exists');
+    if (_existingDm) return _existingDm;
 
     const otherUser = await this.userService.getUserById(otherUserId);
     if (!otherUser) throw new Error('Other User does not exist');
@@ -70,9 +70,9 @@ export class ChatService {
       },
     });
 
-    this.addUserToRoom(userId, _room.id, null, true);
-    this.addUserToRoom(otherUserId, _room.id, null, true);
-    this.userService.addFriend(userId, otherUserId);
+    await this.addUserToRoom(userId, _room.id, null, true);
+    await this.addUserToRoom(otherUserId, _room.id, null, true);
+    await this.userService.addFriend(userId, otherUserId);
 
     return _room;
   }
@@ -100,7 +100,7 @@ export class ChatService {
       },
     });
 
-    this.addUserToRoom(creatorId, _room.id, password, true);
+    await this.addUserToRoom(creatorId, _room.id, password, true);
 
     return _room;
   }
@@ -237,7 +237,7 @@ export class ChatService {
   async removeUserFromRoom(
     userToRemoveId: string,
     roomId: string,
-  ): Promise<boolean> {
+  ): Promise<RoomUser> {
     const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
     if (!_room) throw new Error('Room does not exist');
 
@@ -255,7 +255,7 @@ export class ChatService {
       },
     });
 
-    return _deletedRu ? true : false;
+    return _deletedRu;
   }
 
   async removeUserFromRoomByAdmin(
@@ -295,7 +295,7 @@ export class ChatService {
     bannedUserId: string,
     roomId: string,
     ban: boolean,
-  ) {
+  ): Promise<RoomUser> {
     const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
     if (!_room) throw new Error('Room does not exist');
 
@@ -314,7 +314,7 @@ export class ChatService {
     if (_existingRoomUser.isBanned === ban)
       throw new Error(`User is already${!ban ? ' not banned' : 'banned'}`);
 
-    this.prisma.roomUser.update({
+    const ru = await this.prisma.roomUser.update({
       where: {
         id: _existingRoomUser.id,
       },
@@ -322,6 +322,8 @@ export class ChatService {
         isBanned: ban,
       },
     });
+
+    return ru;
   }
 
   async getRoomUsersByRoomId(
@@ -418,6 +420,8 @@ export class ChatService {
   async getChatsByUserId(userId: string): Promise<any[]> {
     const _rooms: Room[] = await this.getRoomsByUserId(userId);
 
+    console.log("NUM ROOMS", _rooms.length);
+
     const _chats = _rooms.map(async (room) => {
       let _name: string = null;
       let _image: string = null;
@@ -450,7 +454,12 @@ export class ChatService {
     });
 
     const _sortedChats = (await Promise.all(_chats)).sort(
-      (a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt,
+      (a, b) => {
+        if (!a.lastMessage && !b.lastMessage) return 0;
+        if (!a.lastMessage) return 1;
+        if (!b.lastMessage) return -1;
+        return b.lastMessage.createdAt - a.lastMessage.createdAt
+      }
     );
     return _sortedChats;
   }

@@ -1,9 +1,10 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios, { AxiosError } from "axios";
 import { io, Socket } from "socket.io-client";
 import cookie from 'cookie';
+import ChatStore, { ChatContext } from "../stores/chat_store";
 
 // type User = {
 //   avatar: string;
@@ -47,55 +48,30 @@ socket.on("exception", (exception) => {
   console.log('exception: ', exception);
 });
 
-// export const UserContext = React.createContext<GlobalContent | undefined>(undefined);
-export const SocketContext = React.createContext<Socket | undefined>(undefined);
+export const SocketContext = React.createContext<Socket>(socket);
 
-export const SocketProvider = (props: { children: React.ReactNode }) => {
-  // const [loader, setLoader] = useState(true);
-  // const [statusCode, setStatusCode] = useState(401);
-
-  // const [data, setData] = useState(
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-  //     createdAt: "",
-  //     first_name: "",
-  //     id: "",
-  //     last_name: "",
-  //     two_factor_auth: false,
-  //     updateAt: "",
-  //     username: "",
-  //   }
-  // );
-
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`,
-  //       {
-  //         withCredentials: true,
-  //       }
-  //     );
-  //     setData(response.data);
-  //   } catch (error: any) {
-  //     console.error(error);
-  //     setStatusCode(error.response.status);
-  //   }
-  //   finally {
-  //     setLoader(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
-
-  return <SocketContext.Provider value={socket}>{props.children}</SocketContext.Provider>
+function MyApp({ Component, pageProps, router }: AppProps) {
+  return (
+    <SocketContext.Provider value={socket}>
+      <ChatStore>
+        <InitialComponent Component={Component} pageProps={pageProps} router={router} />
+      </ChatStore>
+    </SocketContext.Provider>
+  );
 }
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <SocketProvider>
-    return <Component {...pageProps} />
-  </SocketProvider>
+function InitialComponent({ Component, pageProps }: AppProps) {
+  const [chats, setChats] = useContext(ChatContext);
+
+  useEffect(() => {
+    console.log("CHAT LIST SUBSRCIBED");
+    socket!.on('chat_list', (data: any) => {
+      console.log('chat_list: ', data);
+      setChats(data);
+    });
+  }, []);
+
+  return (<Component {...pageProps} />);
 }
 
 export default MyApp

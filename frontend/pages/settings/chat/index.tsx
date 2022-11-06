@@ -7,18 +7,19 @@ import styles_tree_p from "../../../styles/treeProints.module.css";
 import SettingsNav from "../../../components/settings_nav";
 import ConversationBox from "../../../components/conversation_box";
 import styles_c_b from "../../../styles/conversation_box.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
 import axios from "axios";
-// import { useContext } from "react";
-// import { UserContext } from "../../_app";
+import { ChatContext } from "../../../stores/chat_store";
+import { SocketContext } from "../../_app";
 
 const Chat = () => {
-  // const context = useContext( UserContext );
+  const [chats, setChats] = useContext(ChatContext);
+  console.log("CHATS UPDATED");
 
-  // console.log( "chat: ", context?.data );
+  const socket = useContext(SocketContext);
 
   const [group_box_index, set_g_b_i] = useState(0);
 
@@ -174,16 +175,23 @@ const Chat = () => {
 
   const [chatroomInputs, setChatroomInputs] = useState({
     groupName: "",
-    groupType: "public",
+    groupType: "PUBLIC",
     password: "",
   });
+
   const handleSubmitGroup = (e: any) => {
     e.preventDefault();
     console.log(chatroomInputs);
     // do something with the data
+    socket?.emit("create_room", {
+      name: chatroomInputs.groupName,
+      privacy: chatroomInputs.groupType,
+      password: chatroomInputs.password,
+      image: 'https://ui-avatars.com/api/?name=Room'
+    });
     setChatroomInputs({
       groupName: "",
-      groupType: "public",
+      groupType: "PUBLIC",
       password: "",
     });
     setChat_room(false);
@@ -235,9 +243,9 @@ const Chat = () => {
                   })
                 }
               >
-                <option value="public">public</option>
-                <option value="protected">protected</option>
-                <option value="private">private</option>
+                <option value="PUBLIC">public</option>
+                <option value="PROTECTED">protected</option>
+                <option value="PRIVATE">private</option>
               </select>
             </div>
             {chatroomInputs.groupType === "protected" && (
@@ -304,20 +312,7 @@ const Chat = () => {
               </div>
               <div className={styles.l_part_two}>
                 <ConversationBox
-                  conversations={
-                    searchInput
-                      ? conversationsBox.filter((conv) => {
-                        if (conv.hasOwnProperty("group"))
-                          return conv.group_name
-                            ?.toLowerCase()
-                            .includes(searchInput);
-                        else
-                          return conv.fullName
-                            ?.toLowerCase()
-                            .includes(searchInput);
-                      })
-                      : conversationsBox
-                  }
+                  conversations={chats}
                   getSenderInfo={getSenderInfo}
                   messages={messages}
                   setCurrent_conv={setCurrentConv}

@@ -15,6 +15,15 @@ const ConversationBox = ({
     conversations.map((ele: any, i: number) => ele === ele && i != 0)
   );
 
+  // format date
+  const formatDateAndTime = (date: string) => {
+    if (!date) return;
+    const dateObj = new Date(date);
+    const dateStr = dateObj.toLocaleDateString();
+    const timeStr = dateObj.toLocaleTimeString();
+    return `${dateStr} ${timeStr}`;
+  }
+
   return conversations.map((conv: any, i: number) => {
     return (
       <div key={i}>
@@ -48,7 +57,7 @@ const ConversationBox = ({
                   i < 3 && (
                     <div key={i}>
                       <Image
-                        src={conv.image}
+                        src={conv.image === null ? "https://ui-avatars.com/api/?name=John+Doe" : conv.image}
                         alt="conversation_image"
                         width={"30px"}
                         height={"30px"}
@@ -61,7 +70,7 @@ const ConversationBox = ({
           ) : (
             <div className={styles.conversation_img}>
               <Image
-                src={conv.image}
+                src={conv.image === null ? "https://ui-avatars.com/api/?name=John+Doe" : conv.image}
                 alt="conversation_image"
                 width={"42px"}
                 height={"42px"}
@@ -70,12 +79,12 @@ const ConversationBox = ({
           )}
           <div>
             <p className={styles.conversation_name}>
-              {conv.hasOwnProperty("group") ? conv.group_name : conv.fullName}
+              {conv.name}
             </p>
-            <p className={styles.conversation_text}>{conv.lastMessage}</p>
+            <p className={styles.conversation_text}>{conv.lastMessage?.message}</p>
           </div>
           <div>
-            <p className={styles.conversation_time}>{conv.lastTime}</p>
+            <p className={styles.conversation_time}>{formatDateAndTime(conv.lastMessage?.createdAt)}</p>
             <p
               className={cn(
                 currentConv !== conv.fullName &&
@@ -83,9 +92,7 @@ const ConversationBox = ({
                   styles.conversation_number
               )}
             >
-              {currentConv !== conv.fullName &&
-                newMessage[i] &&
-                conv.messageNumber}
+              {conv.wasRead ? "" : "1"}
             </p>
           </div>
         </div>
