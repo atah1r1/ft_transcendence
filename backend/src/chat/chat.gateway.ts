@@ -9,11 +9,11 @@ import {
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from './chat.service';
 import { Socket, Server } from 'socket.io';
+import { Room } from '@prisma/client';
 
 const EV_CHAT_LIST = 'chat_list';
 const EV_MESSAGE = 'message';
 const EV_SEEN = 'seen';
-const EV_ONLINE_FRIENDS = 'online_friends';
 const EV_CREATE_DM = 'create_dm';
 const EV_CREATE_ROOM = 'create_room';
 const EV_JOIN_ROOM = 'join_room';
@@ -25,12 +25,21 @@ const EV_REMOVE_MEMBER = 'remove_member';
 const EV_MAKE_ADMIN = 'make_admin';
 const EV_FIND_ROOM = 'find_room';
 
+const EV_EMIT_ONLINE_FRIENDS = 'online_friends';
+const EV_EMIT_ROOM_CREATED = 'room_created';
+const EV_EMIT_ROOM_JOINED = 'room_joined';
+const EV_EMIT_ROOM_LEFT = 'room_left';
+const EV_EMIT_USER_BANNED = 'user_banned';
+const EV_EMIT_MEMBER_ADDED = 'member_added';
+const EV_EMIT_MEMBER_REMOVED = 'member_removed';
+const EV_EMIT_ADMIN_MADE = 'admin_made';
+
 @WebSocketGateway({ namespace: 'chat', cors: true, origins: '*' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private authService: AuthService,
     private chatService: ChatService,
-  ) {}
+  ) { }
   @WebSocketServer() server: Server;
 
   /* *******************
@@ -100,14 +109,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         friend.id,
       );
       sockets.forEach((s) => {
-        this.server.to(s.id).emit(EV_ONLINE_FRIENDS, onlineFriends);
+        this.server.to(s.id).emit(EV_EMIT_ONLINE_FRIENDS, onlineFriends);
       });
     });
   }
 
   private async sendOnlineFriendsToClient(client: Socket) {
     const friends = this.chatService.getConnectedFriends(client.data.id);
-    client.emit(EV_ONLINE_FRIENDS, friends);
+    client.emit(EV_EMIT_ONLINE_FRIENDS, friends);
   }
 
   private async verifyAndSave(client: Socket) {
@@ -116,6 +125,55 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decoded = await this.authService.verifyToken(token);
     // save the user id in the socket
     client.data = decoded;
+  }
+
+  private async sendRoomCreatedToClients(room: Room) {
+    const memebers = await this.chatService.getRoomUsersByRoomId(room.id);
+    memebers.forEach((member) => {
+      const sockets = this.chatService.getConnectedUserById(member.userId);
+      if (!sockets || sockets.length === 0) return;
+      sockets.forEach((s) => {
+        this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, room);
+      });
+    });
+  }
+
+  private async sendRoomJoinedToClient(room: Room) {
+    const memebers = await this.chatService.getRoomUsersByRoomId(room.id);
+    memebers.forEach((member) => {
+      const sockets = this.chatService.getConnectedUserById(member.userId);
+      if (!sockets || sockets.length === 0) return;
+      sockets.forEach((s) => {
+        this.server.to(s.id).emit(EV_EMIT_ROOM_JOINED, room);
+      });
+    });
+  }
+
+  private async sendRoomLeftToClient(userId: string, room: Room) {
+    const sockets = this.chatService.getConnectedUserById(userId);
+    if (!sockets || sockets.length === 0) return;
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, room);
+    });
+  }
+
+  private async sendUserBannedToClient(userId: string, room: Room) {
+    const sockets = this.chatService.getConnectedUserById(userId);
+    if (!sockets || sockets.length === 0) return;
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_USER_BANNED, room);
+    });
+  }
+
+  private async sendMemberAddedToClient(userId: string, room: Room) {
+    const memebers = await this.chatService.getRoomUsersByRoomId(room.id);
+    memebers.forEach((member) => {
+      const sockets = this.chatService.getConnectedUserById(member.userId);
+      if (!sockets || sockets.length === 0) return;
+      sockets.forEach((s) => {
+        this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, room);
+      });
+    });
   }
 
   /* *******************

@@ -33,7 +33,7 @@ CREATE TABLE "Room" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "name" VARCHAR(50) NOT NULL,
+    "name" VARCHAR(255),
     "image" VARCHAR(255),
     "password" VARCHAR(255),
     "isPasswordRequired" BOOLEAN NOT NULL DEFAULT false,

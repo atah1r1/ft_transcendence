@@ -78,6 +78,43 @@ export class UserService {
         return friends;
     }
 
+    async addFriend(userId: string, friendId: string) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        const friend = await this.prisma.user.findUnique({ where: { id: friendId } });
+
+        
+        if (user && friend) {
+            const isFriend = this.getFriends(userId).then(friends => {
+                return friends.some(friend => friend.id === friendId);
+            });
+            if (isFriend)
+                return { message: 'User is already your friend' };
+
+            await this.prisma.user.update({
+                where: { id: userId },
+                data: {
+                    friends: {
+                        connect: {
+                            id: friendId
+                        }
+                    }
+                }
+            });
+            await this.prisma.user.update({
+                where: { id: friendId },
+                data: {
+                    friends: {
+                        connect: {
+                            id: userId
+                        }
+                    }
+                }
+            });
+            return { message: 'Friend added' };
+        }
+        return { message: 'User not found' };
+    }
+
     async searchUser(username: string) {
         const users = await this.prisma.user.findMany({
             where: {

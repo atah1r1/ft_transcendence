@@ -11,20 +11,20 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
+import axios from "axios";
 // import { useContext } from "react";
 // import { UserContext } from "../../_app";
 
-const Chat = () =>
-{
+const Chat = () => {
   // const context = useContext( UserContext );
 
   // console.log( "chat: ", context?.data );
 
-  const [ group_box_index, set_g_b_i ] = useState( 0 );
+  const [group_box_index, set_g_b_i] = useState(0);
 
-  const [ currentConv, setCurrentConv ] = useState( { group_user: [] } );
+  const [currentConv, setCurrentConv] = useState({ group_user: [] });
 
-  const [ conversationsBox, setConversationsBox ] = useState( [
+  const [conversationsBox, setConversationsBox] = useState([
     {
       group_user: [
         {
@@ -129,14 +129,13 @@ const Chat = () =>
       lastTime: "11:34PM",
       messageNumber: "6",
     },
-  ] );
+  ]);
 
-  const getSenderInfo = ( senderInfo: any ) =>
-  {
-    setMessages( senderInfo );
+  const getSenderInfo = (senderInfo: any) => {
+    setMessages(senderInfo);
   };
 
-  const [ messages, setMessages ] = useState( [
+  const [messages, setMessages] = useState([
     {
       sender: false,
       message: "..",
@@ -152,14 +151,13 @@ const Chat = () =>
       avatar: "",
       fullName: "",
     },
-  ] );
+  ]);
 
-  const [ messageInput, setMessageInput ] = useState( "" );
-  const handleSubmitMessages = ( e: any ) =>
-  {
+  const [messageInput, setMessageInput] = useState("");
+  const handleSubmitMessages = (e: any) => {
     e.preventDefault();
-    if ( messageInput )
-      setMessages( [
+    if (messageInput)
+      setMessages([
         ...messages,
         {
           sender: true,
@@ -168,60 +166,60 @@ const Chat = () =>
           avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
           fullName: "Yassine hadari",
         },
-      ] );
-    setMessageInput( "" );
+      ]);
+    setMessageInput("");
   };
 
-  const [ chat_room, setChat_room ] = useState( false );
+  const [chat_room, setChat_room] = useState(false);
 
-  const [ chatroomInputs, setChatroomInputs ] = useState( {
+  const [chatroomInputs, setChatroomInputs] = useState({
     groupName: "",
     groupType: "public",
     password: "",
-  } );
-  const handleSubmitGroup = ( e: any ) =>
-  {
+  });
+  const handleSubmitGroup = (e: any) => {
     e.preventDefault();
-    console.log( chatroomInputs );
-    setChatroomInputs( {
+    console.log(chatroomInputs);
+    // do something with the data
+    setChatroomInputs({
       groupName: "",
       groupType: "public",
       password: "",
-    } );
-    setChat_room( false );
+    });
+    setChat_room(false);
   };
 
-  const [ searchInput, setSearchInput ] = useState( "" );
+  const [searchInput, setSearchInput] = useState("");
 
-  const [ treePoints, setTreePoints ] = useState( false );
-  const [ group_box, setGroupBox ] = useState( false );
+  const [treePoints, setTreePoints] = useState(false);
+  const [group_box, setGroupBox] = useState(false);
 
   return (
     <div>
-      { chat_room && (
-        <div className={ styles_r_w.add_btn_window }>
-          <div className={ styles_r_w.part_up }>
-            <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div>
+      {chat_room && (
+        <div className={styles_r_w.add_btn_window}>
+          <div className={styles_r_w.part_up}>
+            <div className={styles_r_w.text}>CREATE A CHAT ROOM</div>
             <div
-              className={ styles_r_w.remove }
-              onClick={ () => setChat_room( false ) }
+              className={styles_r_w.remove}
+              onClick={() => setChat_room(false)}
             >
               X
             </div>
           </div>
-          <form onSubmit={ handleSubmitGroup }>
+          <form onSubmit={handleSubmitGroup}>
             <div>
               <label>group name</label>
               <input
                 type="text"
-                value={ chatroomInputs.groupName }
+                value={chatroomInputs.groupName}
                 placeholder="pingpong"
                 required
-                onChange={ ( e ) =>
-                  setChatroomInputs( {
+                onChange={(e) =>
+                  setChatroomInputs({
                     ...chatroomInputs,
                     groupName: e.target.value,
-                  } )
+                  })
                 }
               ></input>
             </div>
@@ -229,12 +227,12 @@ const Chat = () =>
               <label>group type</label>
               <select
                 required
-                value={ chatroomInputs.groupType }
-                onChange={ ( e ) =>
-                  setChatroomInputs( {
+                value={chatroomInputs.groupType}
+                onChange={(e) =>
+                  setChatroomInputs({
                     ...chatroomInputs,
                     groupType: e.target.value,
-                  } )
+                  })
                 }
               >
                 <option value="public">public</option>
@@ -242,191 +240,187 @@ const Chat = () =>
                 <option value="private">private</option>
               </select>
             </div>
-            { chatroomInputs.groupType === "protected" && (
+            {chatroomInputs.groupType === "protected" && (
               <div>
                 <label>password</label>
                 <input
                   type="password"
                   placeholder="************"
                   required
-                  value={ chatroomInputs.password }
-                  onChange={ ( e ) =>
-                    setChatroomInputs( {
+                  value={chatroomInputs.password}
+                  onChange={(e) =>
+                    setChatroomInputs({
                       ...chatroomInputs,
                       password: e.target.value,
-                    } )
+                    })
                   }
                 ></input>
               </div>
-            ) }
-            <div className={ styles_r_w.part_down }>
+            )}
+            <div className={styles_r_w.part_down}>
               <div
-                className={ styles_r_w.cancel }
-                onClick={ () => setChat_room( false ) }
+                className={styles_r_w.cancel}
+                onClick={() => setChat_room(false)}
               >
                 CANCEL
               </div>
-              <button className={ styles_r_w.create } type="submit">
+              <button className={styles_r_w.create} type="submit">
                 CREATE
               </button>
             </div>
           </form>
         </div>
-      ) }
+      )}
       <div
-        className={ cn( styles_box.container, chat_room && styles_r_w.chat_room ) }
+        className={cn(styles_box.container, chat_room && styles_r_w.chat_room)}
       >
-        <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn ) }>logout</div>
-        <SettingsNav selected={ "chat" } />
-        <div className={ styles_box.profile_details }>
-          <div className={ styles.chat_box }>
-            <div className={ styles.chat_left }>
-              <div className={ styles.l_part_one }>
-                <div className={ styles.chat_plus }>
+        <div className={cn(styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn)}>logout</div>
+        <SettingsNav selected={"chat"} />
+        <div className={styles_box.profile_details}>
+          <div className={styles.chat_box}>
+            <div className={styles.chat_left}>
+              <div className={styles.l_part_one}>
+                <div className={styles.chat_plus}>
                   <p>CHATS</p>
                   <div
-                    className={ styles.plus_btn }
-                    onClick={ () => setChat_room( true ) }
+                    className={styles.plus_btn}
+                    onClick={() => setChat_room(true)}
                   >
                     +
                   </div>
                 </div>
                 <form
-                  className={ styles.search }
-                  onSubmit={ ( e ) =>
-                  {
+                  className={styles.search}
+                  onSubmit={(e) => {
                     e.preventDefault();
-                  } }
+                  }}
                 >
                   <input
                     type="search"
                     placeholder="Search..."
-                    onChange={ ( e ) => setSearchInput( e.target.value ) }
+                    onChange={(e) => setSearchInput(e.target.value)}
                   ></input>
                 </form>
               </div>
-              <div className={ styles.l_part_two }>
+              <div className={styles.l_part_two}>
                 <ConversationBox
                   conversations={
                     searchInput
-                      ? conversationsBox.filter( ( conv ) =>
-                      {
-                        if ( conv.hasOwnProperty( "group" ) )
+                      ? conversationsBox.filter((conv) => {
+                        if (conv.hasOwnProperty("group"))
                           return conv.group_name
                             ?.toLowerCase()
-                            .includes( searchInput );
+                            .includes(searchInput);
                         else
                           return conv.fullName
                             ?.toLowerCase()
-                            .includes( searchInput );
-                      } )
+                            .includes(searchInput);
+                      })
                       : conversationsBox
                   }
-                  getSenderInfo={ getSenderInfo }
-                  messages={ messages }
-                  setCurrent_conv={ setCurrentConv }
+                  getSenderInfo={getSenderInfo}
+                  messages={messages}
+                  setCurrent_conv={setCurrentConv}
                 />
               </div>
-              <div className={ styles.l_part_tree }>
-                <div className={ styles.online }>
+              <div className={styles.l_part_tree}>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
-                <div className={ styles.online }>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/atahiri.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
-                <div className={ styles.online }>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/mbrija.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
-                <div className={ styles.online }>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
-                <div className={ styles.online }>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/ojoubout.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
-                <div className={ styles.online }>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
-                <div className={ styles.online }>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
-                <div className={ styles.online }>
+                <div className={styles.online}>
                   <Image
                     src="https://cdn.intra.42.fr/users/yhadari.jpg"
                     alt="online_friend_img"
-                    width={ "34px" }
-                    height={ "34px" }
-                    layout={ "fixed" }
+                    width={"34px"}
+                    height={"34px"}
+                    layout={"fixed"}
                   ></Image>
                 </div>
               </div>
             </div>
-            <div className={ styles.chat_right }>
+            <div className={styles.chat_right}>
               <ClickOutsidePoints
-                setTreePoints={ setTreePoints }
-                setGroupBox={ setGroupBox }
+                setTreePoints={setTreePoints}
+                setGroupBox={setGroupBox}
                 content={
-                  treePoints && !currentConv.hasOwnProperty( "group" ) ? (
+                  treePoints && !currentConv.hasOwnProperty("group") ? (
                     <TreePointsBox />
                   ) : (
                     treePoints &&
-                    currentConv.hasOwnProperty( "group" ) && (
+                    currentConv.hasOwnProperty("group") && (
                       <div>
-                        <div className={ styles_tree_p.treepoints_box }>
-                          { currentConv.group_user?.map(
-                            ( user: any, i: number ) =>
-                            {
+                        <div className={styles_tree_p.treepoints_box}>
+                          {currentConv.group_user?.map(
+                            (user: any, i: number) => {
                               return (
-                                !user.hasOwnProperty( "me" ) && (
+                                !user.hasOwnProperty("me") && (
                                   <div
-                                    key={ i }
-                                    className={ styles_tree_p.treepoints_box_row }
-                                    onClick={ () =>
-                                    {
-                                      setGroupBox( true );
-                                      set_g_b_i( i );
-                                    } }
+                                    key={i}
+                                    className={styles_tree_p.treepoints_box_row}
+                                    onClick={() => {
+                                      setGroupBox(true);
+                                      set_g_b_i(i);
+                                    }}
                                   >
                                     <div
                                       className={
@@ -434,111 +428,110 @@ const Chat = () =>
                                       }
                                     >
                                       <Image
-                                        src={ user.image }
+                                        src={user.image}
                                         alt="friend_avatar"
-                                        width={ "40px" }
-                                        height={ "40px" }
+                                        width={"40px"}
+                                        height={"40px"}
                                         className={
                                           styles_tree_p.treePoints_box_avatar
                                         }
                                       />
                                     </div>
-                                    <p>{ user.fullName }</p>
+                                    <p>{user.fullName}</p>
                                     <Image
                                       src="/settings_icon.svg"
                                       alt="invete_player_icon"
-                                      width={ "20px" }
-                                      height={ "20px" }
+                                      width={"20px"}
+                                      height={"20px"}
                                     />
                                   </div>
                                 )
                               );
                             }
-                          ) }
+                          )}
                         </div>
-                        { group_box && (
+                        {group_box && (
                           <TreePointsBox
-                            group_box={ group_box }
-                            group_box_i={ group_box_index }
+                            group_box={group_box}
+                            group_box_i={group_box_index}
                           />
-                        ) }
+                        )}
                       </div>
                     )
                   )
                 }
               />
-              <div className={ styles.conversation_head }>
+              <div className={styles.conversation_head}>
                 <p
-                  className={ cn(
+                  className={cn(
                     styles_c_b.conversation_name,
                     styles_c_b.conversation_name_current
-                  ) }
+                  )}
                 >
-                  { messages[ 0 ].fullName }
+                  {messages[0].fullName}
                 </p>
                 <div
-                  className={ styles_tree_p.conversation_head_treepoints }
-                  onClick={ () => setTreePoints( true ) }
+                  className={styles_tree_p.conversation_head_treepoints}
+                  onClick={() => setTreePoints(true)}
                 >
                   ...
                 </div>
               </div>
-              <div className={ styles.conversation_body }>
-                <div className={ styles.message_part_content }>
-                  { messages.map( ( message, i ) =>
-                  {
+              <div className={styles.conversation_body}>
+                <div className={styles.message_part_content}>
+                  {messages.map((message, i) => {
                     return (
-                      <div className={ styles.message_left } key={ i }>
-                        <div className={ styles.message_box }>
-                          <div className={ styles.message_avatar }>
+                      <div className={styles.message_left} key={i}>
+                        <div className={styles.message_box}>
+                          <div className={styles.message_avatar}>
                             <Image
-                              src={ message.avatar }
+                              src={message.avatar}
                               alt="message_avatar"
-                              width={ "42px" }
-                              height={ "42px" }
+                              width={"42px"}
+                              height={"42px"}
                             />
                           </div>
-                          <div style={ { width: "100%" } }>
-                            <div className={ styles.message_nametime_box }>
-                              <div className={ styles.message_fullName }>
-                                { message.fullName }
+                          <div style={{ width: "100%" }}>
+                            <div className={styles.message_nametime_box}>
+                              <div className={styles.message_fullName}>
+                                {message.fullName}
                               </div>
-                              <div className={ styles.message_time }>
-                                { message.time }
+                              <div className={styles.message_time}>
+                                {message.time}
                               </div>
                             </div>
-                            <div className={ styles.message_text }>
-                              { message.message }
+                            <div className={styles.message_text}>
+                              {message.message}
                             </div>
                           </div>
                         </div>
                       </div>
                     );
-                  } ) }
+                  })}
                 </div>
-                <div className={ styles.message_part_send }>
-                  <div className={ styles.message_box_sender }>
+                <div className={styles.message_part_send}>
+                  <div className={styles.message_box_sender}>
                     <form
-                      className={ styles.message_form }
-                      onSubmit={ handleSubmitMessages }
+                      className={styles.message_form}
+                      onSubmit={handleSubmitMessages}
                     >
                       <input
                         type="search"
                         placeholder="Type a message here ."
-                        onChange={ ( e ) => setMessageInput( e.target.value ) }
-                        value={ messageInput }
+                        onChange={(e) => setMessageInput(e.target.value)}
+                        value={messageInput}
                       ></input>
                     </form>
                   </div>
                   <div
-                    className={ styles.message_send }
-                    onClick={ handleSubmitMessages }
+                    className={styles.message_send}
+                    onClick={handleSubmitMessages}
                   >
                     <Image
                       src="/send_icon.svg"
                       alt="send_message_icon"
-                      width={ "20%" }
-                      height={ "20%" }
+                      width={"20%"}
+                      height={"20%"}
                     ></Image>
                   </div>
                 </div>

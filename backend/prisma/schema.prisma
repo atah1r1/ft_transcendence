@@ -41,16 +41,22 @@ model RoomUser {
 }
 
 model Room {
-  id                 String     @id @default(uuid())
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  name               String?    @db.VarChar(255)
-  image              String?    @db.VarChar(255)
-  password           String?    @db.VarChar(255)
-  isPasswordRequired Boolean    @default(false)
-  isDm               Boolean    @default(false)
+  id                 String      @id @default(uuid())
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  name               String?     @db.VarChar(255)
+  image              String?     @db.VarChar(255)
+  password           String?     @db.VarChar(255)
+  privacy            RoomPrivacy @default(PUBLIC)
+  isDm               Boolean     @default(false)
   members            RoomUser[]
   messages           Message[]
+}
+
+enum RoomPrivacy {
+  PUBLIC
+  PRIVATE
+  PROTECTED
 }
 
 model Message {

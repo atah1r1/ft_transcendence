@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Room, RoomUser, Message } from '@prisma/client';
+import { Room, RoomUser, Message, RoomPrivacy } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
@@ -10,7 +10,7 @@ export class ChatService {
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
-  ) {}
+  ) { }
 
   // NOTE: userId -> [socketId]
   private connectedUsers: Map<string, Socket[]> = new Map();
@@ -65,13 +65,14 @@ export class ChatService {
         name: null,
         image: null,
         password: null,
-        isPasswordRequired: false,
+        privacy: 'PRIVATE',
         isDm: true,
       },
     });
 
     this.addUserToRoom(userId, _room.id, null, true);
     this.addUserToRoom(otherUserId, _room.id, null, true);
+    this.userService.addFriend(userId, otherUserId);
 
     return _room;
   }
@@ -80,12 +81,12 @@ export class ChatService {
     creatorId: string,
     name: string,
     image: string,
-    isPasswordRequired: boolean,
+    privacy: RoomPrivacy,
     password: string,
   ): Promise<Room> {
     let _hashed: string = null;
 
-    if (isPasswordRequired) {
+    if (privacy === 'PROTECTED') {
       _hashed = await this.encryptRoomPassword(password);
     }
 
@@ -93,7 +94,7 @@ export class ChatService {
       data: {
         name: name,
         image: image,
-        isPasswordRequired: isPasswordRequired,
+        privacy: privacy,
         password: _hashed,
         isDm: false,
       },
@@ -175,8 +176,7 @@ export class ChatService {
     if (_existingRoomUser) throw new Error('User already in room');
 
     if (
-      _room.isPasswordRequired &&
-      this.validateRoomPassword(password, _room.password)
+      _room.privacy === 'PROTECTED' && !(await this.validateRoomPassword(password, _room.password))
     )
       throw new Error('Incorrect room password');
 
@@ -200,6 +200,7 @@ export class ChatService {
   ): Promise<RoomUser> {
     const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
     if (!_room) throw new Error('Room does not exist');
+    if (_room.isDm) throw new Error('Room is a DM');
 
     const _adminRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
       adminId,
@@ -384,6 +385,7 @@ export class ChatService {
           contains: name,
         },
         NOT: {
+          privacy: 'PRIVATE',
           members: {
             some: {
               userId: userId,
@@ -400,6 +402,7 @@ export class ChatService {
       where: {
         isDm: false,
         NOT: {
+          privacy: 'PRIVATE',
           members: {
             some: {
               userId: userId,
@@ -521,6 +524,8 @@ export class ChatService {
 
     const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
     if (!_roomUser) throw new Error('You are not in room');
+
+    if (_roomUser.isBanned) throw new Error('User is banned');
 
     return await this.prisma.message.findMany({
       where: {
