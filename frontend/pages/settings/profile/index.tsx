@@ -7,6 +7,7 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Image from "next/image";
 import requireAuthentication from "../../../hooks/requiredAuthentication";
+import { MenuOutline } from 'react-ionicons'
 
 const Profile = () => {
 
@@ -25,6 +26,7 @@ const Profile = () => {
   const [loader, setLoader] = useState(true);
   const [s_witch, setSwitch] = useState(false);
   const [ value, setValue ] = useState( {firstName: '', lastName: '', username: ''} );
+  const [ menu, setMenu ] = useState(false);
 
   const handleFirstName = ( e: any ) =>
   {
@@ -61,9 +63,22 @@ const Profile = () => {
   })
 
   return (
+    <>
+    <div className={styles.nav}>
+      <div className={ styles.menu_btn } onClick={()=> setMenu(!menu)}>
+        <MenuOutline
+          color={ '#fffff' }
+          height="50px"
+          width="50px"
+        />
+      </div>
+    </div>
+    {
+      !menu && <div className={styles.menuNav}></div>
+    }
     <div className={styles_box.container}>
       {
-        !loader &&
+        !loader && !menu &&
         <SettingsNav selected={"profile"} />
       }
       <div className={styles_box.profile_details}>
@@ -175,6 +190,7 @@ const Profile = () => {
         }
       </div>
     </div>
+  </>
   );
 };
 

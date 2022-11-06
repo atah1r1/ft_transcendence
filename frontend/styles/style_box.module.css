@@ -34,7 +34,7 @@
 .logout_btn {
   z-index: 1;
   position: absolute;
-  top: -16rem;
+  top: -17rem;
   right: 0;
   padding: 1.2rem 3.6rem !important;
 }
@@ -43,6 +43,14 @@
 
 @media (max-width: 1000px) {
   .profile_setting {
-    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    background: none;
+    backdrop-filter: blur(0);
+    position: fixed;
+    /* display: none; */
   }
 }
