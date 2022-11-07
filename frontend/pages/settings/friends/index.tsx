@@ -12,81 +12,81 @@ const History = () => {
   const [inputForm, setInputForm] = useState("");
 
 
-  const [friends1, setFriends1] = useState([]);
+  const [friends, setFriends] = useState([]);
 
   useEffect(() => {
     axios.get("http://localhost:9000/api/user/all", {
       withCredentials: true,
     }).then((res) => {
-      setFriends1(res.data);
+      setFriends(res.data);
       console.log(res.data);
     }).catch((err) => {
       console.log(err);
     });
   }, []);
 
-  const [friends, setFriends] = useState([
-    {
-      avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-      fullName: "HADARI YASSINE",
-      userName: "YHADARI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
-      fullName: "AMINE TAHIRI",
-      userName: "ATAHIRI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
-      fullName: "BRAHIM SANAOUI",
-      userName: "BSANAOUI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
-      fullName: "ISMAIL BOUHIRI",
-      userName: "IBOUHIRI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-      fullName: "HADARI YASSINE",
-      userName: "YHADARI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
-      fullName: "AMINE TAHIRI",
-      userName: "ATAHIRI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
-      fullName: "BRAHIM SANAOUI",
-      userName: "BSANAOUI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
-      fullName: "ISMAIL BOUHIRI",
-      userName: "IBOUHIRI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-      fullName: "HADARI YASSINE",
-      userName: "YHADARI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
-      fullName: "AMINE TAHIRI",
-      userName: "ATAHIRI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
-      fullName: "BRAHIM SANAOUI",
-      userName: "BSANAOUI",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
-      fullName: "ISMAIL BOUHIRI",
-      userName: "IBOUHIRI",
-    },
-  ]);
+  // const [friends, setFriends] = useState([
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
+  //     fullName: "HADARI YASSINE",
+  //     userName: "YHADARI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
+  //     fullName: "AMINE TAHIRI",
+  //     userName: "ATAHIRI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
+  //     fullName: "BRAHIM SANAOUI",
+  //     userName: "BSANAOUI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
+  //     fullName: "ISMAIL BOUHIRI",
+  //     userName: "IBOUHIRI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
+  //     fullName: "HADARI YASSINE",
+  //     userName: "YHADARI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
+  //     fullName: "AMINE TAHIRI",
+  //     userName: "ATAHIRI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
+  //     fullName: "BRAHIM SANAOUI",
+  //     userName: "BSANAOUI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
+  //     fullName: "ISMAIL BOUHIRI",
+  //     userName: "IBOUHIRI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
+  //     fullName: "HADARI YASSINE",
+  //     userName: "YHADARI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
+  //     fullName: "AMINE TAHIRI",
+  //     userName: "ATAHIRI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
+  //     fullName: "BRAHIM SANAOUI",
+  //     userName: "BSANAOUI",
+  //   },
+  //   {
+  //     avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
+  //     fullName: "ISMAIL BOUHIRI",
+  //     userName: "IBOUHIRI",
+  //   },
+  // ]);
 
   return (
     <div className={styles_box.container}>
@@ -113,7 +113,7 @@ const History = () => {
             // friends={friends.filter((ele) => {
             //   return ele.userName.toLowerCase().includes(inputForm);
             // })}
-            friends={friends1}
+            friends={friends}
           ></Friends_box>
         </div>
       </div>

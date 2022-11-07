@@ -11,7 +11,7 @@ const Friends_box = ({ friends }: any) => {
     return (
       <div className={styles.friends_box} key={i}>
         <div className={styles.friends_avatar}>
-          <Image src={ele.avatar} alt="avatar" width="68" height="68" />
+          <Image src={ele.avatar === null ? `https://ui-avatars.com/api/?name=${ele.username}` : ele.avatar} alt="avatar" width="68" height="68" />
         </div>
         <div className={styles.friends_userName}>
           <p>{ele.username}</p>
@@ -32,7 +32,7 @@ const Friends_box = ({ friends }: any) => {
             socket?.emit("create_dm", { otherUserId: ele.id });
           }}>
             <Image
-              src="/unfriend.svg"
+              src="/chat.svg"
               alt="invete_player_icon"
               width={"26px"}
               height={"26px"}

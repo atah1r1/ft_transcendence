@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "RoomPrivacy" AS ENUM ('PUBLIC', 'PRIVATE', 'PROTECTED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -36,7 +39,7 @@ CREATE TABLE "Room" (
     "name" VARCHAR(255),
     "image" VARCHAR(255),
     "password" VARCHAR(255),
-    "isPasswordRequired" BOOLEAN NOT NULL DEFAULT false,
+    "privacy" "RoomPrivacy" NOT NULL DEFAULT 'PUBLIC',
     "isDm" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Room_pkey" PRIMARY KEY ("id")

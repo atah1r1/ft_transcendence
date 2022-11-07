@@ -187,7 +187,7 @@ const Chat = () => {
       name: chatroomInputs.groupName,
       privacy: chatroomInputs.groupType,
       password: chatroomInputs.password,
-      image: 'https://ui-avatars.com/api/?name=Room'
+      image: `https://ui-avatars.com/api/?name=${chatroomInputs.groupName}`,
     });
     setChatroomInputs({
       groupName: "",
@@ -248,7 +248,7 @@ const Chat = () => {
                 <option value="PRIVATE">private</option>
               </select>
             </div>
-            {chatroomInputs.groupType === "protected" && (
+            {chatroomInputs.groupType === "PROTECTED" && (
               <div>
                 <label>password</label>
                 <input
