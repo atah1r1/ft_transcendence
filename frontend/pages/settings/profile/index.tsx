@@ -114,13 +114,11 @@ const Profile = () =>
           }
         </div>
       </div>
-      {
-        menu && <div className={ styles.menuNav }></div>
-      }
+      <div className={ cn( styles.menuNav, `${ menu && styles.navOpen }` ) }></div>
       <div className={ styles_box.container }>
         {
-          !loader && (menu || windowDimensions!.width > 1000) &&
-          <SettingsNav selected={ "profile" } />
+          !loader &&
+          <SettingsNav selected={ "profile" } menu={menu} />
         }
         <div className={ styles_box.profile_details }>
           {

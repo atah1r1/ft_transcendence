@@ -22,6 +22,7 @@
   justify-content: center;
   gap: 4.2rem;
   padding: 0 4.2rem;
+  /* transition: all 1s ease-in; */
 }
 
 .profile_details {
@@ -39,17 +40,25 @@
   padding: 1.2rem 3.6rem !important;
 }
 
+.navOpen.profile_setting {
+  position: absolute;
+  top:50%;
+  left: 50%;
+  position: fixed;
+}
+
 /* media q--------------------- */
 
 @media (max-width: 1000px) {
   .profile_setting {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: -100%;
     transform: translate(-50%, -50%);
     z-index: 1;
     background: none;
     backdrop-filter: blur(0);
     position: fixed;
+    transition: all 0.3s ease-in;
   }
 }

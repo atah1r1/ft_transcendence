@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../pages/_app";
 
-const SettingsNav = ( { selected }: any ) =>
+const SettingsNav = ( { selected, menu }: any ) =>
 {
   const sections = [ "profile", "chat", "history", "statistics", "friends" ];
   const router = useRouter();
@@ -31,7 +31,7 @@ const SettingsNav = ( { selected }: any ) =>
   }, [] )
 
   return (
-    <div className={ styles_box.profile_setting }>
+    <div className={ cn( styles_box.profile_setting, `${ menu && styles_box.navOpen }` ) }>
       <div className={ styles_s_l.profile_info }>
         <div className={ styles_s_l.profile_image_wrap }>
           <Image

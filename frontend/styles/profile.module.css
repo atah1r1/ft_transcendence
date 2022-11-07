@@ -84,7 +84,7 @@
   margin-bottom: 8rem;
 }
 
-.details_form div{
+.details_form div {
   padding: 1rem;
   text-align: left;
 }
@@ -128,7 +128,7 @@
   background-color: #da3e58;
 }
 
-.save_unclick{
+.save_unclick {
   pointer-events: none;
   background-color: #dd6176 !important;
 }
@@ -151,7 +151,6 @@
   font-size: 1.4rem;
   letter-spacing: 1px;
 }
-
 
 /* Swich Botton ---------------*/
 
@@ -216,13 +215,13 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.nav{
+.nav {
   position: absolute;
   z-index: 2;
   display: none;
 }
 
-.menuNav{
+.menuNav {
   height: 100vh;
   width: 100%;
   background: rgba(255, 255, 255, 0.26);
@@ -230,18 +229,32 @@ input:checked + .slider:before {
   position: fixed;
   z-index: 1;
   display: none;
+  transition: all 0.3s ease-in;
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
-.menu_btn{
+.navOpen.menuNav{
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateX(0);
+  /* z-index: 9999; */
+}
+
+.menu_btn {
   position: absolute;
   padding-left: 3.2rem;
   color: #fff;
   cursor: pointer;
   transition: all 0.5s;
+  position: fixed;
 }
 
-.menu_btn:active{
-  transform: translateY(6px);
+.menu_btn:active {
+  transform: translateY(4px);
 }
 
 /* media q--------------------- */
@@ -256,13 +269,13 @@ input:checked + .slider:before {
     top: -4rem;
   }
 
-  .details_form input{
+  .details_form input {
     width: 28rem;
   }
 }
 
 @media (max-width: 1000px) {
-  .nav, .menuNav{
+  .nav,.menuNav {
     display: block;
   }
 }
