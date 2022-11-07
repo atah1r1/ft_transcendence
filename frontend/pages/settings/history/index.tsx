@@ -7,9 +7,11 @@ import SettingsNav from "../../../components/settings_nav";
 import Loader from "../../../components/Loading";
 import HistoryBox from "../../../components/history_box";
 import { useState } from "react";
+import MenuNav from "../../../components/menuNav";
 
 const History = () =>
 {
+  const [ menu, setMenu ] = useState( false );
   const [ history, setHistory ] = useState( [
     {
       avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
@@ -112,15 +114,18 @@ const History = () =>
     },
   ] );
   return (
-    <div className={ styles_box.container }>
-      <SettingsNav selected={ "history" } />
-      <div className={ styles_box.profile_details }>
-        <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
-        <div className={ styles_h.history }>
-          <HistoryBox history={ history }></HistoryBox>
+    <>
+      <MenuNav menu={ menu } setMenu={ setMenu } />
+      <div className={ styles_box.container }>
+        <SettingsNav selected={ "history" } menu={ menu } />
+        <div className={ styles_box.profile_details }>
+          <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
+          <div className={ styles_h.history }>
+            <HistoryBox history={ history }></HistoryBox>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

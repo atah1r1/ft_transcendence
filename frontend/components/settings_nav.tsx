@@ -8,6 +8,30 @@ import { UserContext } from "../pages/_app";
 
 const SettingsNav = ( { selected, menu }: any ) =>
 {
+  function getWindowDimensions ()
+  {
+    if ( typeof window !== "undefined" )
+    {
+      const { innerWidth: width, innerHeight: height } = window;
+      return {
+        width,
+        height
+      };
+    }
+  }
+
+  const [ windowDimensions, setWindowDimensions ] = useState( getWindowDimensions() );
+  useEffect( () =>
+  {
+    function handleResize ()
+    {
+      setWindowDimensions( getWindowDimensions() );
+    }
+
+    window.addEventListener( 'resize', handleResize );
+    return () => window.removeEventListener( 'resize', handleResize );
+  }, [] );
+
   const sections = [ "profile", "chat", "history", "statistics", "friends" ];
   const router = useRouter();
 
@@ -31,7 +55,7 @@ const SettingsNav = ( { selected, menu }: any ) =>
   }, [] )
 
   return (
-    <div className={ cn( styles_box.profile_setting, `${ menu && styles_box.navOpen }` ) }>
+    <div className={ cn( styles_box.profile_setting, `${ menu && windowDimensions!.width < 1000 && styles_box.navOpen }` ) }>
       <div className={ styles_s_l.profile_info }>
         <div className={ styles_s_l.profile_image_wrap }>
           <Image

@@ -7,34 +7,10 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Image from "next/image";
 import requireAuthentication from "../../../hooks/requiredAuthentication";
-import { MenuOutline, CloseOutline } from 'react-ionicons'
-// import useWindowDimensions from "../../../hooks/useWindowDimensions";
+import MenuNav from "../../../components/menuNav";
 
 const Profile = () =>
 {
-  function getWindowDimensions ()
-  {
-    if ( typeof window !== "undefined" )
-    {
-      const { innerWidth: width, innerHeight: height } = window;
-      return {
-        width,
-        height
-      };
-    }
-  }
-
-  const [ windowDimensions, setWindowDimensions ] = useState( getWindowDimensions() );
-  useEffect( () =>
-  {
-    function handleResize ()
-    {
-      setWindowDimensions( getWindowDimensions() );
-    }
-
-    window.addEventListener( 'resize', handleResize );
-    return () => window.removeEventListener( 'resize', handleResize );
-  }, [] );
 
   const [ data, setData ] = useState(
     {
@@ -94,31 +70,11 @@ const Profile = () =>
 
   return (
     <>
-      <div className={ styles.nav }>
-        <div className={ styles.menu_btn } onClick={ () => setMenu( !menu ) }>
-          {
-            !menu &&
-            <MenuOutline
-              color={ '#fffff' }
-              height="50px"
-              width="50px"
-            />
-          }
-          {
-            menu &&
-            <CloseOutline
-              color={ '#fffff' }
-              height="50px"
-              width="50px"
-            />
-          }
-        </div>
-      </div>
-      <div className={ cn( styles.menuNav, `${ menu && styles.navOpen }` ) }></div>
+      <MenuNav menu={menu} setMenu={setMenu}/>
       <div className={ styles_box.container }>
         {
           !loader &&
-          <SettingsNav selected={ "profile" } menu={menu} />
+          <SettingsNav selected={ "profile" } menu={ menu } />
         }
         <div className={ styles_box.profile_details }>
           {

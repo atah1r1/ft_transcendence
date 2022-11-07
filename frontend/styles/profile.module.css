@@ -52,7 +52,7 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.3);
-  transition: all 0.3s;
+  transition: all 0.4s;
 }
 
 .upload_avatar {
@@ -215,48 +215,6 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.nav {
-  position: absolute;
-  z-index: 2;
-  display: none;
-}
-
-.menuNav {
-  height: 100vh;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.26);
-  backdrop-filter: blur(16px);
-  position: fixed;
-  z-index: 1;
-  display: none;
-  transition: all 0.3s ease-in;
-  transform: translateX(-100%);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.navOpen.menuNav{
-  opacity: 1;
-  pointer-events: auto;
-  visibility: visible;
-  transform: translateX(0);
-  /* z-index: 9999; */
-}
-
-.menu_btn {
-  position: absolute;
-  padding-left: 3.2rem;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.5s;
-  position: fixed;
-}
-
-.menu_btn:active {
-  transform: translateY(4px);
-}
-
 /* media q--------------------- */
 
 @media (max-width: 1280px) {
@@ -271,11 +229,5 @@ input:checked + .slider:before {
 
   .details_form input {
     width: 28rem;
-  }
-}
-
-@media (max-width: 1000px) {
-  .nav,.menuNav {
-    display: block;
   }
 }

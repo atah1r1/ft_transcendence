@@ -11,15 +11,11 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
-import { useContext } from "react";
-import { UserContext } from "../../_app";
+import MenuNav from "../../../components/menuNav";
 
 const Chat = () =>
 {
-  const context = useContext( UserContext );
-
-  console.log( "chat: ", context?.data );
-
+  const [ menu, setMenu ] = useState( false );
   const [ group_box_index, set_g_b_i ] = useState( 0 );
 
   const [ currentConv, setCurrentConv ] = useState( { group_user: [] } );
@@ -198,6 +194,7 @@ const Chat = () =>
 
   return (
     <div>
+      <MenuNav menu={ menu } setMenu={ setMenu } />
       { chat_room && (
         <div className={ styles_r_w.add_btn_window }>
           <div className={ styles_r_w.part_up }>
@@ -276,7 +273,7 @@ const Chat = () =>
       <div
         className={ cn( styles_box.container, chat_room && styles_r_w.chat_room ) }
       >
-        <SettingsNav selected={ "chat" } />
+        <SettingsNav selected={ "chat" } menu={ menu } />
         <div className={ styles_box.profile_details }>
           <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
           <div className={ styles.chat_box }>
