@@ -79,3 +79,29 @@
   width: 26rem;
   font-family: "Phosphate";
 }
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .history_box {
+    /* padding: 1.2rem 0; */
+     font-size: 1.5rem;
+  }
+
+  .history_achievements {
+    width: 12rem;
+  }
+
+  .history_score_points {
+    width: 12rem;
+  }
+
+  .history_victory_defeat_box {
+    width: 12rem;
+    font-size: 2.4rem;
+  }
+
+  .history_gameMode_time {
+    width: 20rem;
+  }
+}

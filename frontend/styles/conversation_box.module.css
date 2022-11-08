@@ -82,6 +82,7 @@
   color: #555;
   font-size: 1rem;
 }
+
 .conversation_time {
   position: absolute;
   top: 10%;
@@ -89,6 +90,7 @@
   color: rgba(0, 0, 0, 0.5);
   font-size: 1rem;
 }
+
 .conversation_number {
   position: absolute;
   top: 40%;
@@ -123,4 +125,12 @@
 
 .conversation_head_box.conversation:hover {
   background-color: #d9d9d9;
+}
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .conversation {
+    grid-template-columns: 1fr 4fr 1fr;
+  }
 }

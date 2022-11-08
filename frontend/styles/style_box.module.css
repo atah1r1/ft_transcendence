@@ -1,5 +1,6 @@
 .container {
   height: 100vh;
+  width: 100%;
   display: flex;
   justify-content: center;
   gap: 8rem;
@@ -41,12 +42,21 @@
 
 .navOpen.profile_setting {
   position: absolute;
-  top:50%;
+  top: 50%;
   left: 50%;
   position: fixed;
 }
 
 /* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .profile_details {
+    padding: 2.2rem;
+  }
+  .container {
+    gap: 4rem;
+  }
+}
 
 @media (max-width: 1000px) {
   .profile_setting {

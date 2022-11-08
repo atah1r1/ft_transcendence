@@ -74,7 +74,7 @@ const ConversationBox = ({
             </p>
             <p className={styles.conversation_text}>{conv.lastMessage}</p>
           </div>
-          <div>
+          <div className={ styles.conversation_part_tree}>
             <p className={styles.conversation_time}>{conv.lastTime}</p>
             <p
               className={cn(
