@@ -63,21 +63,16 @@ const Chat = () =>
           image: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
           fullName: "Ismail BOUHIRI",
         },
-        {
-          image: "https://cdn.intra.42.fr/users/yhadari.jpg",
-          fullName: "Yassine HADARI",
-          me: true,
-        },
       ],
       group_name: "Group TRANDANDANE",
-      group_image: "https://cdn.intra.42.fr/users/yhadari.jpg",
+      group_image: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
       lastMessage: "wa fin a sat",
       lastTime: "3:16PM",
       messageNumber: "2",
       group: true,
     },
     {
-      image: "https://cdn.intra.42.fr/users/yhadari.jpg",
+      image: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
       fullName: "Yassine HADARI",
       lastMessage: "wa fin a sat",
       lastTime: "3:16PM",
@@ -98,7 +93,7 @@ const Chat = () =>
       messageNumber: "6",
     },
     {
-      image: "https://cdn.intra.42.fr/users/zsidki.jpg",
+      image: "https://cdn.intra.42.fr/users/atahiri.jpg",
       fullName: "Zakariya SIDKI",
       lastMessage: "wa fin a sat",
       lastTime: "3:16PM",
@@ -161,8 +156,8 @@ const Chat = () =>
           sender: true,
           message: messageInput,
           time: "Today at 17:15",
-          avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-          fullName: "Yassine hadari",
+          avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
+          fullName: "Amine tahiri",
         },
       ] );
     setMessageInput( "" );
@@ -327,7 +322,7 @@ const Chat = () =>
               <div className={ styles.l_part_tree }>
                 <div className={ styles.online }>
                   <Image
-                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
                     alt="online_friend_img"
                     width={ "34px" }
                     height={ "34px" }
@@ -372,7 +367,7 @@ const Chat = () =>
                 </div>
                 <div className={ styles.online }>
                   <Image
-                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
                     alt="online_friend_img"
                     width={ "34px" }
                     height={ "34px" }
@@ -381,7 +376,7 @@ const Chat = () =>
                 </div>
                 <div className={ styles.online }>
                   <Image
-                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    src="https://cdn.intra.42.fr/users/atahiri.jpg"
                     alt="online_friend_img"
                     width={ "34px" }
                     height={ "34px" }
@@ -390,7 +385,196 @@ const Chat = () =>
                 </div>
                 <div className={ styles.online }>
                   <Image
-                    src="https://cdn.intra.42.fr/users/yhadari.jpg"
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/atahiri.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/mbrija.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/atahiri.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/atahiri.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/atahiri.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/mbrija.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/atahiri.jpg"
+                    alt="online_friend_img"
+                    width={ "34px" }
+                    height={ "34px" }
+                    layout={ "fixed" }
+                  ></Image>
+                </div>
+                <div className={ styles.online }>
+                  <Image
+                    src="https://cdn.intra.42.fr/users/ojoubout.jpg"
                     alt="online_friend_img"
                     width={ "34px" }
                     height={ "34px" }

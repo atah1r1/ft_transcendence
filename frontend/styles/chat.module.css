@@ -10,6 +10,17 @@
   padding-right: 2rem;
 }
 
+.chat_left::after {
+  display: none;
+  content: "online";
+  position: absolute;
+  top: 0;
+  left: 53%;
+  transform: translateY(-50%, -50%);
+  font-family: "Pixeboy";
+  font-size: 3.6rem;
+}
+
 .chat_right {
   display: flex;
   flex-direction: column;
@@ -274,7 +285,7 @@
 
 /* media q--------------------- */
 
-@media (max-width: 1280px) {
+@media (max-width: 1280px) and (min-width: 1000px) {
   .chat_box {
     display: flex;
     flex-direction: column;
@@ -286,20 +297,50 @@
     border-right: 0;
     border-bottom: 2px solid rgba(255, 255, 255, 0.25);
     padding-right: 0;
+    padding-bottom: 1.2rem;
+  }
+  .chat_left::after{
+    display: block;
   }
   .chat_right {
     height: 50%;
+    padding-top: 1.2rem;
   }
 
   .l_part_one {
     height: 30%;
+    width: 50%;
   }
   .l_part_two {
-    height: 50%;
+    height: 70%;
+    width: 50%;
   }
   .l_part_tree {
-    height: 20%;
-    width: 40rem;
-    margin: 0 auto;
+    height: 75%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 1.8rem;
+    column-gap: 3rem;
+    position: absolute;
+    top: 50%;
+    right:0;
+    transform: translate(-50%, -50%);
+    overflow-y: scroll;
+    overflow-x: auto;
+    margin-top: 3.2rem;
+    padding-right: 1rem;
+  }
+  .l_part_tree::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  /* Handle */
+  .l_part_tree::-webkit-scrollbar-thumb {
+    background: #aaa;
+    border-radius: 10px;
+  }
+
+  .online_text {
+    display: block;
   }
 }
