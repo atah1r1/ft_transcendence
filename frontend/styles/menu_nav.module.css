@@ -7,8 +7,9 @@
 .menuNav {
   height: 100vh;
   width: 100%;
-  background: rgba(255, 255, 255, 0.26);
-  backdrop-filter: blur(16px);
+  /* background: rgba(255, 255, 255, 0.26); */
+  background: hsla(224, 48%, 16%, 0.5);
+  backdrop-filter: blur(20px);
   position: fixed;
   z-index: 1;
   display: none;
