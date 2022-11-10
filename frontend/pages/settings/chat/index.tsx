@@ -12,6 +12,7 @@ import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
 import MenuNav from "../../../components/menuNav";
+import { CloseSharp, LockClosedSharp } from 'react-ionicons'
 
 const Chat = () =>
 {
@@ -166,6 +167,14 @@ const Chat = () =>
     },
   ] );
 
+  const [ value, setValue ] = useState( '' );
+  const handleChange = ( e: any ) =>
+  {
+    const result = e.target.value.replace( /\D/g, '' );
+
+    setValue( result );
+  };
+
   const getSenderInfo = ( senderInfo: any ) =>
   {
     setMessages( senderInfo );
@@ -207,7 +216,10 @@ const Chat = () =>
     setMessageInput( "" );
   };
 
-  const [ chat_room, setChat_room ] = useState( false );
+  const [ room, setRoom ] = useState( false );
+  const [ creat_room, setCreat_room ] = useState( false );
+  const [ join_room, setJoin_room ] = useState( false );
+  const [ protected_room, setProtected_room ] = useState( false );
 
   const [ chatroomInputs, setChatroomInputs ] = useState( {
     groupName: "",
@@ -217,13 +229,12 @@ const Chat = () =>
   const handleSubmitGroup = ( e: any ) =>
   {
     e.preventDefault();
-    console.log( chatroomInputs );
     setChatroomInputs( {
       groupName: "",
       groupType: "public",
       password: "",
     } );
-    setChat_room( false );
+    setCreat_room( false );
   };
 
   const [ searchInput, setSearchInput ] = useState( "" );
@@ -234,51 +245,91 @@ const Chat = () =>
   return (
     <div>
       <MenuNav menu={ menu } setMenu={ setMenu } />
-      { chat_room && (
+      { room && (
         <div className={ styles_r_w.add_btn_window }>
           <div className={ styles_r_w.part_up }>
-            <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div>
+            { room && !creat_room && !join_room && !protected_room && <div className={ styles_r_w.text }>CREATE/JOIN A CHAT ROOM</div> }
+            { creat_room && <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div> }
+            { join_room && !protected_room && <div className={ styles_r_w.text }>JOIN A CHAT ROOM</div> }
+            { protected_room && <div className={ styles_r_w.text }>JOIN CHAT_PROTECTED</div> }
             <div
               className={ styles_r_w.remove }
-              onClick={ () => setChat_room( false ) }
+              onClick={ () => { setCreat_room( false ); setJoin_room( false ); setRoom( false ); setProtected_room( false ) } }
             >
-              X
+              <CloseSharp
+                color={ '#ffffff' }
+                height="40px"
+                width="40px"
+              />
             </div>
           </div>
+          {
+            room && !creat_room && !join_room && !protected_room &&
+            <div className={ styles_r_w.creat_join_btn }>
+              <div className={ styles_r_w.create } onClick={ () => setCreat_room( true ) }>CREAT A CHAT ROOM</div>
+              <div className={ styles_r_w.create } onClick={ () => setJoin_room( true ) }>JOIN A CHAT ROOM</div>
+            </div>
+          }
+          {
+            join_room && !protected_room &&
+            <div className={ cn( styles_r_w.creat_join_btn, styles_r_w.join_box ) }>
+              <div className={ styles_r_w.create }
+                onClick={ () => setProtected_room( true ) }>CHAT_PROTECTED
+                <LockClosedSharp
+                  color={ '#00000' }
+                  height="30px"
+                  width="30px"
+                /></div>
+              <div className={ styles_r_w.create }>CHAT_PUBLIC</div>
+            </div>
+          }
+          {
+            protected_room &&
+            <div className={ cn( styles_r_w.creat_join_btn, styles_r_w.join_box, styles_r_w.join_protect ) }>
+              <label>PASSWORD</label>
+              <input type="text" placeholder="******" maxLength={ 6 } value={ value } onChange={ handleChange }></input>
+            </div>
+          }
           <form onSubmit={ handleSubmitGroup }>
-            <div>
-              <label>group name</label>
-              <input
-                type="text"
-                value={ chatroomInputs.groupName }
-                placeholder="pingpong"
-                required
-                onChange={ ( e ) =>
-                  setChatroomInputs( {
-                    ...chatroomInputs,
-                    groupName: e.target.value,
-                  } )
-                }
-              ></input>
-            </div>
-            <div>
-              <label>group type</label>
-              <select
-                required
-                value={ chatroomInputs.groupType }
-                onChange={ ( e ) =>
-                  setChatroomInputs( {
-                    ...chatroomInputs,
-                    groupType: e.target.value,
-                  } )
-                }
-              >
-                <option value="public">public</option>
-                <option value="protected">protected</option>
-                <option value="private">private</option>
-              </select>
-            </div>
-            { chatroomInputs.groupType === "protected" && (
+            {
+              creat_room &&
+              <div>
+                <label>group name</label>
+                <input
+                  type="text"
+                  value={ chatroomInputs.groupName }
+                  placeholder="pingpong"
+                  required
+                  onChange={ ( e ) =>
+                    setChatroomInputs( {
+                      ...chatroomInputs,
+                      groupName: e.target.value,
+                    } )
+                  }
+                ></input>
+              </div>
+            }
+            {
+              creat_room &&
+              <div>
+                <label>group type</label>
+                <select
+                  required
+                  value={ chatroomInputs.groupType }
+                  onChange={ ( e ) =>
+                    setChatroomInputs( {
+                      ...chatroomInputs,
+                      groupType: e.target.value,
+                    } )
+                  }
+                >
+                  <option value="public">public</option>
+                  <option value="protected">protected</option>
+                  <option value="private">private</option>
+                </select>
+              </div>
+            }
+            { chatroomInputs.groupType === "protected" && creat_room && (
               <div>
                 <label>password</label>
                 <input
@@ -286,6 +337,7 @@ const Chat = () =>
                   placeholder="************"
                   required
                   value={ chatroomInputs.password }
+                  maxLength={ 16 }
                   onChange={ ( e ) =>
                     setChatroomInputs( {
                       ...chatroomInputs,
@@ -296,21 +348,47 @@ const Chat = () =>
               </div>
             ) }
             <div className={ styles_r_w.part_down }>
-              <div
-                className={ styles_r_w.cancel }
-                onClick={ () => setChat_room( false ) }
-              >
-                CANCEL
-              </div>
-              <button className={ styles_r_w.create } type="submit">
-                CREATE
-              </button>
+              {
+                room && !creat_room && !join_room && !protected_room &&
+                <div
+                  className={ styles_r_w.cancel }
+                  onClick={ () => { setCreat_room( false ); setRoom( false ) } }
+                >
+                  CANCEL
+                </div>
+              }
+              {
+                ( creat_room || join_room || protected_room ) &&
+                <div
+                  className={ styles_r_w.cancel }
+                  onClick={ () =>
+                  {
+                    creat_room && setCreat_room( false );
+                    join_room && !protected_room && setJoin_room( false );
+                    protected_room && setProtected_room( false )
+                  } }
+                >
+                  BACK
+                </div>
+              }
+              {
+                creat_room &&
+                <button className={ styles_r_w.create } type="submit">
+                  CREATE
+                </button>
+              }
+              {
+                protected_room &&
+                <button className={ styles_r_w.create }>
+                  JOIN
+                </button>
+              }
             </div>
           </form>
         </div>
       ) }
       <div
-        className={ cn( styles_box.container, chat_room && styles_r_w.chat_room ) }
+        className={ cn( styles_box.container, room && styles_r_w.room ) }
       >
         <SettingsNav selected={ "chat" } menu={ menu } />
         <div className={ styles_box.profile_details }>
@@ -322,7 +400,7 @@ const Chat = () =>
                   <p>CHATS</p>
                   <div
                     className={ styles.plus_btn }
-                    onClick={ () => setChat_room( true ) }
+                    onClick={ () => setRoom( true ) }
                   >
                     +
                   </div>

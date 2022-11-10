@@ -11,7 +11,7 @@ const MenuNav = ({menu, setMenu}: any) =>
           {
             !menu &&
             <MenuOutline
-              color={ '#fffff' }
+              color={ '#ffffff' }
               height="50px"
               width="50px"
             />
@@ -19,7 +19,7 @@ const MenuNav = ({menu, setMenu}: any) =>
           {
             menu &&
             <CloseOutline
-              color={ '#fffff' }
+              color={ '#ffffff' }
               height="50px"
               width="50px"
             />

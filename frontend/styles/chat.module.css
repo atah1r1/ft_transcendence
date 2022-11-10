@@ -85,6 +85,7 @@
 }
 
 .plus_btn {
+  font-size: 3.8rem;
   display: flex;
   justify-content: center;
   align-items: center;
