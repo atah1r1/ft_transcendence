@@ -28,7 +28,7 @@
 .profile_details {
   position: relative;
   width: 120rem;
-  padding: 3.8rem;
+  padding: 2.4rem;
   color: #fff;
 }
 
@@ -51,7 +51,7 @@
 
 @media (max-width: 1280px) {
   .profile_details {
-    padding: 2.2rem;
+    padding: 1.2rem;
   }
   .container {
     gap: 4rem;
@@ -69,5 +69,11 @@
     position: fixed;
     transition: all 0.4s ease-in;
     background: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .profile_details {
+    height: 90rem;
   }
 }

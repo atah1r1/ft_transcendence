@@ -1,7 +1,7 @@
 .conversation_head_treepoints {
   cursor: pointer;
   position: absolute;
-  top: -36%;
+  top: -32%;
   right: 2%;
   font-size: 4rem;
   color: #fff;
@@ -14,18 +14,14 @@
 
 .treepoints_box {
   position: absolute;
-  right: 8rem;
-  top: 5%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  right: 7rem;
+  top: 3.2%;
   width: 22rem;
-  /* max-height: 56rem; */
+  max-height: 36rem;
   background-color: #0f3460;
   padding: 1.6rem;
   font-family: "Pixeboy";
   font-size: 1.6rem;
-  gap: 1.2rem;
   border-radius: 1rem;
   z-index: 1;
   overflow-y: scroll;
@@ -48,6 +44,10 @@
   justify-content: space-between;
   cursor: pointer;
   transition: all 0.3s;
+}
+
+.treepoints_box_row:not(:last-child) {
+  margin-bottom: 1.4rem;
 }
 
 .treepoints_box_row:active {
@@ -74,6 +74,12 @@
 
 @media (max-width: 1280px) {
   .treepoints_box {
-    top: 42.2%;
+    top: 42%;
+  }
+}
+
+@media (max-width: 700px) {
+  .treepoints_box {
+    top: 41.5%;
   }
 }

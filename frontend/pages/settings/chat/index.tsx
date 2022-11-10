@@ -24,6 +24,50 @@ const Chat = () =>
     {
       group_user: [
         {
+          image: "https://cdn.intra.42.fr/users/atahiri.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
+          image: "https://cdn.intra.42.fr/users/mokellat.jpg",
+          fullName: "Mohammed Ali",
+        },
+        {
           image: "https://cdn.intra.42.fr/users/mokellat.jpg",
           fullName: "Mohammed Ali",
         },

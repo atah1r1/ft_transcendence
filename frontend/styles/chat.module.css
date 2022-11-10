@@ -288,7 +288,7 @@
 
 /* media q--------------------- */
 
-@media (max-width: 1280px){
+@media (max-width: 1280px) {
   .chat_box {
     display: flex;
     flex-direction: column;
@@ -353,10 +353,20 @@
   }
 
   .conversation_body {
-    min-height: 88.5%;
+    min-height: 86%;
   }
 
   .online_text {
     display: block;
+  }
+}
+
+@media (max-width: 700px) {
+  .conversation_head {
+    min-height: 9%;
+  }
+
+  .conversation_body {
+    min-height: 89%;
   }
 }
