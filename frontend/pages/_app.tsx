@@ -31,23 +31,6 @@ const socket = io("http://localhost:9000/chat", {
   }
 });
 
-socket.on("connect", () => {
-  console.log('CONNECT: ', socket.id);
-});
-
-socket.on("disconnect", () => {
-  console.log('DISCONNECT: ', socket.id);
-});
-
-socket.on("connect_error", () => {
-  console.log('CONNECT_ERROR: ', socket.id);
-  socket.connect();
-});
-
-socket.on("exception", (exception) => {
-  console.log('exception: ', exception);
-});
-
 export const SocketContext = React.createContext<Socket>(socket);
 
 function MyApp({ Component, pageProps, router }: AppProps) {
@@ -65,6 +48,25 @@ function InitialComponent({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     console.log("CHAT LIST SUBSRCIBED");
+
+    socket.on("connect", () => {
+      console.log('CONNECT: ', socket.id);
+    });
+    
+    socket.on("disconnect", () => {
+      console.log('DISCONNECT: ', socket.id);
+    });
+    
+    socket.on("connect_error", () => {
+      console.log('CONNECT_ERROR: ', socket.id);
+      socket.connect();
+    });
+    
+    socket.on("exception", (exception) => {
+      console.log('exception: ', exception);
+    });
+
+    
     socket!.on('chat_list', (data: any) => {
       console.log('chat_list: ', data);
       setChats(data);

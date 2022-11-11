@@ -17,7 +17,21 @@ import { SocketContext } from "../../_app";
 
 const Chat = () => {
   const [chats, setChats] = useContext(ChatContext);
-  console.log("CHATS UPDATED");
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/chats`, {
+      withCredentials: true,
+    }).then((res) => {
+      setChats(res.data);
+      console.log(res.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, []);
+
+  useEffect(() => {
+
+  }, []);
 
   const socket = useContext(SocketContext);
 

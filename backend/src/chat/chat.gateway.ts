@@ -407,7 +407,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(EV_CREATE_ROOM)
   async createRoom(client: Socket, payload: any) {
-    console.log('create room', payload);
     this.validateCreateRoom(payload);
 
     try {
@@ -445,6 +444,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new WsException({
           error: EV_JOIN_ROOM,
           message: 'Cannot join DM',
+        });
+      }
+
+      if (room && room.privacy === RoomPrivacy.PRIVATE) {
+        throw new WsException({
+          error: EV_JOIN_ROOM,
+          message: 'Cannot join Private Room',
         });
       }
 

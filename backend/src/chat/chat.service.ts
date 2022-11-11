@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Room, RoomUser, Message, RoomPrivacy } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
 
@@ -448,6 +448,7 @@ export class ChatService {
         roomId: room.id,
         name: _name,
         image: _image,
+        updatedAt: room.updatedAt,
         lastMessage: _lastMessage,
         wasRead: _wasRead,
       };
@@ -455,10 +456,7 @@ export class ChatService {
 
     const _sortedChats = (await Promise.all(_chats)).sort(
       (a, b) => {
-        if (!a.lastMessage && !b.lastMessage) return 0;
-        if (!a.lastMessage) return 1;
-        if (!b.lastMessage) return -1;
-        return b.lastMessage.createdAt - a.lastMessage.createdAt
+        return b.updatedAt.getTime() - a.updatedAt.getTime();
       }
     );
     return _sortedChats;
@@ -518,6 +516,17 @@ export class ChatService {
         roomId: roomId,
       },
     });
+
+    if (_message) {
+      await this.prisma.room.update({
+        where: {
+          id: roomId,
+        },
+        data: {
+          updatedAt: new Date(),
+        },
+      });
+    }
 
     return _message;
   }
