@@ -24,8 +24,8 @@ const Friends_box = ({ friends }: any) => {
             <Image
               src="/view_profile.svg"
               alt="invete_player_icon"
-              width={"26px"}
-              height={"26px"}
+              width={"22px"}
+              height={"22px"}
             />
           </div>
           <div onClick={() => {
@@ -34,16 +34,16 @@ const Friends_box = ({ friends }: any) => {
             <Image
               src="/chat.svg"
               alt="invete_player_icon"
-              width={"26px"}
-              height={"26px"}
+              width={"22px"}
+              height={"22px"}
             />
           </div>
           <div>
             <Image
               src="/block_user.svg"
               alt="invete_player_icon"
-              width={"26px"}
-              height={"26px"}
+              width={"22px"}
+              height={"22px"}
             />
           </div>
         </div>

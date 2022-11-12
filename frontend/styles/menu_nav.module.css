@@ -1,0 +1,46 @@
+.nav {
+  position: absolute;
+  z-index: 2;
+  display: none;
+}
+
+.menuNav {
+  height: 100vh;
+  width: 100%;
+  /* background: rgba(255, 255, 255, 0.26); */
+  background: hsla(224, 48%, 16%, 0.7);
+  backdrop-filter: blur(20px);
+  position: fixed;
+  z-index: 1;
+  display: none;
+  transition: all 0.4s ease-in;
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.navOpen.menuNav{
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.menu_btn {
+  position: absolute;
+  padding-left: 3.2rem;
+  cursor: pointer;
+  transition: all 0.4s;
+  /* position: fixed; */
+}
+
+.menu_btn:active {
+  transform: translateY(4px);
+}
+
+@media (max-width: 1000px) {
+  .nav,.menuNav {
+    display: block;
+  }
+}

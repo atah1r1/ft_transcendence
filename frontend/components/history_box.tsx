@@ -29,8 +29,8 @@ const HistoryBox = ( { history }: any ) =>
               key={ i.toString() }
               src={ ele }
               alt={ "achivement" }
-              width={ "34%" }
-              height={ "34%" }
+              width={ "28%" }
+              height={ "28%" }
             /> )
           } ) }
         </div>

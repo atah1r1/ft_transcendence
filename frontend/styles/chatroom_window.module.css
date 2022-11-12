@@ -1,4 +1,4 @@
-.chat_room {
+.room {
   opacity: 0.5;
   filter: blur(0.6rem);
   pointer-events: none;
@@ -113,7 +113,61 @@
   font-size: 3rem;
 }
 .remove {
-  font-size: 2.6rem;
   cursor: pointer;
   transition: all 0.3s;
+}
+
+.creat_join_btn {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  gap: 3.2rem;
+}
+
+.creat_join_btn div {
+  font-size: 2.4rem;
+  width: 21.2rem;
+  height: 5.6rem;
+}
+
+.join_box {
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.join_box div {
+  justify-content: space-between;
+  align-items: center;
+  color: black;
+  background: #d9d9d9;
+  width: 48rem;
+  height: 5.6rem;
+  border-radius: 3rem;
+  padding: 0 2.6rem;
+}
+
+.join_protect label {
+  font-family: "Pixeboy";
+  font-size: 2.8rem;
+}
+
+.join_protect input:focus {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 2px 15px;
+}
+
+.join_protect input {
+  font-family: "Inter";
+  width: 34rem;
+  height: 5rem;
+  border-radius: 1rem;
+  border: none;
+  background: #d9d9d9;
+  outline: none;
+  font-size: 1.8rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 1px;
+  color: #222;
 }

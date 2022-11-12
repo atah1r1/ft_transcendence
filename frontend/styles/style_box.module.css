@@ -1,8 +1,10 @@
 .container {
   height: 100vh;
+  width: 100%;
   display: flex;
-  gap: 10rem;
-  padding: 18rem;
+  justify-content: center;
+  gap: 8rem;
+  padding: 18rem 3.2rem;
 }
 
 .profile_setting,
@@ -14,16 +16,64 @@
 }
 
 .profile_setting {
-  min-width: 30rem;
+  width: 30rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4.2rem;
+  padding: 0 4.2rem;
 }
 
 .profile_details {
-  width: 100%;
-  padding: 3.8rem;
+  position: relative;
+  width: 120rem;
+  padding: 2.4rem;
   color: #fff;
+}
+
+.logout_btn {
+  z-index: 1;
+  position: absolute;
+  top: -17rem;
+  right: 0;
+  padding: 1.2rem 3.6rem !important;
+}
+
+.navOpen.profile_setting {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  position: fixed;
+}
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .profile_details {
+    padding: 1.2rem;
+  }
+  .container {
+    gap: 4rem;
+  }
+}
+
+@media (max-width: 1000px) {
+  .profile_setting {
+    position: absolute;
+    top: 50%;
+    left: -100%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    backdrop-filter: blur(0);
+    position: fixed;
+    transition: all 0.4s ease-in;
+    background: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .profile_details {
+    height: 90rem;
+  }
 }

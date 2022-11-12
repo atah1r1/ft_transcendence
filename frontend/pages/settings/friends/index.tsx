@@ -6,9 +6,11 @@ import SettingsNav from "../../../components/settings_nav";
 import Image from "next/image";
 import Friends_box from "../../../components/friend_box";
 import { useEffect, useState } from "react";
+import MenuNav from "../../../components/menuNav";
 import axios from "axios";
 
 const History = () => {
+  const [menu, setMenu] = useState(false);
   const [inputForm, setInputForm] = useState("");
 
 
@@ -25,99 +27,38 @@ const History = () => {
     });
   }, []);
 
-  // const [friends, setFriends] = useState([
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-  //     fullName: "HADARI YASSINE",
-  //     userName: "YHADARI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
-  //     fullName: "AMINE TAHIRI",
-  //     userName: "ATAHIRI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
-  //     fullName: "BRAHIM SANAOUI",
-  //     userName: "BSANAOUI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
-  //     fullName: "ISMAIL BOUHIRI",
-  //     userName: "IBOUHIRI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-  //     fullName: "HADARI YASSINE",
-  //     userName: "YHADARI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
-  //     fullName: "AMINE TAHIRI",
-  //     userName: "ATAHIRI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
-  //     fullName: "BRAHIM SANAOUI",
-  //     userName: "BSANAOUI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
-  //     fullName: "ISMAIL BOUHIRI",
-  //     userName: "IBOUHIRI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
-  //     fullName: "HADARI YASSINE",
-  //     userName: "YHADARI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
-  //     fullName: "AMINE TAHIRI",
-  //     userName: "ATAHIRI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/bsanaoui.jpg",
-  //     fullName: "BRAHIM SANAOUI",
-  //     userName: "BSANAOUI",
-  //   },
-  //   {
-  //     avatar: "https://cdn.intra.42.fr/users/ibouhiri.jpg",
-  //     fullName: "ISMAIL BOUHIRI",
-  //     userName: "IBOUHIRI",
-  //   },
-  // ]);
-
   return (
-    <div className={styles_box.container}>
-      <div className={cn(styles_s_l.setting_btn, styles_s_l.current_btn, styles_s_l.logout_btn)}>logout</div>
-      <SettingsNav selected={"friends"} />
-      <div className={styles_box.profile_details}>
-        <form
-          className={styles.search}
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <input
-            type="search"
-            placeholder="Search..."
-            onChange={(e) => {
-              setInputForm(e.target.value);
+    <>
+      <MenuNav menu={menu} setMenu={setMenu} />
+      <div className={styles_box.container}>
+        <SettingsNav selected={"friends"} menu={menu} />
+        <div className={styles_box.profile_details}>
+          <div className={cn(styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn)}>logout</div>
+          <form
+            className={styles.search}
+            onSubmit={(e) => {
+              e.preventDefault();
             }}
-            value={inputForm}
-          ></input>
-        </form>
-        <div className={styles.friends}>
-          <Friends_box
-            // friends={friends.filter((ele) => {
-            //   return ele.userName.toLowerCase().includes(inputForm);
-            // })}
-            friends={friends}
-          ></Friends_box>
+          >
+            <input
+              type="search"
+              placeholder="Search..."
+              onChange={(e) => {
+                setInputForm(e.target.value);
+              }}
+              value={inputForm}
+            ></input>
+          </form>
+          <div className={styles.friends}>
+            <Friends_box
+              friends={friends.filter((ele: any) => {
+                return ele.username.toLowerCase().includes(inputForm);
+              })}
+            ></Friends_box>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

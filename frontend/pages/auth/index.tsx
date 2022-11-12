@@ -38,13 +38,13 @@ const AuthPage = () =>
           <form className={ styles.details_form }>
             <div>
               <label>Code</label>
-              <input type="text" placeholder="****" maxLength={ 6 } value={ value }
+              <input type="text" placeholder="******" maxLength={ 6 } value={ value }
                 onChange={ handleChange } ></input>
             </div>
           </form>
         </div>
         <div className={ styles.verify_box }>
-          <div className={ cn( styles_s_l.setting_btn, styles.verify_btn ) }>
+          <div className={ cn( styles_s_l.setting_btn, styles.verify_btn, `${ value.length !== 6 && styles.verify_unclick}`) }>
             Verify
           </div>
         </div>

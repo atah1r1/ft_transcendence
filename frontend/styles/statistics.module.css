@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 1.6rem;
   padding-bottom: 0;
 }
 
@@ -64,6 +64,7 @@
   border-top: 1px solid #fff;
   gap: 3rem;
   padding: 0.6rem 3.8rem;
+  justify-content: center;
 }
 
 .avatar {
@@ -108,7 +109,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 2.4rem;
   color: #fff;
   font-family: "Pixeboy";
   border-radius: 1rem;
@@ -140,3 +141,57 @@
 /* .ach_medal div:not(:last-child) {
   margin-right: -12rem;
 } */
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .statistics_box {
+    display: flex;
+    flex-direction: row;
+  }
+  .part_one {
+    /* width: 50%; */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    gap: 20rem;
+    border-right: 2px solid rgba(255, 255, 255, 0.25);
+    padding-right: 2rem;
+  }
+
+  .left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3.2rem;
+  }
+
+  .part_two {
+    justify-content: stretch;
+    padding: 0;
+    padding-left: 2.8rem;
+    gap: 4rem;
+  }
+  .ach_medal {
+    flex-direction: column;
+    gap: 4rem;
+    overflow-y: scroll;
+    padding: 1.6rem;
+    margin: auto;
+  }
+  .ach_medal::-webkit-scrollbar {
+    width: 6px;
+  }
+  /* Handle */
+  .ach_medal::-webkit-scrollbar-thumb {
+    background: #aaa;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 700px) {
+  .ach_goal {
+    font-size: 3rem;
+  }
+}

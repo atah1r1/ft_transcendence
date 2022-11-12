@@ -75,6 +75,11 @@
   right: 8rem;
 }
 
+.box .verify_unclick{
+  pointer-events: none;
+  background-color: #dd6176 !important;
+}
+
 .box .verify_btn{
   font-size: 1.6rem;
   font-weight: 600;
@@ -91,12 +96,21 @@
 /* media --------------------------------- */
 
 @media (max-width: 900px) {
-  .auth_image{
-    width: 288px;
-    height: 256px;
+  .container{
+    min-width: 60rem;
   }
+
+  .auth_text_box{
+    width: 35rem;
+  }
+
+  .auth_image{
+    width: 28.8rem;
+    height: 25.6rem;
+  }
+
   .verify_box{
-    right: 7rem;
+    right: 5rem;
   }
 }
 
@@ -104,6 +118,7 @@
   .auth_image{
     display: none;
   }
+
   .container{
     display: flex;
     flex-direction: column;
@@ -111,6 +126,7 @@
     min-width: auto;
     text-align: center;
   }
+
   .verify_box{
     right: 50%;
     transform: translate(50%);
