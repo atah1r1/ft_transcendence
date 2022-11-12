@@ -22,6 +22,7 @@ export class ChatService {
 
   async getConnectedFriends(userId: string): Promise<any[]> {
     const friends = await this.userService.getFriends(userId);
+    console.log("Friends: ", friends);
     const connectedUsers = friends.filter((friend) =>
       this.connectedUsers.has(friend.id),
     );
@@ -515,6 +516,14 @@ export class ChatService {
         roomUserId: _roomUser.id,
         roomId: roomId,
       },
+      include: {
+        roomUser: {
+          include: {
+            user: true,
+          }
+        },
+        room: true,
+      },
     });
 
     if (_message) {
@@ -528,13 +537,13 @@ export class ChatService {
       });
     }
 
-    return _message;
+    return this.formatMessage(_message);
   }
 
   async getMessagesByRoomId(
     userId: string,
     roomId: string,
-    includeRoomUser = false,
+    includeUser = false,
     includeRoom = false,
   ): Promise<any[]> {
     const room = await this.getRoomById(roomId);
@@ -550,7 +559,11 @@ export class ChatService {
         roomId: roomId,
       },
       include: {
-        roomUser: includeRoomUser,
+        roomUser: {
+          include: {
+            user: includeUser,
+          }
+        },
         room: includeRoom,
       },
       orderBy: {
@@ -559,24 +572,30 @@ export class ChatService {
     });
   }
 
+  formatMessage(message: any): any {
+    return {
+      id: message.id,
+      message: message.message,
+      createdAt: message.createdAt,
+      roomId: message.roomId,
+      roomName: message.room.name,
+      user: {
+        id: message.roomUser.user.id,
+        username: message.roomUser.user.username,
+        avatar: message.roomUser.user.avatar,
+      },
+    };
+  }
+
   async getMessagesByRoomIdFormatted(userId: string, roomId: string) {
     const _messages = await this.getMessagesByRoomId(
       userId,
       roomId,
       true,
-      false,
+      true,
     );
     const _formattedMessages = _messages.map((message) => {
-      return {
-        id: message.id,
-        message: message.message,
-        createdAt: message.createdAt,
-        user: {
-          id: message.roomUser.user.id,
-          username: message.roomUser.user.username,
-          avatar: message.roomUser.user.avatar,
-        },
-      };
+      return this.formatMessage(message);
     });
     return _formattedMessages;
   }

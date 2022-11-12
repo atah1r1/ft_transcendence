@@ -86,10 +86,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private async sendChatsToRoomMembers(roomId: string) {
     // Send the list of chats to all users in roomId.
     const memebers: any[] = await this.chatService.getRoomUsersByRoomId(roomId);
-    memebers.forEach((member) => {
+    memebers.forEach(async (member) => {
       const sockets = this.chatService.getConnectedUserById(member.userId);
       if (!sockets || sockets.length === 0) return;
-      const chats = this.chatService.getChatsByUserId(member.userId);
+      const chats = await this.chatService.getChatsByUserId(member.userId);
       sockets.forEach((s) => {
         this.server.to(s.id).emit(EV_CHAT_LIST, chats);
       });
@@ -114,7 +114,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private async sendOnlineFriendsToClient(client: Socket) {
-    const friends = this.chatService.getConnectedFriends(client.data.id);
+    const friends = await this.chatService.getConnectedFriends(client.data.id);
+    console.log('online friends: ', friends);
     client.emit(EV_EMIT_ONLINE_FRIENDS, friends);
   }
 
@@ -335,7 +336,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket) {
     if (client.data.id) {
       this.chatService.removeConnectedUser(client.data.id, client);
-      this.sendOnlineFriendsOfUserId(client.data.id);
+      await this.sendOnlineFriendsOfUserId(client.data.id);
     }
     console.log('disconnected: ', client.id);
   }
@@ -347,15 +348,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async sendMessage(client: Socket, payload: any) {
     this.validateMessage(payload);
     try {
-      const ms = await this.chatService.createMessage(
+      const formattedMessage = await this.chatService.createMessage(
         client.data.id,
         payload.roomId,
         payload.message,
       );
       await this.chatService.updateSeenInRoom(client.data.id, payload.roomId, false);
       // Send message and chats.
-      this.server.to(payload.roomId).emit(EV_MESSAGE, ms);
       this.sendChatsToRoomMembers(payload.roomId);
+      this.server.to(payload.roomId).emit(EV_MESSAGE, formattedMessage);
     } catch (err) {
       throw new WsException({
         error: EV_MESSAGE,
@@ -397,6 +398,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         await this.sendChatsToUser(member.userId);
       }
       await this.sendRoomCreatedToClients(dm);
+      await this.sendOnlineFriendsToClient(client);
+      await this.sendOnlineFriendsOfUserId(client.data.id);
     } catch (err) {
       throw new WsException({
         error: EV_CREATE_DM,

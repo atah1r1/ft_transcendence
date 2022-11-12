@@ -68,15 +68,17 @@ export class UserService {
 
     async getFriends(id: string) {
         const friends = await this.prisma.user.findUnique(
-            { where: { id } }
-        ).friends().then(friends => {
-            if (friends !== null) {
-                friends.map(friend => {
-                    delete friend.two_factor_auth_key;
-                    return friend;
+            {
+                where: { id }
+            }
+        ).friends().then(fs => {
+            if (fs !== null) {
+                fs.map(f => {
+                    delete f.two_factor_auth_key;
+                    return f;
                 })
             }
-            return [];
+            return fs;
         });
         return friends;
     }
@@ -87,7 +89,7 @@ export class UserService {
 
 
         if (user && friend) {
-            const isFriend = this.getFriends(userId).then(friends => {
+            const isFriend = await this.getFriends(userId).then(friends => {
                 return friends.some(friend => friend.id === friendId);
             });
             if (isFriend)

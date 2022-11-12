@@ -12,88 +12,34 @@ import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
 import axios from "axios";
-import { ChatContext } from "../../../stores/chat_store";
-import { SocketContext } from "../../_app";
+// import { ChatContext } from "../../../stores/chat_store";
+import { OnlineFriendsContext, SocketContext } from "../../_app";
 import MenuNav from "../../../components/menuNav";
 import { CloseSharp, LockClosedSharp } from "react-ionicons";
+import ConversationBody from "../../../components/conversation_body";
 
 const Chat = () => {
-  const [chats, setChats] = useContext(ChatContext);
-
-  useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/chats`, {
-      withCredentials: true,
-    }).then((res) => {
-      setChats(res.data);
-      console.log(res.data);
-    }).catch((err) => {
-      console.log(err);
-    });
-  }, []);
-
-  useEffect(() => {
-
-  }, []);
 
   const socket = useContext(SocketContext);
+  const [onlineFriends, setOnlineFriends] = useContext(OnlineFriendsContext);
 
   const [group_box_index, set_g_b_i] = useState(0);
 
-  const [currentConv, setCurrentConv] = useState({ group_user: [] });
+  const [currentConv, setCurrentConv] = useState<any>({});
 
-  const [ value, setValue ] = useState( '' );
-  const handleChange = ( e: any ) =>
-  {
-    const result = e.target.value.replace( /\D/g, '' );
+  const [value, setValue] = useState('');
+  const handleChange = (e: any) => {
+    const result = e.target.value.replace(/\D/g, '');
 
-    setValue( result );
+    setValue(result);
   };
 
-  const getSenderInfo = ( senderInfo: any ) =>
-  {
-    setMessages( senderInfo );
-  };
 
-  const [messages, setMessages] = useState([
-    {
-      sender: false,
-      message: "..",
-      time: "Today at 17:15",
-      avatar: "",
-      fullName: "",
-    },
-    {
-      sender: false,
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum unde exceptuchite",
-      time: "Today at 17:15",
-      avatar: "",
-      fullName: "",
-    },
-  ]);
 
-  const [messageInput, setMessageInput] = useState("");
-  const handleSubmitMessages = (e: any) => {
-    e.preventDefault();
-    if (messageInput)
-      setMessages([
-        ...messages,
-        {
-          sender: true,
-          message: messageInput,
-          time: "Today at 17:15",
-          avatar: "https://cdn.intra.42.fr/users/atahiri.jpg",
-          fullName: "Amine tahiri",
-        },
-      ]);
-    setMessageInput("");
-  };
-
-  const [chat_room, setChat_room] = useState(false);
-  const [ room, setRoom ] = useState( false );
-  const [ creat_room, setCreat_room ] = useState( false );
-  const [ join_room, setJoin_room ] = useState( false );
-  const [ protected_room, setProtected_room ] = useState( false );
+  const [room, setRoom] = useState(false);
+  const [creat_room, setCreat_room] = useState(false);
+  const [join_room, setJoin_room] = useState(false);
+  const [protected_room, setProtected_room] = useState(false);
 
   const [chatroomInputs, setChatroomInputs] = useState({
     groupName: "",
@@ -116,7 +62,10 @@ const Chat = () => {
       groupType: "PUBLIC",
       password: "",
     });
-    setChat_room(false);
+    setJoin_room(false);
+    setRoom(false);
+    setProtected_room(false);
+    setCreat_room(false);
   };
 
   const [searchInput, setSearchInput] = useState("");
@@ -128,20 +77,20 @@ const Chat = () => {
 
   return (
     <div>
-      <MenuNav menu={ menu } setMenu={ setMenu } />
-      { room && (
-        <div className={ styles_r_w.add_btn_window }>
-          <div className={ styles_r_w.part_up }>
-            { room && !creat_room && !join_room && !protected_room && <div className={ styles_r_w.text }>CREATE/JOIN A CHAT ROOM</div> }
-            { creat_room && <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div> }
-            { join_room && !protected_room && <div className={ styles_r_w.text }>JOIN A CHAT ROOM</div> }
-            { protected_room && <div className={ styles_r_w.text }>JOIN CHAT_PROTECTED</div> }
+      <MenuNav menu={menu} setMenu={setMenu} />
+      {room && (
+        <div className={styles_r_w.add_btn_window}>
+          <div className={styles_r_w.part_up}>
+            {room && !creat_room && !join_room && !protected_room && <div className={styles_r_w.text}>CREATE/JOIN A CHAT ROOM</div>}
+            {creat_room && <div className={styles_r_w.text}>CREATE A CHAT ROOM</div>}
+            {join_room && !protected_room && <div className={styles_r_w.text}>JOIN A CHAT ROOM</div>}
+            {protected_room && <div className={styles_r_w.text}>JOIN CHAT_PROTECTED</div>}
             <div
-              className={ styles_r_w.remove }
-              onClick={ () => { setCreat_room( false ); setJoin_room( false ); setRoom( false ); setProtected_room( false ) } }
+              className={styles_r_w.remove}
+              onClick={() => { setCreat_room(false); setJoin_room(false); setRoom(false); setProtected_room(false) }}
             >
               <CloseSharp
-                color={ '#ffffff' }
+                color={'#ffffff'}
                 height="40px"
                 width="40px"
               />
@@ -149,46 +98,46 @@ const Chat = () => {
           </div>
           {
             room && !creat_room && !join_room && !protected_room &&
-            <div className={ styles_r_w.creat_join_btn }>
-              <div className={ styles_r_w.create } onClick={ () => setCreat_room( true ) }>CREAT A CHAT ROOM</div>
-              <div className={ styles_r_w.create } onClick={ () => setJoin_room( true ) }>JOIN A CHAT ROOM</div>
+            <div className={styles_r_w.creat_join_btn}>
+              <div className={styles_r_w.create} onClick={() => setCreat_room(true)}>CREAT A CHAT ROOM</div>
+              <div className={styles_r_w.create} onClick={() => setJoin_room(true)}>JOIN A CHAT ROOM</div>
             </div>
           }
           {
             join_room && !protected_room &&
-            <div className={ cn( styles_r_w.creat_join_btn, styles_r_w.join_box ) }>
-              <div className={ styles_r_w.create }
-                onClick={ () => setProtected_room( true ) }>CHAT_PROTECTED
+            <div className={cn(styles_r_w.creat_join_btn, styles_r_w.join_box)}>
+              <div className={styles_r_w.create}
+                onClick={() => setProtected_room(true)}>CHAT_PROTECTED
                 <LockClosedSharp
-                  color={ '#00000' }
+                  color={'#00000'}
                   height="30px"
                   width="30px"
                 /></div>
-              <div className={ styles_r_w.create }>CHAT_PUBLIC</div>
+              <div className={styles_r_w.create}>CHAT_PUBLIC</div>
             </div>
           }
           {
             protected_room &&
-            <div className={ cn( styles_r_w.creat_join_btn, styles_r_w.join_box, styles_r_w.join_protect ) }>
+            <div className={cn(styles_r_w.creat_join_btn, styles_r_w.join_box, styles_r_w.join_protect)}>
               <label>PASSWORD</label>
-              <input type="text" placeholder="******" maxLength={ 6 } value={ value } onChange={ handleChange }></input>
+              <input type="text" placeholder="******" maxLength={6} value={value} onChange={handleChange}></input>
             </div>
           }
-          <form onSubmit={ handleSubmitGroup }>
+          <form onSubmit={handleSubmitGroup}>
             {
               creat_room &&
               <div>
                 <label>group name</label>
                 <input
                   type="text"
-                  value={ chatroomInputs.groupName }
+                  value={chatroomInputs.groupName}
                   placeholder="pingpong"
                   required
-                  onChange={ ( e ) =>
-                    setChatroomInputs( {
+                  onChange={(e) =>
+                    setChatroomInputs({
                       ...chatroomInputs,
                       groupName: e.target.value,
-                    } )
+                    })
                   }
                 ></input>
               </div>
@@ -199,71 +148,70 @@ const Chat = () => {
                 <label>group type</label>
                 <select
                   required
-                  value={ chatroomInputs.groupType }
-                  onChange={ ( e ) =>
-                    setChatroomInputs( {
+                  value={chatroomInputs.groupType}
+                  onChange={(e) =>
+                    setChatroomInputs({
                       ...chatroomInputs,
                       groupType: e.target.value,
-                    } )
+                    })
                   }
                 >
-                  <option value="public">public</option>
-                  <option value="protected">protected</option>
-                  <option value="private">private</option>
+                  <option value="PUBLIC">public</option>
+                  <option value="PROTECTED">protected</option>
+                  <option value="PRIVATE">private</option>
                 </select>
               </div>
             }
-            { chatroomInputs.groupType === "protected" && creat_room && (
+            {chatroomInputs.groupType === "PROTECTED" && creat_room && (
               <div>
                 <label>password</label>
                 <input
                   type="password"
                   placeholder="************"
                   required
-                  value={ chatroomInputs.password }
-                  maxLength={ 16 }
-                  onChange={ ( e ) =>
-                    setChatroomInputs( {
+                  value={chatroomInputs.password}
+                  maxLength={16}
+                  onChange={(e) =>
+                    setChatroomInputs({
                       ...chatroomInputs,
                       password: e.target.value,
                     })
                   }
                 ></input>
               </div>
-            ) }
-            <div className={ styles_r_w.part_down }>
+            )}
+            <div className={styles_r_w.part_down}>
               {
                 room && !creat_room && !join_room && !protected_room &&
                 <div
-                  className={ styles_r_w.cancel }
-                  onClick={ () => { setCreat_room( false ); setRoom( false ) } }
+                  className={styles_r_w.cancel}
+                  onClick={() => { setCreat_room(false); setRoom(false) }}
                 >
                   CANCEL
                 </div>
               }
               {
-                ( creat_room || join_room || protected_room ) &&
+                (creat_room || join_room || protected_room) &&
                 <div
-                  className={ styles_r_w.cancel }
-                  onClick={ () =>
-                  {
-                    creat_room && setCreat_room( false );
-                    join_room && !protected_room && setJoin_room( false );
-                    protected_room && setProtected_room( false )
-                  } }
+                  className={styles_r_w.cancel}
+                  onClick={() => {
+                    creat_room && setCreat_room(false);
+                    join_room && !protected_room && setJoin_room(false);
+                    protected_room && setProtected_room(false)
+                  }}
                 >
                   BACK
                 </div>
               }
               {
                 creat_room &&
-                <button className={ styles_r_w.create } type="submit">
+                <button className={styles_r_w.create} type="submit">
                   CREATE
                 </button>
               }
               {
                 protected_room &&
-                <button className={ styles_r_w.create }>
+                <button className={styles_r_w.create}>
                   JOIN
                 </button>
               }
@@ -272,19 +220,19 @@ const Chat = () => {
         </div>
       )}
       <div
-        className={ cn( styles_box.container, room && styles_r_w.room ) }
+        className={cn(styles_box.container, room && styles_r_w.room)}
       >
-        <SettingsNav selected={ "chat" } menu={ menu } />
-        <div className={ styles_box.profile_details }>
-          <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
-          <div className={ styles.chat_box }>
-            <div className={ styles.chat_left }>
-              <div className={ styles.l_part_one }>
-                <div className={ styles.chat_plus }>
+        <SettingsNav selected={"chat"} menu={menu} />
+        <div className={styles_box.profile_details}>
+          <div className={cn(styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn)}>logout</div>
+          <div className={styles.chat_box}>
+            <div className={styles.chat_left}>
+              <div className={styles.l_part_one}>
+                <div className={styles.chat_plus}>
                   <p>CHATS</p>
                   <div
-                    className={ styles.plus_btn }
-                    onClick={ () => setRoom( true ) }
+                    className={styles.plus_btn}
+                    onClick={() => setRoom(true)}
                   >
                     +
                   </div>
@@ -303,23 +251,22 @@ const Chat = () => {
                 </form>
               </div>
               <div className={styles.l_part_two}>
-                <ConversationBox
-                  conversations={chats}
-                  getSenderInfo={getSenderInfo}
-                  messages={messages}
-                  setCurrent_conv={setCurrentConv}
-                />
+                <ConversationBox setCurrent_conv={setCurrentConv} />
               </div>
               <div className={styles.l_part_tree}>
-                <div className={styles.online}>
-                  <Image
-                    src="https://cdn.intra.42.fr/users/bsanaoui.jpg"
-                    alt="online_friend_img"
-                    width={"34px"}
-                    height={"34px"}
-                    layout={"fixed"}
-                  ></Image>
-                </div>
+                {
+                  onlineFriends.map((friend: any) => (
+                    <div className={styles.online}>
+                    <Image
+                      src={friend?.avatar}
+                      alt="online_friend_img"
+                      width={"34px"}
+                      height={"34px"}
+                      layout={"fixed"}
+                    ></Image>
+                  </div>
+                  ))
+                }
               </div>
             </div>
             <div className={styles.chat_right}>
@@ -327,13 +274,13 @@ const Chat = () => {
                 setTreePoints={setTreePoints}
                 setGroupBox={setGroupBox}
                 content={
-                  treePoints && !currentConv.hasOwnProperty("group") ? (
+                  treePoints ? (
                     <TreePointsBox />
                   ) : (
                     treePoints &&
-                    currentConv.hasOwnProperty("group") && (
+                    (
                       <div>
-                        <div className={styles_tree_p.treepoints_box}>
+                        {/* <div className={styles_tree_p.treepoints_box}>
                           {currentConv.group_user?.map(
                             (user: any, i: number) => {
                               return (
@@ -373,7 +320,7 @@ const Chat = () => {
                               );
                             }
                           )}
-                        </div>
+                        </div> */}
                         {group_box && (
                           <TreePointsBox
                             group_box={group_box}
@@ -392,7 +339,7 @@ const Chat = () => {
                     styles_c_b.conversation_name_current
                   )}
                 >
-                  {messages[0].fullName}
+                  {currentConv?.name}
                 </p>
                 <div
                   className={styles_tree_p.conversation_head_treepoints}
@@ -401,65 +348,7 @@ const Chat = () => {
                   ...
                 </div>
               </div>
-              <div className={styles.conversation_body}>
-                <div className={styles.message_part_content}>
-                  {messages.map((message, i) => {
-                    return (
-                      <div className={styles.message_left} key={i}>
-                        <div className={styles.message_box}>
-                          <div className={styles.message_avatar}>
-                            <Image
-                              src={message.avatar}
-                              alt="message_avatar"
-                              width={"42px"}
-                              height={"42px"}
-                            />
-                          </div>
-                          <div style={{ width: "100%" }}>
-                            <div className={styles.message_nametime_box}>
-                              <div className={styles.message_fullName}>
-                                {message.fullName}
-                              </div>
-                              <div className={styles.message_time}>
-                                {message.time}
-                              </div>
-                            </div>
-                            <div className={styles.message_text}>
-                              {message.message}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className={styles.message_part_send}>
-                  <div className={styles.message_box_sender}>
-                    <form
-                      className={styles.message_form}
-                      onSubmit={handleSubmitMessages}
-                    >
-                      <input
-                        type="search"
-                        placeholder="Type a message here ."
-                        onChange={(e) => setMessageInput(e.target.value)}
-                        value={messageInput}
-                      ></input>
-                    </form>
-                  </div>
-                  <div
-                    className={styles.message_send}
-                    onClick={handleSubmitMessages}
-                  >
-                    <Image
-                      src="/send_icon.svg"
-                      alt="send_message_icon"
-                      width={"20%"}
-                      height={"20%"}
-                    ></Image>
-                  </div>
-                </div>
-              </div>
+              <ConversationBody currentConv={currentConv} />
             </div>
           </div>
         </div>

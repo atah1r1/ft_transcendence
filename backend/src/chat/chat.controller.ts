@@ -25,8 +25,9 @@ export class ChatController {
 
   @Get('messages/:roomId')
   async getMessages(@Req() req: any) {
+    console.log('PARAMS: ', req.params);
     try {
-      return await this.chatService.getMessagesByRoomId(
+      return await this.chatService.getMessagesByRoomIdFormatted(
         req.user.id,
         req.params.roomId,
       );
