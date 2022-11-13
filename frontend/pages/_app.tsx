@@ -31,7 +31,7 @@ function MyApp ( { Component, pageProps }: AppProps )
   const [ chats, setChats ] = useState( [] );
   const [ messages, setMessages ] = useState( new Map<string, any[]>() );
   const [ onlineFriends, setOnlineFriends ] = useState( [] );
-  const [ currentConv, setCurrentConv ] = useState( {} );
+  const [ currentConv, setCurrentConv ] = useState<any>( {} );
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -66,11 +66,12 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( "exception", ( exception ) =>
     {
-      toast.error( `Error: ${ exception }`, toastOptions );
+      toast.error( `Error: ${ exception.error }: ${ exception.message }`, toastOptions );
     } );
 
     socket.on( 'chat_list', ( data: any ) =>
     {
+      console.log( "NEW CHATSSSSSSS: ", data );
       setChats( data );
     } );
 
@@ -91,6 +92,7 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'message', ( data: any ) =>
     {
+      console.log( "NEW MESSAGE", data );
       const userId = localStorage.getItem( 'userId' );
       if ( userId !== data.user?.id )
       {
@@ -107,6 +109,7 @@ function MyApp ( { Component, pageProps }: AppProps )
         }
         return prev;
       } );
+
     } );
 
   }, [] );

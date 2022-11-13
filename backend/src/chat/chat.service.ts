@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Room, RoomUser, Message, RoomPrivacy } from '@prisma/client';
+import { Room, RoomUser, Message, RoomPrivacy, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
@@ -10,7 +10,7 @@ export class ChatService {
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
-  ) { }
+  ) {}
 
   // NOTE: userId -> [socketId]
   connectedUsers: Map<string, Socket[]> = new Map();
@@ -22,7 +22,7 @@ export class ChatService {
 
   async getConnectedFriends(userId: string): Promise<any[]> {
     const friends = await this.userService.getFriends(userId);
-    console.log("Friends: ", friends);
+    console.log('Friends: ', friends);
     const connectedUsers = friends.filter((friend) =>
       this.connectedUsers.has(friend.id),
     );
@@ -74,8 +74,9 @@ export class ChatService {
     await this.addUserToRoom(userId, _room.id, null, true);
     await this.addUserToRoom(otherUserId, _room.id, null, true);
     await this.userService.addFriend(userId, otherUserId);
+    const _updatedRoom = await this.getRoomById(_room.id, true);
 
-    return await this.formatChat(userId, _room, false);
+    return await this.formatChat(userId, _updatedRoom, false);
   }
 
   async createRoom(
@@ -99,6 +100,13 @@ export class ChatService {
         password: _hashed,
         isDm: false,
       },
+      include: {
+        members: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
 
     await this.addUserToRoom(creatorId, _room.id, password, true);
@@ -106,13 +114,23 @@ export class ChatService {
     return await this.formatChat(creatorId, _room, false);
   }
 
-  async getRoomsByUserId(userId: string): Promise<Room[]> {
+  async getRoomsByUserId(
+    userId: string,
+    includeUsers = false,
+  ): Promise<Room[]> {
     const _rooms = await this.prisma.room.findMany({
       where: {
         members: {
           some: {
             userId: userId,
             isBanned: false,
+          },
+        },
+      },
+      include: {
+        members: {
+          include: {
+            user: includeUsers,
           },
         },
       },
@@ -124,7 +142,13 @@ export class ChatService {
   async getRoomById(roomId: string, includeMembers = false): Promise<Room> {
     const _room = await this.prisma.room.findUnique({
       where: { id: roomId },
-      include: { members: includeMembers },
+      include: {
+        members: {
+          include: {
+            user: includeMembers,
+          },
+        },
+      },
     });
     return _room;
   }
@@ -177,7 +201,8 @@ export class ChatService {
     if (_existingRoomUser) throw new Error('User already in room');
 
     if (
-      _room.privacy === 'PROTECTED' && !(await this.validateRoomPassword(password, _room.password))
+      _room.privacy === 'PROTECTED' &&
+      !(await this.validateRoomPassword(password, _room.password))
     )
       throw new Error('Incorrect room password');
 
@@ -417,14 +442,19 @@ export class ChatService {
     return _rooms;
   }
 
-  async formatChat(userId: string, room: Room, existing: boolean): Promise<any> {
+  async formatChat(userId: string, room: any, existing: boolean): Promise<any> {
     let _name: string = null;
     let _image: string = null;
+    const _members: User[] = room.members.map((ru) => {
+      delete ru.user.two_factor_auth;
+      delete ru.user.two_factor_auth_uri;
+      delete ru.user.two_factor_auth_key;
+      return ru.user;
+    });
 
     if (room.isDm) {
-      const _roomUsers = await this.getRoomUsersByRoomId(room.id, true, false);
-      _name = _roomUsers.find((ru) => ru.userId !== userId).user.username;
-      _image = _roomUsers.find((ru) => ru.userId !== userId).user.avatar;
+      _name = _members.find((member: User) => member.id !== userId).username;
+      _image = _members.find((member: User) => member.id !== userId).avatar;
     } else {
       _name = room.name;
       _image = room.image;
@@ -444,24 +474,23 @@ export class ChatService {
       isDm: room.isDm,
       wasRead: _wasRead,
       existing: existing,
+      members: _members,
     };
   }
 
   // Chats
   async getChatsByUserId(userId: string): Promise<any[]> {
-    const _rooms: Room[] = await this.getRoomsByUserId(userId);
+    const _rooms: Room[] = await this.getRoomsByUserId(userId, true);
 
-    console.log("NUM ROOMS", _rooms.length);
+    console.log('NUM ROOMS', _rooms.length);
 
     const _chats = _rooms.map(async (room) => {
       return await this.formatChat(userId, room, true);
     });
 
-    const _sortedChats = (await Promise.all(_chats)).sort(
-      (a, b) => {
-        return b.updatedAt.getTime() - a.updatedAt.getTime();
-      }
-    );
+    const _sortedChats = (await Promise.all(_chats)).sort((a, b) => {
+      return b.updatedAt.getTime() - a.updatedAt.getTime();
+    });
     return _sortedChats;
   }
 
@@ -522,7 +551,7 @@ export class ChatService {
         roomUser: {
           include: {
             user: true,
-          }
+          },
         },
         room: true,
       },
@@ -564,7 +593,7 @@ export class ChatService {
         roomUser: {
           include: {
             user: includeUser,
-          }
+          },
         },
         room: includeRoom,
       },

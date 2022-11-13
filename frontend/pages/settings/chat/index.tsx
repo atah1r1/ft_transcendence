@@ -30,7 +30,7 @@ const Chat = ( { router }: AppProps ) =>
 
   const [ group_box_index, set_g_b_i ] = useState( 0 );
 
-  const [ currentConv, setCurrentConv ] = useContext(CurrentConvContext);
+  const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
 
   const [ value, setValue ] = useState( '' );
   const handleChange = ( e: any ) =>
@@ -39,21 +39,6 @@ const Chat = ( { router }: AppProps ) =>
 
     setValue( result );
   };
-
-  // if ( router.query.hasOwnProperty( 'roomId' ) && router.query.roomId )
-  // {
-  //   setCurrentConv( router.query );
-  // }
-
-  // // useEffect( () =>
-  // // {
-  // //   console.log( "USE EFFECT CALLED!", currentConv?.roomId );
-  // //   if ( router.query.hasOwnProperty( 'roomId' ) && router.query.roomId )
-  // //   {
-  // //     setCurrentConv( router.query );
-  // //     console.log( "CONDITION IS TRUE!", currentConv?.roomId );
-  // //   }
-  // // }, [] );
 
   const [ room, setRoom ] = useState( false );
   const [ creat_room, setCreat_room ] = useState( false );
@@ -69,8 +54,6 @@ const Chat = ( { router }: AppProps ) =>
   const handleSubmitGroup = ( e: any ) =>
   {
     e.preventDefault();
-    console.log( chatroomInputs );
-    // do something with the data
     socket?.emit( "create_room", {
       name: chatroomInputs.groupName,
       privacy: chatroomInputs.groupType,
@@ -296,24 +279,26 @@ const Chat = ( { router }: AppProps ) =>
                 setTreePoints={ setTreePoints }
                 setGroupBox={ setGroupBox }
                 content={
-                  treePoints ? (
+                  treePoints && currentConv.isDm ? (
                     <TreePointsBox />
                   ) : (
                     treePoints &&
-                    (
+                    !currentConv.isDm && (
                       <div>
-                        {/* <div className={styles_tree_p.treepoints_box}>
-                          {currentConv.group_user?.map(
-                            (user: any, i: number) => {
+                        <div className={ styles_tree_p.treepoints_box }>
+                          { currentConv.members?.map(
+                            ( user: any, i: number ) =>
+                            {
                               return (
-                                !user.hasOwnProperty("me") && (
+                                user.id !== localStorage.getItem( 'userId' ) && (
                                   <div
-                                    key={i}
-                                    className={styles_tree_p.treepoints_box_row}
-                                    onClick={() => {
-                                      setGroupBox(true);
-                                      set_g_b_i(i);
-                                    }}
+                                    key={ i }
+                                    className={ styles_tree_p.treepoints_box_row }
+                                    onClick={ () =>
+                                    {
+                                      setGroupBox( true );
+                                      set_g_b_i( i );
+                                    } }
                                   >
                                     <div
                                       className={
@@ -321,28 +306,28 @@ const Chat = ( { router }: AppProps ) =>
                                       }
                                     >
                                       <Image
-                                        src={user.image}
+                                        src={ user.avatar }
                                         alt="friend_avatar"
-                                        width={"40px"}
-                                        height={"40px"}
+                                        width={ "40px" }
+                                        height={ "40px" }
                                         className={
                                           styles_tree_p.treePoints_box_avatar
                                         }
                                       />
                                     </div>
-                                    <p>{user.fullName}</p>
+                                    <p>{ user.username }</p>
                                     <Image
                                       src="/settings_icon.svg"
                                       alt="invete_player_icon"
-                                      width={"20px"}
-                                      height={"20px"}
+                                      width={ "20px" }
+                                      height={ "20px" }
                                     />
                                   </div>
                                 )
                               );
                             }
-                          )}
-                        </div> */}
+                          ) }
+                        </div>
                         { group_box && (
                           <TreePointsBox
                             group_box={ group_box }
@@ -370,7 +355,7 @@ const Chat = ( { router }: AppProps ) =>
                   ...
                 </div>
               </div>
-              <ConversationBody/>
+              <ConversationBody />
             </div>
           </div>
         </div>

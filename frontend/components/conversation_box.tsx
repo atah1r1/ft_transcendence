@@ -65,13 +65,15 @@ const ConversationBox = () =>
           </div>
           <div>
             <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
-            <p
-              className={ cn(
-                styles.conversation_number
-              ) }
-            >
-              { conv.wasRead ? "" : "1" }
-            </p>
+            { conv.wasRead !== true && (
+              <p
+                className={ cn(
+                  styles.conversation_number
+                ) }
+              >
+                { conv.wasRead ? "" : "" }
+              </p> )
+            }
           </div>
         </div>
       </div>

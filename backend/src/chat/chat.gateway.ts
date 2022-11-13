@@ -375,6 +375,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.roomId,
         payload.seen,
       );
+
+      await this.sendChatsToClient(client);
     } catch (err) {
       throw new WsException({
         error: EV_SEEN,
@@ -432,12 +434,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           message: 'Failed to create room',
         });
       }
-      await this.joinNewRoom(client.data.id, chat.id);
+
+      this.joinNewRoom(client.data.id, chat.roomId);
       await this.sendChatsToUser(client.data.id);
       await this.sendRoomCreatedToClient(client.data.id, chat);
     } catch (err) {
       throw new WsException({
-        error: EV_CREATE_DM,
+        error: EV_CREATE_ROOM,
         message: err.message,
       });
     }
