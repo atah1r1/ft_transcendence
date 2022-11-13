@@ -3,12 +3,13 @@ import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import styles from "../styles/chat.module.css";
 // import { MessagesContext } from "../stores/messages_store";
-import { MessagesContext, SocketContext } from "../pages/_app";
+import { CurrentConvContext, MessagesContext, SocketContext } from "../pages/_app";
 
-export default function ConversationBody({ currentConv }: any) {
+export default function ConversationBody() {
 
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useContext(MessagesContext);
+  const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
   const socket = useContext(SocketContext);
 
   useEffect(() => {

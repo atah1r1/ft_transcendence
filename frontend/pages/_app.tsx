@@ -4,77 +4,126 @@ import React, { useContext, useEffect, useState } from 'react';
 import axios, { AxiosError } from "axios";
 import { io, Socket } from "socket.io-client";
 import cookie from 'cookie';
+import { useRouter } from 'next/router';
+import { ToastContainer, ToastOptions, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { type } from 'os';
 // import ChatStore, { ChatContext } from "../stores/chat_store";
 
-const socket = io("http://localhost:9000/chat", {
-  auth: (cb) => {
-    cb({
-      token: typeof window !== "undefined" ? cookie.parse(document.cookie).jwt : '',
-    });
+const socket = io( "http://localhost:9000/chat", {
+  auth: ( cb ) =>
+  {
+    cb( {
+      token: typeof window !== "undefined" ? cookie.parse( document.cookie ).jwt : '',
+    } );
   }
-});
+} );
 
-export const SocketContext = React.createContext<Socket>(socket);
-export const MessagesContext = React.createContext<any[]>([new Map(), () => { }]);
-export const ChatContext = React.createContext<any[]>([[], () => { }]);
-export const OnlineFriendsContext = React.createContext<any[]>([[], () => { }]);
+export const SocketContext = React.createContext<Socket>( socket );
+export const MessagesContext = React.createContext<any[]>( [ new Map(), () => { } ] );
+export const ChatContext = React.createContext<any[]>( [ [], () => { } ] );
+export const OnlineFriendsContext = React.createContext<any[]>( [ [], () => { } ] );
+export const CurrentConvContext = React.createContext<any[]>( [ {}, () => { } ] );
 
-function MyApp({ Component, pageProps }: AppProps) {
-  const [chats, setChats] = useState([]);
-  const [messages, setMessages] = useState(new Map<string, any[]>());
-  const [onlineFriends, setOnlineFriends] = useState([]);
+function MyApp ( { Component, pageProps }: AppProps )
+{
+  const router = useRouter();
+  const [ chats, setChats ] = useState( [] );
+  const [ messages, setMessages ] = useState( new Map<string, any[]>() );
+  const [ onlineFriends, setOnlineFriends ] = useState( [] );
+  const [ currentConv, setCurrentConv ] = useState( {} );
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log('CONNECT: ', socket.id);
-    });
+  const toastOptions: ToastOptions<{}> = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
 
-    socket.on("disconnect", () => {
-      console.log('DISCONNECT: ', socket.id);
-    });
+  };
 
-    socket.on("connect_error", () => {
-      console.log('CONNECT_ERROR: ', socket.id);
+  useEffect( () =>
+  {
+    socket.on( "connect", () =>
+    {
+      console.log( 'CONNECT: ', socket.id );
+    } );
+
+    socket.on( "disconnect", () =>
+    {
+      console.log( 'DISCONNECT: ', socket.id );
+    } );
+
+    socket.on( "connect_error", () =>
+    {
+      toast.error( 'Websocket connection failed.', toastOptions );
+      // TODO: redirect to login page.
       socket.connect();
-    });
+    } );
 
-    socket.on("exception", (exception) => {
-      console.log('exception: ', exception);
-    });
+    socket.on( "exception", ( exception ) =>
+    {
+      toast.error( `Error: ${ exception }`, toastOptions );
+    } );
 
-    socket!.on('chat_list', (data: any) => {
-      console.log('chat_list: ', data);
-      setChats(data);
-    });
+    socket.on( 'chat_list', ( data: any ) =>
+    {
+      setChats( data );
+    } );
 
-    socket!.on('online_friends', (data: any) => {
-      console.log('online_friends: ', data);
-      setOnlineFriends(data);
-    });
+    socket.on( 'online_friends', ( data: any ) =>
+    {
+      setOnlineFriends( data );
+    } );
 
-    socket!.on('message', (data: any) => {
-      setMessages((prev) => {
-        if (prev.has(data.roomId)) {
-          prev.set(data.roomId, [...(prev.get(data.roomId) ?? []), data]);
-        } else {
-          prev.set(data.roomId, [data]);
+    socket.on( 'room_created', ( data: any ) =>
+    {
+      if ( data?.existing === false )
+      {
+        toast.info( `A new ${ data?.isDm === true ? "DM" : "Group Chat" } has been created.`, toastOptions );
+      }
+      setCurrentConv( data );
+      router.push( `/settings/chat` );
+    } );
+
+    socket.on( 'message', ( data: any ) =>
+    {
+      const userId = localStorage.getItem( 'userId' );
+      if ( userId !== data.user?.id )
+      {
+        toast.info( `You have a new ${ data?.roomName ? "Message" : "DM" } from ${ data?.user ? data?.user.username : "N/A" }`, toastOptions );
+      }
+      setMessages( ( prev ) =>
+      {
+        if ( prev.has( data.roomId ) )
+        {
+          prev.set( data.roomId, [ ...( prev.get( data.roomId ) ?? [] ), data ] );
+        } else
+        {
+          prev.set( data.roomId, [ data ] );
         }
         return prev;
-      });
-    });
+      } );
+    } );
 
-  }, []);
+  }, [] );
 
   return (
-    <OnlineFriendsContext.Provider value={[onlineFriends, setOnlineFriends]}>
-      <ChatContext.Provider value={[chats, setChats]}>
-        <MessagesContext.Provider value={[messages, setMessages]}>
-          <SocketContext.Provider value={socket}>
-            <Component {...pageProps} />
-          </SocketContext.Provider>
-        </MessagesContext.Provider>
-      </ChatContext.Provider>
-    </OnlineFriendsContext.Provider>
+    <CurrentConvContext.Provider value={ [ currentConv, setCurrentConv ] }>
+      <OnlineFriendsContext.Provider value={ [ onlineFriends, setOnlineFriends ] }>
+        <ChatContext.Provider value={ [ chats, setChats ] }>
+          <MessagesContext.Provider value={ [ messages, setMessages ] }>
+            <SocketContext.Provider value={ socket }>
+              <Component { ...pageProps } />
+              <ToastContainer style={ { fontSize: "1.2rem" } } />
+            </SocketContext.Provider>
+          </MessagesContext.Provider>
+        </ChatContext.Provider>
+      </OnlineFriendsContext.Provider>
+    </CurrentConvContext.Provider>
   );
 }
 

@@ -54,6 +54,7 @@ const Profile = () =>
       );
       setData( response.data );
       localStorage.setItem( "user", JSON.stringify( response.data ) );
+      localStorage.setItem("userId", response.data?.id);
     } catch ( error: any )
     {
     }

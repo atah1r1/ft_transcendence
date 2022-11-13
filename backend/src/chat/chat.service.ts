@@ -54,9 +54,9 @@ export class ChatService {
   }
 
   // Rooms
-  async createDm(userId: string, otherUserId: string): Promise<Room> {
+  async createDm(userId: string, otherUserId: string): Promise<any> {
     const _existingDm = await this.getDmByUserIds(userId, otherUserId);
-    if (_existingDm) return _existingDm;
+    if (_existingDm) return this.formatChat(userId, _existingDm, true);
 
     const otherUser = await this.userService.getUserById(otherUserId);
     if (!otherUser) throw new Error('Other User does not exist');
@@ -75,7 +75,7 @@ export class ChatService {
     await this.addUserToRoom(otherUserId, _room.id, null, true);
     await this.userService.addFriend(userId, otherUserId);
 
-    return _room;
+    return await this.formatChat(userId, _room, false);
   }
 
   async createRoom(
@@ -84,7 +84,7 @@ export class ChatService {
     image: string,
     privacy: RoomPrivacy,
     password: string,
-  ): Promise<Room> {
+  ): Promise<any> {
     let _hashed: string = null;
 
     if (privacy === 'PROTECTED') {
@@ -103,7 +103,7 @@ export class ChatService {
 
     await this.addUserToRoom(creatorId, _room.id, password, true);
 
-    return _room;
+    return await this.formatChat(creatorId, _room, false);
   }
 
   async getRoomsByUserId(userId: string): Promise<Room[]> {
@@ -417,6 +417,36 @@ export class ChatService {
     return _rooms;
   }
 
+  async formatChat(userId: string, room: Room, existing: boolean): Promise<any> {
+    let _name: string = null;
+    let _image: string = null;
+
+    if (room.isDm) {
+      const _roomUsers = await this.getRoomUsersByRoomId(room.id, true, false);
+      _name = _roomUsers.find((ru) => ru.userId !== userId).user.username;
+      _image = _roomUsers.find((ru) => ru.userId !== userId).user.avatar;
+    } else {
+      _name = room.name;
+      _image = room.image;
+    }
+
+    const _lastMessage: any = await this.getLastMessageByRoomId(room.id);
+    const _wasRead: boolean = (
+      await this.getRoomUserByUserIdAndRoomId(userId, room.id)
+    ).hasRead;
+
+    return {
+      roomId: room.id,
+      name: _name,
+      image: _image,
+      updatedAt: room.updatedAt,
+      lastMessage: _lastMessage,
+      isDm: room.isDm,
+      wasRead: _wasRead,
+      existing: existing,
+    };
+  }
+
   // Chats
   async getChatsByUserId(userId: string): Promise<any[]> {
     const _rooms: Room[] = await this.getRoomsByUserId(userId);
@@ -424,35 +454,7 @@ export class ChatService {
     console.log("NUM ROOMS", _rooms.length);
 
     const _chats = _rooms.map(async (room) => {
-      let _name: string = null;
-      let _image: string = null;
-
-      if (room.isDm) {
-        const _roomUsers = await this.getRoomUsersByRoomId(
-          room.id,
-          true,
-          false,
-        );
-        _name = _roomUsers.find((ru) => ru.userId !== userId).user.username;
-        _image = _roomUsers.find((ru) => ru.userId !== userId).user.avatar;
-      } else {
-        _name = room.name;
-        _image = room.image;
-      }
-
-      const _lastMessage: any = await this.getLastMessageByRoomId(room.id);
-      const _wasRead: boolean = (
-        await this.getRoomUserByUserIdAndRoomId(userId, room.id)
-      ).hasRead;
-
-      return {
-        roomId: room.id,
-        name: _name,
-        image: _image,
-        updatedAt: room.updatedAt,
-        lastMessage: _lastMessage,
-        wasRead: _wasRead,
-      };
+      return await this.formatChat(userId, room, true);
     });
 
     const _sortedChats = (await Promise.all(_chats)).sort(

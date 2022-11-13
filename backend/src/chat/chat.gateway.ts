@@ -38,7 +38,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private authService: AuthService,
     private chatService: ChatService,
-  ) { }
+  ) {}
   @WebSocketServer() server: Server;
 
   /* *******************
@@ -127,14 +127,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.data = decoded;
   }
 
-  private async sendRoomCreatedToClients(room: Room) {
-    const memebers = await this.chatService.getRoomUsersByRoomId(room.id);
-    memebers.forEach((member) => {
-      const sockets = this.chatService.getConnectedUserById(member.userId);
-      if (!sockets || sockets.length === 0) return;
-      sockets.forEach((s) => {
-        this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, room);
-      });
+  private async sendRoomCreatedToClient(userId: string, chat: any) {
+    const sockets = this.chatService.getConnectedUserById(userId);
+    if (!sockets || sockets.length === 0) return;
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, chat);
     });
   }
 
@@ -322,7 +319,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       await this.verifyAndSave(client);
       // Add user to connectedUsers map.
-      console.log("CONNECT ID: ", client.data.id);
+      console.log('CONNECT ID: ', client.data.id);
       this.chatService.addConnectedUser(client.data.id, client);
       await this.joinRooms(client);
       await this.sendChatsToClient(client);
@@ -353,7 +350,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.roomId,
         payload.message,
       );
-      await this.chatService.updateSeenInRoom(client.data.id, payload.roomId, false);
+      await this.chatService.updateSeenInRoom(
+        client.data.id,
+        payload.roomId,
+        false,
+      );
       // Send message and chats.
       this.sendChatsToRoomMembers(payload.roomId);
       this.server.to(payload.roomId).emit(EV_MESSAGE, formattedMessage);
@@ -369,7 +370,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async sendSeen(client: Socket, payload: any) {
     this.validateSeen(payload);
     try {
-      await this.chatService.updateSeen(client.data.id, payload.roomId, payload.seen);
+      await this.chatService.updateSeen(
+        client.data.id,
+        payload.roomId,
+        payload.seen,
+      );
     } catch (err) {
       throw new WsException({
         error: EV_SEEN,
@@ -382,24 +387,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async createDM(client: Socket, payload: any) {
     this.validateCreateDm(payload);
     try {
-      const dm = await this.chatService.createDm(
+      const chat = await this.chatService.createDm(
         client.data.id,
         payload.otherUserId,
       );
-      if (!dm) {
+      if (!chat) {
         throw new WsException({
           error: EV_CREATE_ROOM,
           message: 'Failed to create room',
         });
       }
-      const members = await this.chatService.getRoomUsersByRoomId(dm.id);
+      const members = await this.chatService.getRoomUsersByRoomId(chat.roomId);
       for (const member of members) {
-        this.joinNewRoom(member.userId, dm.id);
+        this.joinNewRoom(member.userId, chat.roomId);
         await this.sendChatsToUser(member.userId);
       }
-      await this.sendRoomCreatedToClients(dm);
       await this.sendOnlineFriendsToClient(client);
       await this.sendOnlineFriendsOfUserId(client.data.id);
+      await this.sendRoomCreatedToClient(client.data.id, chat);
     } catch (err) {
       throw new WsException({
         error: EV_CREATE_DM,
@@ -413,7 +418,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.validateCreateRoom(payload);
 
     try {
-      const room = await this.chatService.createRoom(
+      const chat = await this.chatService.createRoom(
         client.data.id,
         payload.name,
         payload.image,
@@ -421,15 +426,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.password,
       );
 
-      if (!room) {
+      if (!chat) {
         throw new WsException({
           error: EV_CREATE_ROOM,
           message: 'Failed to create room',
         });
       }
-      await this.joinNewRoom(client.data.id, room.id);
+      await this.joinNewRoom(client.data.id, chat.id);
       await this.sendChatsToUser(client.data.id);
-      await this.sendRoomCreatedToClients(room);
+      await this.sendRoomCreatedToClient(client.data.id, chat);
     } catch (err) {
       throw new WsException({
         error: EV_CREATE_DM,
