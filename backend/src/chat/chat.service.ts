@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Room, RoomUser, Message, RoomPrivacy, User } from '@prisma/client';
+import {
+  Room,
+  RoomUser,
+  Message,
+  RoomPrivacy,
+  User,
+  RoomRole,
+  RoomUserStatus,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
@@ -58,8 +66,8 @@ export class ChatService {
     const _existingDm = await this.getDmByUserIds(userId, otherUserId);
     if (_existingDm) return this.formatChat(userId, _existingDm, true);
 
-    const otherUser = await this.userService.getUserById(otherUserId);
-    if (!otherUser) throw new Error('Other User does not exist');
+    const otherUser = await this.userService.getUserById(userId, otherUserId);
+    if (!otherUser) throw new Error('User does not exist or blocked');
 
     const _room = await this.prisma.room.create({
       data: {
@@ -71,8 +79,8 @@ export class ChatService {
       },
     });
 
-    await this.addUserToRoom(userId, _room.id, null, true);
-    await this.addUserToRoom(otherUserId, _room.id, null, true);
+    await this.addUserToRoom(userId, _room.id, null, RoomRole.OWNER);
+    await this.addUserToRoom(otherUserId, _room.id, null, RoomRole.OWNER);
     await this.userService.addFriend(userId, otherUserId);
     const _updatedRoom = await this.getRoomById(_room.id, true);
 
@@ -109,9 +117,17 @@ export class ChatService {
       },
     });
 
-    await this.addUserToRoom(creatorId, _room.id, password, true);
-
+    await this.addUserToRoom(creatorId, _room.id, password, RoomRole.OWNER);
     return await this.formatChat(creatorId, _room, false);
+  }
+
+  async deleteDm(userId: string, roomId: string) {
+    const _dm = await this.getRoomById(roomId);
+    if (!_dm) throw new Error('Room does not exist');
+    if (!_dm.isDm) throw new Error('Room is not a DM');
+    await this.deleteAllMessagesInRoom(roomId);
+    await this.removeAllMembersFromRoom(roomId);
+    await this.prisma.room.delete({ where: { id: roomId } });
   }
 
   async getRoomsByUserId(
@@ -123,7 +139,9 @@ export class ChatService {
         members: {
           some: {
             userId: userId,
-            isBanned: false,
+            status: {
+              not: RoomUserStatus.BANNED,
+            },
           },
         },
       },
@@ -139,7 +157,7 @@ export class ChatService {
     return _rooms;
   }
 
-  async getRoomById(roomId: string, includeMembers = false): Promise<Room> {
+  async getRoomById(roomId: string, includeMembers = false): Promise<any> {
     const _room = await this.prisma.room.findUnique({
       where: { id: roomId },
       include: {
@@ -153,7 +171,7 @@ export class ChatService {
     return _room;
   }
 
-  async getDmByUserIds(userId: string, otherUserId: string): Promise<Room> {
+  async getDmByUserIds(userId: string, otherUserId: string): Promise<any> {
     const _room = await this.prisma.room.findFirst({
       where: {
         isDm: true,
@@ -189,7 +207,7 @@ export class ChatService {
     userToAddId: string,
     roomId: string,
     password?: string,
-    isAdmin = false,
+    role: RoomRole = RoomRole.MEMBER,
   ): Promise<RoomUser> {
     const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
     if (!_room) throw new Error('Room does not exist');
@@ -201,15 +219,14 @@ export class ChatService {
     if (_existingRoomUser) throw new Error('User already in room');
 
     if (
-      _room.privacy === 'PROTECTED' &&
+      _room.privacy === RoomPrivacy.PROTECTED &&
       !(await this.validateRoomPassword(password, _room.password))
     )
       throw new Error('Incorrect room password');
 
     const _roomUser = await this.prisma.roomUser.create({
       data: {
-        isAdmin: isAdmin,
-        isBanned: false,
+        role: role,
         hasRead: true,
         roomId: roomId,
         userId: userToAddId,
@@ -233,30 +250,23 @@ export class ChatService {
       roomId,
     );
     if (!_adminRoomUser) throw new Error('User not in room');
-    if (!_adminRoomUser.isAdmin) throw new Error('You are not an admin');
+    if (_adminRoomUser.role === RoomRole.MEMBER)
+      throw new Error('You are not an admin or owner');
 
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
       userToAddId,
       roomId,
     );
     if (_existingRoomUser) throw new Error('User already in room');
-
-    // if (
-    //   _room.isPasswordRequired &&
-    //   this.validateRoomPassword(password, _room.password)
-    // )
-    //   throw new Error('Incorrect room password');
-
     const _roomUser = await this.prisma.roomUser.create({
       data: {
-        isAdmin: false,
-        isBanned: false,
+        role: RoomRole.MEMBER,
+        status: RoomUserStatus.NORMAL,
         hasRead: false,
         roomId: roomId,
         userId: userToAddId,
       },
     });
-
     return _roomUser;
   }
 
@@ -272,8 +282,12 @@ export class ChatService {
       roomId,
     );
     if (!_existingRoomUser) throw new Error('User not in room');
-
     if (_room.isDm) throw new Error('Cannot leave DM');
+    if (_existingRoomUser.role === RoomRole.OWNER)
+      throw new Error('Cannot leave room as owner');
+
+    // NEED TO DELETE ALL MESSAGES FROM USER IN ROOM
+    await this.deleteAllMessagesOfRoomUser(_existingRoomUser.id);
 
     const _deletedRu = await this.prisma.roomUser.delete({
       where: {
@@ -291,22 +305,26 @@ export class ChatService {
   ): Promise<boolean> {
     const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
     if (!_room) throw new Error('Room does not exist');
+    if (_room.isDm) throw new Error('Cannot leave DM');
 
-    const _adminRoomUser = await this.getRoomUserByUserIdAndRoomId(
+    const _adminRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
       adminId,
       roomId,
     );
     if (!_adminRoomUser) throw new Error('User not in room');
-    if (!_adminRoomUser.isAdmin) throw new Error('You are not an admin');
+    if (_adminRoomUser.role === RoomRole.MEMBER)
+      throw new Error('You are not an admin or owner');
 
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
       userToRemoveId,
       roomId,
     );
     if (!_existingRoomUser) throw new Error('User not in room');
+    if (_existingRoomUser.role === RoomRole.OWNER)
+      throw new Error('Cannot remove owner');
 
-    if (_room.isDm) throw new Error('Cannot leave DM');
-
+    // NEED TO DELETE ALL MESSAGES FROM USER
+    await this.deleteAllMessagesOfRoomUser(_existingRoomUser.id);
     const _deletedRu = await this.prisma.roomUser.delete({
       where: {
         id: _existingRoomUser.id,
@@ -316,36 +334,88 @@ export class ChatService {
     return _deletedRu ? true : false;
   }
 
-  async banUserFromRoom(
+  async removeAllMembersFromRoom(roomId: string) {
+    const _room = await this.getRoomById(roomId);
+    if (!_room) throw new Error('Room does not exist');
+
+    await this.prisma.roomUser.deleteMany({
+      where: {
+        roomId: roomId,
+      },
+    });
+  }
+
+  async updateUserStatus(
     adminId: string,
-    bannedUserId: string,
+    subjectedUserId: string,
     roomId: string,
-    ban: boolean,
+    newStatus: RoomUserStatus,
   ): Promise<RoomUser> {
     const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
     if (!_room) throw new Error('Room does not exist');
 
-    const _adminRoomUser = await this.getRoomUserByUserIdAndRoomId(
+    const _adminRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
       adminId,
       roomId,
     );
     if (!_adminRoomUser) throw new Error('You are not in room');
-    if (!_adminRoomUser.isAdmin) throw new Error('You are not an admin');
+    if (_adminRoomUser.role === RoomRole.MEMBER)
+      throw new Error('You are not an admin or owner');
 
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      bannedUserId,
+      subjectedUserId,
       roomId,
     );
     if (!_existingRoomUser) throw new Error('User not in room');
-    if (_existingRoomUser.isBanned === ban)
-      throw new Error(`User is already${!ban ? ' not banned' : 'banned'}`);
+    if (_existingRoomUser.role === RoomRole.OWNER)
+      throw new Error('Cannot mute/ban owner');
+    if (_existingRoomUser.status === newStatus)
+      throw new Error(`User is already ${newStatus}`);
 
     const ru = await this.prisma.roomUser.update({
       where: {
         id: _existingRoomUser.id,
       },
       data: {
-        isBanned: ban,
+        status: newStatus,
+      },
+    });
+
+    return ru;
+  }
+
+  async makeUserAdmin(
+    ownerId: string,
+    subjectedUserId: string,
+    roomId: string,
+  ): Promise<RoomUser> {
+    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    if (!_room) throw new Error('Room does not exist');
+
+    const _ownerRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
+      ownerId,
+      roomId,
+    );
+    if (!_ownerRoomUser) throw new Error('You are not in room');
+    if (_ownerRoomUser.role !== RoomRole.OWNER)
+      throw new Error('You are not an owner');
+
+    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
+      subjectedUserId,
+      roomId,
+    );
+    if (!_existingRoomUser) throw new Error('User not in room');
+    if (_existingRoomUser.role === RoomRole.OWNER)
+      throw new Error('Cannot change owner role');
+    if (_existingRoomUser.role === RoomRole.ADMIN)
+      throw new Error('User is already an admin');
+
+    const ru = await this.prisma.roomUser.update({
+      where: {
+        id: _existingRoomUser.id,
+      },
+      data: {
+        role: RoomRole.ADMIN,
       },
     });
 
@@ -353,13 +423,21 @@ export class ChatService {
   }
 
   async getRoomUsersByRoomId(
+    userId: string,
     roomId: string,
     includeUser = false,
     includeRoom = false,
   ): Promise<any[]> {
+    const _blockedUsersIds = (
+      await this.userService.getBlockedUsers(userId)
+    ).map((user) => user.id);
+
     const _roomUsers = await this.prisma.roomUser.findMany({
       where: {
         roomId: roomId,
+        userId: {
+          notIn: _blockedUsersIds,
+        },
       },
       include: {
         user: includeUser,
@@ -405,8 +483,8 @@ export class ChatService {
     return _roomUser;
   }
 
-  async findRoomByName(userId: string, name: string): Promise<Room> {
-    const _room = await this.prisma.room.findFirst({
+  async findRoomsByName(userId: string, name: string): Promise<Room[]> {
+    const _rooms = await this.prisma.room.findMany({
       where: {
         isDm: false,
         name: {
@@ -422,7 +500,7 @@ export class ChatService {
         },
       },
     });
-    return _room;
+    return _rooms;
   }
 
   async getRooms(userId: string): Promise<Room[]> {
@@ -430,7 +508,7 @@ export class ChatService {
       where: {
         isDm: false,
         NOT: {
-          privacy: 'PRIVATE',
+          privacy: RoomPrivacy.PRIVATE,
           members: {
             some: {
               userId: userId,
@@ -460,7 +538,10 @@ export class ChatService {
       _image = room.image;
     }
 
-    const _lastMessage: any = await this.getLastMessageByRoomId(room.id);
+    const _lastMessage: any = await this.getLastMessageByRoomId(
+      userId,
+      room.id,
+    );
     const _wasRead: boolean = (
       await this.getRoomUserByUserIdAndRoomId(userId, room.id)
     ).hasRead;
@@ -512,7 +593,7 @@ export class ChatService {
   }
 
   async updateSeenInRoom(userId: string, roomId: string, seen: boolean) {
-    const members = await this.getRoomUsersByRoomId(roomId);
+    const members = await this.getRoomUsersByRoomId(userId, roomId);
     members.forEach(async (member) => {
       if (member.userId !== userId) {
         await this.prisma.roomUser.update({
@@ -536,10 +617,13 @@ export class ChatService {
     const _room = await this.getRoomById(roomId);
     if (!_room) throw new Error('Room not found');
 
-    const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
+    const _roomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
+      userId,
+      roomId,
+    );
     if (!_roomUser) throw new Error('User not in room');
-
-    if (_roomUser.isBanned) throw new Error('User is banned');
+    if (_roomUser.status !== RoomUserStatus.NORMAL)
+      throw new Error('User is banned or muted');
 
     const _message: Message = await this.prisma.message.create({
       data: {
@@ -556,7 +640,6 @@ export class ChatService {
         room: true,
       },
     });
-
     if (_message) {
       await this.prisma.room.update({
         where: {
@@ -585,9 +668,18 @@ export class ChatService {
 
     if (_roomUser.isBanned) throw new Error('User is banned');
 
+    const _blockedUsersIds = (
+      await this.userService.getBlockedUsers(userId)
+    ).map((user) => user.id);
+
     return await this.prisma.message.findMany({
       where: {
         roomId: roomId,
+        roomUser: {
+          userId: {
+            notIn: _blockedUsersIds,
+          },
+        },
       },
       include: {
         roomUser: {
@@ -599,6 +691,22 @@ export class ChatService {
       },
       orderBy: {
         createdAt: 'asc',
+      },
+    });
+  }
+
+  async deleteAllMessagesOfRoomUser(roomUserId: string) {
+    await this.prisma.message.deleteMany({
+      where: {
+        roomUserId: roomUserId,
+      },
+    });
+  }
+
+  async deleteAllMessagesInRoom(roomId: string) {
+    await this.prisma.message.deleteMany({
+      where: {
+        roomId: roomId,
       },
     });
   }
@@ -632,13 +740,23 @@ export class ChatService {
   }
 
   private async getLastMessageByRoomId(
+    userId: string,
     roomId: string,
     includeRoomUser = false,
     includeRoom = false,
   ): Promise<any> {
+    const blockedUsersIds = (
+      await this.userService.getBlockedUsers(userId)
+    ).map((user) => user.id);
+
     return await this.prisma.message.findFirst({
       where: {
         roomId: roomId,
+        roomUser: {
+          userId: {
+            notIn: blockedUsersIds,
+          },
+        },
       },
       include: {
         roomUser: includeRoomUser,
