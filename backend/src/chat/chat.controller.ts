@@ -3,6 +3,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Query,
   Req,
   UseGuards,
@@ -22,6 +23,22 @@ export class ChatController {
       return await this.chatService.getChatsByUserId(req.user.id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('room/:roomId/members')
+  async getRoomMembers(
+    @Req() req: any,
+    @Param('roomId') roomId: string,
+  ): Promise<any[]> {
+    try {
+      const members = await this.chatService.getRoomMembersByRoomId(
+        req.user.id,
+        roomId,
+      );
+      return members;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 

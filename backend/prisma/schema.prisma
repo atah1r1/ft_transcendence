@@ -71,6 +71,7 @@ enum RoomUserStatus {
   NORMAL
   BANNED
   MUTED
+  LEFT
 }
 
 model Message {
