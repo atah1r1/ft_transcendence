@@ -498,14 +498,13 @@ export class ChatService {
       },
     });
     return _leftRu ? true : false;
-    // NEED TO DELETE ALL MESSAGES FROM USER
+    // OLD METHOD: Delete room user and messages
     // await this.deleteAllMessagesOfRoomUser(_existingRoomUser.id);
     // const _deletedRu = await this.prisma.roomUser.delete({
     //   where: {
     //     id: _existingRoomUser.id,
     //   },
     // });
-
     // return _deletedRu ? true : false;
   }
 
@@ -540,7 +539,7 @@ export class ChatService {
     roomId: string,
     newStatus: RoomUserStatus,
   ): Promise<RoomUser> {
-    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    const _room = await this.getRoomById(roomId);
     if (!_room) throw new Error('Room does not exist');
 
     const _adminRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
@@ -587,7 +586,7 @@ export class ChatService {
     subjectedUserId: string,
     roomId: string,
   ): Promise<RoomUser> {
-    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    const _room = await this.getRoomById(roomId);
     if (!_room) throw new Error('Room does not exist');
 
     const _ownerRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
@@ -676,7 +675,7 @@ export class ChatService {
     if (ru.status === RoomUserStatus.BANNED)
       throw new Error('You are banned from room');
 
-    const members = await this.getRoomUsersByRoomId(userId, roomId);
+    const members = await this.getRoomUsersByRoomId(userId, roomId, true);
 
     if (members) {
       members.sort((a, b) => {
