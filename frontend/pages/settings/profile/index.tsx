@@ -69,6 +69,10 @@ const Profile = () =>
     fetchData();
   }, [] )
 
+  if (!loader) {
+    console.log("data.avatar profile", "|||", data, "|||");
+  }
+
   return (
     <>
       <MenuNav menu={menu} setMenu={setMenu}/>
@@ -100,7 +104,7 @@ const Profile = () =>
                     <div className={ styles.profile_slide }>change picture</div>
                     <input type="file"></input>
                     <Image
-                      src={ data.avatar }
+                      src={ data?.avatar ?? "https://picsum.photos/300/300" }
                       alt="avatar"
                       width="180px"
                       height="180px"

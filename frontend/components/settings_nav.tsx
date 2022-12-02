@@ -3,8 +3,7 @@ import { useRouter } from "next/router";
 import styles_box from "../styles/style_box.module.css";
 import styles_s_l from "../styles/style_settings_nav.module.css";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../pages/_app";
+import { useEffect, useState } from "react";
 
 const SettingsNav = ( { selected, menu }: any ) =>
 {
@@ -53,13 +52,14 @@ const SettingsNav = ( { selected, menu }: any ) =>
     const user = JSON.parse( localStorage.getItem( "user" ) as string );
     setData( user );
   }, [] )
-
+  
+  console.log("data.avatar settings", data.avatar);
   return (
     <div className={ cn( styles_box.profile_setting, `${ menu && windowDimensions!.width < 1000 && styles_box.navOpen }` ) }>
       <div className={ styles_s_l.profile_info }>
         <div className={ styles_s_l.profile_image_wrap }>
           <Image
-            src={ data.avatar }
+            src={ data?.avatar ?? "https://picsum.photos/300/300" }
             alt="avatar"
             width="100px"
             height="100px"

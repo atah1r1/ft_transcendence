@@ -260,7 +260,9 @@ const Chat = ( { router }: AppProps ) =>
               </div>
               <div className={ styles.l_part_tree }>
                 {
-                  onlineFriends.map( ( friend: any ) => (
+                  onlineFriends.map( ( friend: any ) => { 
+                    console.log("friend?.avatar", friend?.avatar);
+                    return(
                     <div key={ friend } className={ styles.online }>
                       <Image
                         src={ friend?.avatar }
@@ -270,7 +272,9 @@ const Chat = ( { router }: AppProps ) =>
                         layout={ "fixed" }
                       ></Image>
                     </div>
-                  ) )
+                  ) 
+                  
+})
                 }
               </div>
             </div>
@@ -289,6 +293,7 @@ const Chat = ( { router }: AppProps ) =>
                           { currentConv.members?.map(
                             ( user: any, i: number ) =>
                             {
+                              console.log("user.avatar", user.avatar);
                               return (
                                 user.id !== localStorage.getItem( 'userId' ) && (
                                   <div

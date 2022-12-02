@@ -11,6 +11,7 @@ const Friends_box = ( { friends }: any ) =>
 
   return friends.map( ( ele: any, i: any ) =>
   {
+    console.log("ele.avatar: ", ele.avatar);
     return (
       <div className={ styles.friends_box } key={ i }>
         <div className={ styles.friends_avatar }>

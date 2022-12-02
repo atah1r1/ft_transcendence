@@ -14,7 +14,7 @@ const History = () =>
   const [ menu, setMenu ] = useState( false );
   const [ data, setData ] = useState(
     {
-      avatar: "https://cdn.intra.42.fr/users/yhadari.jpg",
+      avatar: "",
       createdAt: "",
       first_name: "",
       id: "",
@@ -31,6 +31,8 @@ const History = () =>
     setData( user );
   }, [] )
 
+  console.log("data.avatar history", data.avatar);
+
   return (
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />
@@ -43,7 +45,7 @@ const History = () =>
               <div className={ styles.left }>
                 <div className={ styles.avatar }>
                   <Image
-                    src={ data.avatar }
+                    src={ data?.avatar ?? "https://picsum.photos/300/300" }
                     alt="user_img"
                     width={ "100px" }
                     height={ "100px" }
