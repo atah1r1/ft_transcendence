@@ -7,23 +7,19 @@ const nextConfig = {
 module.exports = nextConfig;
 
 module.exports = {
-  async redirects() {
-    return [
-      {
-        source: "/settings",
-        destination: "/settings/profile",
-        permanent: true,
-      },
-    ];
-  },
-};
-
-module.exports = {
   images: {
     remotePatterns: [
       {
         protocol: "https",
         hostname: "cdn.intra.42.fr",
+      },
+      {
+        protocol: "https",
+        hostname: "ui-avatars.com",
+      },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
       },
     ],
   },

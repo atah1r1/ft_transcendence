@@ -1,0 +1,101 @@
+.friends {
+  width: 100%;
+  height: 90%;
+  overflow-y: scroll;
+  padding-right: 1rem;
+}
+
+.friends::-webkit-scrollbar {
+  width: 6px;
+}
+
+.friends::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 1rem;
+}
+
+.friends_box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
+}
+
+.search {
+  margin: 0 auto;
+  width: 28rem;
+  margin-bottom: 2rem;
+}
+
+.search input {
+  width: inherit;
+  height: 3.8rem;
+  border-radius: 1.4rem;
+  border: none;
+  outline: none;
+  padding: 1.6rem;
+  font-size: 1.4rem;
+  background-color: #d9d9d9;
+  font-weight: bold;
+  color: #333;
+}
+
+.friends_options {
+  display: flex;
+}
+
+.friends_avatar {
+  width: 6.8rem;
+  height: 6.8rem;
+  border-radius: 50%;
+  border: 2px solid #d9d9d9;
+  margin-right: 1.4rem;
+}
+
+.friends_avatar img {
+  border-radius: 50%;
+}
+
+.friends_fullName {
+  width: 32rem;
+}
+
+.friends_userName,
+.friends_fullName {
+  font-family: "Phosphate";
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.friends_options {
+  width: 16rem;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.friends_options div {
+  transition: all 0.3s;
+}
+
+.friends_options div:active {
+  transform: translateY(1.5px);
+}
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .friends_fullName {
+    width: 22rem;
+  }
+  .friends_userName,
+  .friends_fullName {
+    font-size: 2rem;
+  }
+  .friends_options {
+    width: 14rem;
+  }
+}

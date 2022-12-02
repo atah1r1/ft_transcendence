@@ -19,8 +19,8 @@
   align-items: center;
   justify-content: space-around;
   padding: 1.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
   font-size: 1.8rem;
   text-align: center;
   letter-spacing: 1.2px;
@@ -78,4 +78,30 @@
   text-align: right;
   width: 26rem;
   font-family: "Phosphate";
+}
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .history_box {
+    /* padding: 1.2rem 0; */
+     font-size: 1.5rem;
+  }
+
+  .history_achievements {
+    width: 12rem;
+  }
+
+  .history_score_points {
+    width: 12rem;
+  }
+
+  .history_victory_defeat_box {
+    width: 12rem;
+    font-size: 2.4rem;
+  }
+
+  .history_gameMode_time {
+    width: 20rem;
+  }
 }

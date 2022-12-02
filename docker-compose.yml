@@ -1,41 +1,6 @@
 version: '2'
 
 services:
-
-    # nginx: 
-    #     restart: unless-stopped
-    #     container_name: "nginx"
-    #     build: 
-    #         context: .
-    #         dockerfile: ./deployment/nginx/Dockerfile
-    #     ports:
-    #         - 80:80
-    #         - 443:443
-    #     volumes:
-    #         - ./deployment/nginx:/etc/nginx/conf.d
-    #         - logging:/usr/share/nginx/logs
-    #         - /etc/ssl:/etc/ssl
-    #     depends_on:
-    #         - backend
-    #         - frontend
-    #     networks:
-    #         - front-network
-    
-    # frontend: 
-    #     restart: unless-stopped
-    #     container_name: "frontend"
-    #     build: 
-    #         context: .
-    #         dockerfile: ./deployment/frontend/Dockerfile
-    #     ports:
-    #         - 3000:3000
-    #     depends_on:
-    #         - backend
-    #     links:
-    #         - backend
-    #     networks:
-    #         - front-network
-    
     backendDB:
         restart: unless-stopped
         image: postgres:12.10
@@ -49,21 +14,28 @@ services:
             - POSTGRES_PASSWORD=admin
         ports:
             - 5555:5432
-    # pgadmin:
-    #     container_name: pgadmin4_container
-    #     image: dpage/pgadmin4
-    #     restart: always
-    #     environment:
-    #       PGADMIN_DEFAULT_EMAIL: admin@admin.com
-    #       PGADMIN_DEFAULT_PASSWORD: root
-    #     networks:
-    #         - db-network
+        networks:
+            - back-network
+    # api:
+    #     build:
+    #         context: .
+    #         dockerfile: ./deployments/backend/Dockerfile
+    #         target: development
+    #     depends_on:
+    #         - backendDB
+    #     volumes:
+    #         - .:/app
+    #     env_file:
+    #         - ./backend/.env
+    #     command: npm run start:dev
     #     ports:
-    #       - "5050:80"
+    #         - 9000:9000
+    #     networks:
+    #         - back-network
 
 volumes:
     database: {}
 
-# networks:
+networks:
 #     front-network:
-#     back-network:
+    back-network:

@@ -5,17 +5,23 @@
   src: url("../public/Pixeboy.ttf");
 }
 
+@font-face {
+  font-family: Phosphate;
+  src: url("../public/PhosphateRRSolid.ttf");
+}
+
 html,
 body {
   font-size: 62.5%;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  letter-spacing: 0.4px;
 }
 
 body {
   background-size: cover;
   background-image: url("../public/Background_Layout.png");
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.5);
   background-attachment: fixed;
 }
 
@@ -30,28 +36,43 @@ a {
   box-sizing: border-box;
 }
 
-@media (max-height: 20rem) {
+/* media queries ----------------------- */
+
+@media (max-width: 700px) {
+  html {
+    font-size: 52%;
+  }
+}
+
+/* @media (max-height: 20rem) {
   html {
     font-size: 48%;
   }
 }
 
-@media (max-width: 75em) {
+@media (max-width: 116em) {
   html {
-    font-size: 50%;
+    font-size: 54%;
   }
 }
-@media (max-width: 60em) {
+
+@media (max-width: 102em) {
+  html {
+    font-size: 46%;
+  }
+}
+
+@media (max-width: 86em) {
   html {
     font-size: 40%;
   }
-}
+} */
 
 /* Loading css */
 
 .spinner {
   position: absolute;
-  top: 30%;
+  top: 40%;
   left: 50%;
   text-align: center;
   transform: translateX(-50%);

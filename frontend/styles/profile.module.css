@@ -22,8 +22,12 @@
 }
 
 .profile_box {
-  display: flex;
-  justify-content: center;
+  margin: 0 auto;
+  width: 18rem;
+  height: 18rem;
+  margin-bottom: 1.2rem;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff;
 }
 
 .profile_box:hover .profile_slide {
@@ -33,11 +37,12 @@
 .details_avatar input,
 .profile_slide {
   position: absolute;
-  width: 16.6rem;
-  height: 16.6rem;
+  width: 18rem;
+  height: 18rem;
   border-radius: 50%;
   cursor: pointer;
   opacity: 0;
+  z-index: 1;
 }
 
 .profile_slide {
@@ -47,18 +52,26 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.3);
-  transition: all 0.3s;
+  transition: all 0.4s;
+}
+
+.upload_avatar {
+  width: 3.6rem;
+  height: 3.6rem;
+  position: absolute;
+  bottom: 24%;
+  left: 62%;
+  z-index: 1;
+  opacity: 0.8;
 }
 
 .details_avatar img {
   border-radius: 50%;
-  border: 2px solid #fff;
-  margin-bottom: 1.2rem;
-  width: 16.6rem;
 }
 
 .details_medals {
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .details_info {
@@ -71,9 +84,18 @@
   margin-bottom: 8rem;
 }
 
+.details_form div {
+  padding: 1rem;
+  text-align: left;
+}
+
+.details_form input:focus {
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 2px 15px;
+}
+
 .details_form input {
-  width: 26rem;
-  height: 3.6rem;
+  width: 24rem;
+  height: 3.2rem;
   border-radius: 1rem;
   border: none;
   background-color: #d9d9d9;
@@ -83,14 +105,13 @@
   font-family: "Pixeboy";
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   letter-spacing: 1px;
-  color: #333;
+  color: #222;
 }
 
 .details_form label {
   font-family: "Pixeboy";
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   display: block;
-  text-align: left;
   margin-bottom: 0.8rem;
 }
 
@@ -105,6 +126,11 @@
 
 .save_box .save_btn:hover {
   background-color: #da3e58;
+}
+
+.save_unclick {
+  pointer-events: none;
+  background-color: #dd6176 !important;
 }
 
 .details_two_factor_aut {
@@ -187,4 +213,21 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* media q--------------------- */
+
+@media (max-width: 1280px) {
+  .details_form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+    position: relative;
+    top: -4rem;
+  }
+
+  .details_form input {
+    width: 28rem;
+  }
 }

@@ -1,60 +1,85 @@
 import styles from "../styles/conversation_box.module.css";
 import cn from "classnames";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import Image from "next/image";
+import axios from "axios";
+import { ChatContext, CurrentConvContext } from "../pages/_app";
+// import { ChatContext } from "../stores/chat_store";
 
-const ConversationBox = ({ conversations, getSenderInfo, messages }: any) => {
-  const [currentConv, setCurrentConv] = useState(conversations[0]?.fullName);
+const ConversationBox = () =>
+{
+  // format date
+  const formatDateAndTime = ( date: string ) =>
+  {
+    if ( !date ) return;
+    const dateObj = new Date( date );
+    const dateStr = dateObj.toLocaleDateString();
+    const timeStr = dateObj.toLocaleTimeString();
+    return `${ dateStr } ${ timeStr }`;
+  }
 
-  const [newMessage, setNewMessage] = useState(
-    conversations.map((ele: any, i: number) => ele === ele && i != 0)
-  );
+  const [ chats, setChats ] = useContext( ChatContext );
+  const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
 
-  return conversations.map((conv: any, i: number) => {
+  useEffect( () =>
+  {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/chats`, {
+      withCredentials: true,
+    } ).then( ( res ) =>
+    {
+      setChats( res.data );
+    } ).catch( ( err ) =>
+    {
+      console.log( err );
+    } );
+  }, [] );
+
+  return chats?.map( ( conv: any, i: number ) =>
+  {
+    // setCurrent_conv( conv );
+    console.log("conv.image: ", conv.image);
     return (
-      <div key={i}>
+      <div key={ i }>
         <div
-          onClick={() => {
-            setCurrentConv(conv.fullName);
-            newMessage[i] = false;
-            setNewMessage(newMessage);
-            messages.forEach((msg: any) => {
-              if (!msg.sender) {
-                msg.avatar = conv.image;
-                msg.fullName = conv.fullName;
-              }
-            });
-            getSenderInfo([...messages]);
-          }}
-          className={cn(
-            styles.conversation,
-            currentConv === conv.fullName && styles.current_conv
-          )}
+          onClick={ () =>
+          {
+            // console.log( "onclick conv is:", conv );
+            setCurrentConv( conv );
+          } }
+          className={ cn(
+            styles.conversation, ` ${ conv.roomId === currentConv.roomId && styles.current_conv }`
+          ) }
         >
-          <div className={styles.conversation_img}>
-            <img src={conv.image}></img>
+          <div className={ styles.conversation_img }>
+            <Image
+              src={ conv.image === null ? "https://ui-avatars.com/api/?name=John+Doe" : conv.image }
+              alt="conversation_image"
+              width={ "42px" }
+              height={ "42px" }
+            ></Image>
           </div>
           <div>
-            <p className={styles.conversation_name}>{conv.fullName}</p>
-            <p className={styles.conversation_text}>{conv.lastMessage}</p>
-          </div>
-          <div>
-            <p className={styles.conversation_time}>{conv.lastTime}</p>
-            <p
-              className={cn(
-                currentConv !== conv.fullName &&
-                  newMessage[i] &&
-                  styles.conversation_number
-              )}
-            >
-              {currentConv !== conv.fullName &&
-                newMessage[i] &&
-                conv.messageNumber}
+            <p className={ styles.conversation_name }>
+              { conv.name }
             </p>
+            <p className={ styles.conversation_text }>{ conv.lastMessage?.message }</p>
+          </div>
+          <div>
+            <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
+            { conv.wasRead !== true && (
+              <p
+                className={ cn(
+                  styles.conversation_number
+                ) }
+              >
+                { conv.wasRead ? "" : "" }
+              </p> )
+            }
           </div>
         </div>
       </div>
     );
-  });
+  } );
 };
 
 export default ConversationBox;
