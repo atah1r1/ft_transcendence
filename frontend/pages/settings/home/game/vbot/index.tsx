@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import paddle from "../paddle";
 import styled from "styled-components";
 import { io, Socket } from "socket.io-client";
+import MenuNav from "../../../../../components/menuNav";
+import SettingsNav from "../../../../../components/settings_nav";
+import styles_box from "../../../../../styles/style_box.module.css";
+import styles_s_l from "../../../../../styles/style_settings_nav.module.css";
+import cn from "classnames";
 // export const socket = io('0.0.0.0:3001', {
 //     query: {
 //         userLogin: 'mougnou',
@@ -112,13 +117,13 @@ const GameContainer = styled.canvas`
 `;
 
 let rightPaddle: any = {
-    x : 1264,
-    y : 0,
-    width : 8,
-    height : 100,
-    colour : '#ED006C',
-    side : 'right',
-    points : 1,
+    x: 1264,
+    y: 0,
+    width: 8,
+    height: 100,
+    colour: '#ED006C',
+    side: 'right',
+    points: 1,
 };
 
 let leftPaddle: any = {
@@ -132,10 +137,13 @@ let leftPaddle: any = {
 };
 
 
-function Bot_game() {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [p1Score, setP1Score] = React.useState(0);
-    const [p2Score, setP2Score] = React.useState(0);
+function Bot_game ()
+{
+    const [ menu, setMenu ] = useState( false );
+
+    const canvasRef = useRef<HTMLCanvasElement>( null );
+    const [ p1Score, setP1Score ] = React.useState( 0 );
+    const [ p2Score, setP2Score ] = React.useState( 0 );
 
     let animation_id: any;
     // let gameOn: boolean = false;;
@@ -143,35 +151,42 @@ function Bot_game() {
 
 
 
-    useEffect(() => {
+    useEffect( () =>
+    {
 
-        const renderCanvas = () => {
+        const renderCanvas = () =>
+        {
             const canvasBG = canvasRef.current;
-            const ctxBG = canvasBG?.getContext('2d');
+            const ctxBG = canvasBG?.getContext( '2d' );
             const bg = new Image();
             bg.src = '/splash.png';
-            bg.onload = function () {
-                ctxBG?.drawImage(bg, 0, 0, canvasBG!.width, canvasBG!.height);
+            bg.onload = function ()
+            {
+                ctxBG?.drawImage( bg, 0, 0, canvasBG!.width, canvasBG!.height );
             }
         }
 
-        const renderPaddle = () => {
+        const renderPaddle = () =>
+        {
             const paddleC = canvasRef.current;
-            const ctx = paddleC?.getContext('2d');
-            paddle(ctx, paddleC, leftPaddle);
+            const ctx = paddleC?.getContext( '2d' );
+            paddle( ctx, paddleC, leftPaddle );
         }
 
-        const aiIQ100 = () => {
-            
+        const aiIQ100 = () =>
+        {
+
             const paddleC = canvasRef.current;
-            const ctx = paddleC?.getContext('2d');
-            paddle(ctx, paddleC, rightPaddle);
-            
-            let Vy = Math.abs(BALL.dy) - 0.48;
-            if (BALL.y < rightPaddle.y + rightPaddle.height / 2) {
+            const ctx = paddleC?.getContext( '2d' );
+            paddle( ctx, paddleC, rightPaddle );
+
+            let Vy = Math.abs( BALL.dy ) - 0.48;
+            if ( BALL.y < rightPaddle.y + rightPaddle.height / 2 )
+            {
                 rightPaddle.y = rightPaddle.y - Vy;
             }
-            else {
+            else
+            {
                 rightPaddle.y = rightPaddle.y + Vy;
             }
             // if (rightPaddle.x < rightPaddle.y && rightPaddle.y < paddleC?.height! - rightPaddle.height - rightPaddle.x){
@@ -179,11 +194,12 @@ function Bot_game() {
             // }
         }
 
-        const moveBall = () => {
+        const moveBall = () =>
+        {
             const ballC = canvasRef.current;
-            const ctx = ballC?.getContext('2d');
+            const ctx = ballC?.getContext( '2d' );
             ctx?.beginPath();
-            ctx?.arc(BALL.x, BALL.y, BALL.rad, 0, Math.PI * 2, false);
+            ctx?.arc( BALL.x, BALL.y, BALL.rad, 0, Math.PI * 2, false );
             ctx!.fillStyle = '#ffffff';
             ctx!.strokeStyle = '#000000';
             ctx?.fill();
@@ -192,45 +208,53 @@ function Bot_game() {
 
 
             // BALL MOVEMENT
-            if (BALL.y < 0 || BALL.y + BALL.rad > ballC!.height) {
+            if ( BALL.y < 0 || BALL.y + BALL.rad > ballC!.height )
+            {
                 BALL.dy = -BALL.dy;
             }
 
-            function collision(objPlayer: any, objBall: any) {
+            function collision ( objPlayer: any, objBall: any )
+            {
                 if (
                     objPlayer.x + objPlayer.width > objBall.x &&
                     objPlayer.x < objBall.x + objBall.rad &&
                     objPlayer.y + objPlayer.height > objBall.y &&
-                    objPlayer.y < objBall.y + objBall.rad) {
+                    objPlayer.y < objBall.y + objBall.rad )
+                {
                     return true;
                 }
-                else {
+                else
+                {
                     return false;
                 }
             }
 
             //Paddle collision
-            
-            if (collision(leftPaddle, BALL) && BALL.dx < 0) {
+
+            if ( collision( leftPaddle, BALL ) && BALL.dx < 0 )
+            {
                 BALL.dx = -BALL.dx;
                 // audio.play();
             }
 
-            if (collision(rightPaddle, BALL) && BALL.dx > 0) {
+            if ( collision( rightPaddle, BALL ) && BALL.dx > 0 )
+            {
                 BALL.dx = -BALL.dx;
                 // audio.play();
             }
 
             // Score
-            if (BALL.x + BALL.rad > ballC!.width) {
-                setP1Score(leftPaddle.points++);
+            if ( BALL.x + BALL.rad > ballC!.width )
+            {
+                setP1Score( leftPaddle.points++ );
                 BALL.x = ballC!.width / 2;
                 BALL.y = ballC!.height / 2;
                 BALL.dx = 5;
                 BALL.dy = 5;
             }
-            if (BALL.x < 0) {
-                setP2Score(rightPaddle.points++);
+            if ( BALL.x < 0 )
+            {
+                setP2Score( rightPaddle.points++ );
                 BALL.x = ballC!.width / 2;
                 BALL.y = ballC!.height / 2;
                 BALL.dx = -5;
@@ -240,7 +264,8 @@ function Bot_game() {
             BALL.x += BALL.dx;
             BALL.y += BALL.dy;
         }
-        const render = () => {
+        const render = () =>
+        {
 
             renderCanvas();
             renderPaddle();
@@ -248,20 +273,23 @@ function Bot_game() {
             aiIQ100();
 
             canvasRef.current!.focus();
-            animation_id = requestAnimationFrame(render);
+            animation_id = requestAnimationFrame( render );
         };
-        requestAnimationFrame(render);
+        requestAnimationFrame( render );
         render();
         canvasRef.current?.focus();
-    }, []);
+    }, [] );
 
 
-    const keyboardevent = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
-        if (e.key === "ArrowUp"  && leftPaddle.y > 0) {
+    const keyboardevent = ( e: React.KeyboardEvent<HTMLCanvasElement> ) =>
+    {
+        if ( e.key === "ArrowUp" && leftPaddle.y > 0 )
+        {
             leftPaddle.y -= 40;
-            console.log(leftPaddle.y);
+            console.log( leftPaddle.y );
         }
-        else if (e.key === "ArrowDown" && leftPaddle.y < 620) {
+        else if ( e.key === "ArrowDown" && leftPaddle.y < 620 )
+        {
             leftPaddle.y += 40;
         }
     }
@@ -283,24 +311,31 @@ function Bot_game() {
 
     return (
         <>
-            <Container>
-                <GameContainer id="game" ref={canvasRef}
-                    tabIndex={0}
-                    onKeyDown={keyboardevent}
-                    width="1280" height="720">
-                </GameContainer>
-                <ScoreContainer>
-                <ScoreContainerP1>
-                    <p> SENKO </p>
-                    <h2> {p1Score}</h2>
-                </ScoreContainerP1>
+            <MenuNav menu={ menu } setMenu={ setMenu } />
+            <div className={ styles_box.container }>
+                <SettingsNav selected={ "home" } menu={ menu } />
+                <div className={ styles_box.profile_details }>
+                    <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
+                    <Container>
+                        <GameContainer id="game" ref={ canvasRef }
+                            tabIndex={ 0 }
+                            onKeyDown={ keyboardevent }
+                            width="1280" height="720">
+                        </GameContainer>
+                        <ScoreContainer>
+                            <ScoreContainerP1>
+                                <p> SENKO </p>
+                                <h2> { p1Score }</h2>
+                            </ScoreContainerP1>
 
-                <ScoreContainerP2>
-                    <p> PUNK </p>
-                    <h2> {p2Score} </h2>
-                </ScoreContainerP2>
-            </ScoreContainer>
-            </Container>
+                            <ScoreContainerP2>
+                                <p> PUNK </p>
+                                <h2> { p2Score } </h2>
+                            </ScoreContainerP2>
+                        </ScoreContainer>
+                    </Container>
+                </div>
+            </div>
         </>
     );
 }

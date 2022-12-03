@@ -31,7 +31,7 @@ const SettingsNav = ( { selected, menu }: any ) =>
     return () => window.removeEventListener( 'resize', handleResize );
   }, [] );
 
-  const sections = [ "profile", "chat", "history", "statistics", "friends" ];
+  const sections = [ "home", "profile", "chat", "history", "statistics", "friends" ];
   const router = useRouter();
 
   const [ data, setData ] = useState(
@@ -52,8 +52,8 @@ const SettingsNav = ( { selected, menu }: any ) =>
     const user = JSON.parse( localStorage.getItem( "user" ) as string );
     setData( user );
   }, [] )
-  
-  console.log("data.avatar settings", data.avatar);
+
+  console.log( "data.avatar settings", data.avatar );
   return (
     <div className={ cn( styles_box.profile_setting, `${ menu && windowDimensions!.width < 1000 && styles_box.navOpen }` ) }>
       <div className={ styles_s_l.profile_info }>
