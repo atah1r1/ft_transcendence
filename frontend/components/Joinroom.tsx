@@ -10,20 +10,9 @@ const ContainerBaground = styled.div`
     position: fixed;
     display: flex;
     justify-content: center;
-    align-content: center;
     align-items: center;
     top : 0;
-    &:after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        opacity: .6;
-        z-index: -1;
-    }
+    left: 0;
 `;
 const JoinRoomcontainer = styled.div`
     width: 20em;
@@ -177,10 +166,12 @@ const JoinRoomButton = styled.button`
 `;
 
 
-export function JoinRoom(props: any) {
+export function JoinRoom ( props: any )
+{
 
     const router = useRouter();
-    const userCancelQueue= (e: any) => {
+    const userCancelQueue = ( e: any ) =>
+    {
 
         e.preventDefault();
         // socket.emit("cancelQueue");
@@ -190,11 +181,11 @@ export function JoinRoom(props: any) {
     return (
         <>
             <form>
-                  <ContainerBaground>
+                <ContainerBaground>
                     <JoinRoomcontainer>
                         <h4>* IN QUEUE *</h4>
                         <LoadingImg />
-                        <JoinRoomButton onClick={userCancelQueue}>Cancel</JoinRoomButton>
+                        <JoinRoomButton onClick={ userCancelQueue }>Cancel</JoinRoomButton>
                     </ JoinRoomcontainer>
                 </ContainerBaground>
             </form>

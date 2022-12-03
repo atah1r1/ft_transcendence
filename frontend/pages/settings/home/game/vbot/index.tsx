@@ -94,12 +94,16 @@ const BALL = {
 
 
 const Container = styled.div`
+    background-image:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url("/bg.jpeg");
+    background-size: cover;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     margin: 0;
     padding: 0;
 `;

@@ -3,7 +3,6 @@ import paddle from "./paddle";
 import { JoinRoom } from "../../../../components/Joinroom";
 import Score, { p1_points, p2_points } from "../../../../components/score";
 import styled from "styled-components";
-import bg from "./assets/bg.jpeg";
 import { io, Socket } from "socket.io-client";
 import styles_box from "../../../../styles/style_box.module.css";
 import styles_s_l from "../../../../styles/style_settings_nav.module.css";
@@ -17,12 +16,16 @@ export const socket = io( '0.0.0.0:3001', {
 } ); //update this to mac pubic ip
 
 const Container = styled.div`
+    background-image:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url("/bg.jpeg");
+    background-size: cover;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     margin: 0;
     padding: 0;
 `;
