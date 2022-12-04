@@ -73,7 +73,6 @@ export class UserController {
       },
     }),
   )
-
   @Post('upload')
   async uploadedImage(
     @UploadedFile() file: Express.Multer.File,
@@ -145,12 +144,15 @@ export class UserController {
   // get All users
   @Get('all')
   async getAllUsers(@Req() req: any): Promise<User[]> {
-    const users = await this.userService.getAllUsers(req.user.id);
-    console.log("USERS: \n", users);
-    if (users) {
-      return users;
+    try {
+      const users = await this.userService.getAllUsers(req.user.id);
+      if (users) {
+        return users;
+      }
+      return [];
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
   // search user by username

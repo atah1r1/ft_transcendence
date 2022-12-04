@@ -127,7 +127,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.data.id,
         payload.otherUserId,
       );
-      console.log('CHAAAAT: \n', chat);
       if (!chat) {
         throw new WsException({
           error: EV_CREATE_ROOM,
@@ -400,8 +399,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.userService.blockUser(client.data.id, payload.targetUserId);
       await this.sendChatsToUser(client.data.id);
+      if (dm)
+        await this.sendChatsToUser(payload.targetUserId);
       await this.sendOnlineFriendsToUser(client.data.id);
-      await this.sendOnlineFriendsToUser(payload.targetUserId);
+      if (dm)
+        await this.sendOnlineFriendsToUser(payload.targetUserId);
       await this.sendUserBlockedToUser(client.data.id, payload.targetUserId);
       await this.sendUserBlockedToUser(payload.targetUserId, client.data.id);
     } catch (err) {

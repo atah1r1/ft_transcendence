@@ -95,12 +95,10 @@ export class ChatService {
    */
   async createDm(userId: string, otherUserId: string): Promise<any> {
     const _existingDm = await this.getDmByUserIds(userId, otherUserId, true);
-
-    console.log('EXSTING ROOM: \n', _existingDm);
-
     if (_existingDm) return await this.formatChat(userId, _existingDm, true);
 
     const otherUser = await this.userService.getUserById(userId, otherUserId);
+    console.log('OTHER USER: ', otherUser);
     if (!otherUser) throw new Error('User does not exist or blocked');
 
     const _room = await this.prisma.room.create({
@@ -239,7 +237,11 @@ export class ChatService {
    * @param otherUserId second user in DM
    * @returns Room object or null
    */
-  async getDmByUserIds(userId: string, otherUserId: string, includeMembers:boolean = false): Promise<any> {
+  async getDmByUserIds(
+    userId: string,
+    otherUserId: string,
+    includeMembers: boolean = false,
+  ): Promise<any> {
     const _room = await this.prisma.room.findFirst({
       where: {
         isDm: true,

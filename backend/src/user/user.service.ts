@@ -69,15 +69,16 @@ export class UserService {
       (user) => user.id,
     );
 
+    if (blockedUsersIds.includes(id)) {
+      throw new Error('User is blocked');
+    }
+
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (user) {
       delete user.two_factor_auth_key;
       return user;
     }
 
-    if (blockedUsersIds.includes(id)) {
-      throw new Error('User is blocked');
-    }
     throw new Error('User not found');
   }
 

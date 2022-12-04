@@ -66,7 +66,10 @@ const Friends_box = ( { friends }: any ) =>
               />
             </div>
           }
-          <div>
+          <div onClick={ () =>
+          {
+            socket?.emit( "block_user", { targetUserId: friends[ i ].id } );
+          } }>
             <RemoveCircleOutline
               color={ '#ffffff' }
               height="30px"

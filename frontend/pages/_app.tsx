@@ -113,6 +113,21 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     } );
 
+    socket.on( 'user_blocked', ( data: any ) =>
+    {
+      const userId = localStorage.getItem( 'userId' );
+      if ( data )
+      {
+        if ( userId === data )
+        {
+          toast.info( `User with Id: ${ data } blocked you.`, toastOptions );
+        } else
+        {
+          toast.info( `User with Id: ${ data } was blocked.`, toastOptions );
+        }
+      }
+    } );
+
   }, [] );
 
   return (
