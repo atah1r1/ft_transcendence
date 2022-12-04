@@ -5,11 +5,11 @@ const HistoryBox = ( { history }: any ) =>
 {
   return history.map( ( ele: any, i: any ) =>
   {
-    console.log("ele.avatar: ", ele.avatar);
+    console.log( "ele.avatar: ", ele.avatar );
     return (
       <div className={ styles.history_box } key={ i }>
         <div className={ styles.history_avatar }>
-          <Image src={ ele.avatar } alt={ "avatar" } width={ 54 } height={ 54 } />
+          <Image src={ ele?.avatar ?? "https://picsum.photos/300/300" } alt={ "avatar" } width={ 54 } height={ 54 } />
           <div className={ styles.history_numberGame }>{ ele.numberGame }</div>
         </div>
         <div className={ styles.history_score_points }>

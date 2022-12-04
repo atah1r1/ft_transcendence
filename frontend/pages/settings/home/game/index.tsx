@@ -215,7 +215,7 @@ function Game ()
         <>
             <MenuNav menu={ menu } setMenu={ setMenu } />
             <div className={ styles_box.container }>
-                <SettingsNav selected={ "home" } menu={ menu } />
+                {/* <SettingsNav selected={ "home" } menu={ menu } /> */ }
                 <div className={ styles_box.profile_details }>
                     <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
                     { !gameOn && <JoinRoom /> }

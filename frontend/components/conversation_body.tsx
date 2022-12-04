@@ -66,13 +66,13 @@ export default function ConversationBody ()
       <div className={ styles.message_part_content }>
         { messages?.get( currentConv!.roomId )?.map( ( message: any, i: number ) =>
         {
-          console.log("message.user?.avatar: ", message.user?.avatar);
+          console.log( "message.user?.avatar: ", message.user?.avatar );
           return (
             <div className={ styles.message_left } key={ i }>
               <div className={ styles.message_box }>
                 <div className={ styles.message_avatar }>
                   <Image
-                    src={ message.user?.avatar }
+                    src={ message.user?.avatar ?? "https://picsum.photos/300/300" }
                     alt="message_avatar"
                     width={ "42px" }
                     height={ "42px" }

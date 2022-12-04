@@ -260,21 +260,22 @@ const Chat = ( { router }: AppProps ) =>
               </div>
               <div className={ styles.l_part_tree }>
                 {
-                  onlineFriends.map( ( friend: any ) => { 
-                    console.log("friend?.avatar", friend?.avatar);
-                    return(
-                    <div key={ friend } className={ styles.online }>
-                      <Image
-                        src={ friend?.avatar }
-                        alt="online_friend_img"
-                        width={ "34px" }
-                        height={ "34px" }
-                        layout={ "fixed" }
-                      ></Image>
-                    </div>
-                  ) 
-                  
-})
+                  onlineFriends.map( ( friend: any ) =>
+                  {
+                    console.log( "friend?.avatar", friend?.avatar );
+                    return (
+                      <div key={ friend } className={ styles.online }>
+                        <Image
+                          src={ friend?.avatar ?? "https://picsum.photos/300/300" }
+                          alt="online_friend_img"
+                          width={ "34px" }
+                          height={ "34px" }
+                          layout={ "fixed" }
+                        ></Image>
+                      </div>
+                    )
+
+                  } )
                 }
               </div>
             </div>
@@ -293,7 +294,7 @@ const Chat = ( { router }: AppProps ) =>
                           { currentConv.members?.map(
                             ( user: any, i: number ) =>
                             {
-                              console.log("user.avatar", user.avatar);
+                              console.log( "user.avatar", user.avatar );
                               return (
                                 user.id !== localStorage.getItem( 'userId' ) && (
                                   <div
@@ -311,7 +312,7 @@ const Chat = ( { router }: AppProps ) =>
                                       }
                                     >
                                       <Image
-                                        src={ user.avatar }
+                                        src={ user?.avatar ?? "https://picsum.photos/300/300" }
                                         alt="friend_avatar"
                                         width={ "40px" }
                                         height={ "40px" }
