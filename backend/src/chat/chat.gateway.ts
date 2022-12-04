@@ -127,6 +127,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.data.id,
         payload.otherUserId,
       );
+      console.log('CHAAAAT: \n', chat);
       if (!chat) {
         throw new WsException({
           error: EV_CREATE_ROOM,

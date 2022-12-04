@@ -27,6 +27,7 @@ export const CurrentConvContext = React.createContext<any[]>( [ {}, () => { } ] 
 
 function MyApp ( { Component, pageProps }: AppProps )
 {
+  console.log( 'app' );
   const router = useRouter();
   const [ chats, setChats ] = useState( [] );
   const [ messages, setMessages ] = useState( new Map<string, any[]>() );

@@ -53,7 +53,6 @@ const SettingsNav = ( { selected, menu }: any ) =>
     setData( user );
   }, [] )
 
-  console.log( "data.avatar settings", data.avatar );
   return (
     <div className={ cn( styles_box.profile_setting, `${ menu && windowDimensions!.width < 1000 && styles_box.navOpen }` ) }>
       <div className={ styles_s_l.profile_info }>

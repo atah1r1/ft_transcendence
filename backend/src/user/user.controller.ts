@@ -73,6 +73,7 @@ export class UserController {
       },
     }),
   )
+
   @Post('upload')
   async uploadedImage(
     @UploadedFile() file: Express.Multer.File,
@@ -145,6 +146,7 @@ export class UserController {
   @Get('all')
   async getAllUsers(@Req() req: any): Promise<User[]> {
     const users = await this.userService.getAllUsers(req.user.id);
+    console.log("USERS: \n", users);
     if (users) {
       return users;
     }

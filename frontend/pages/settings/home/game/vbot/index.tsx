@@ -314,7 +314,7 @@ function Bot_game ()
 
     return (
         <>
-            <MenuNav menu={ menu } setMenu={ setMenu } />
+            {/* <MenuNav menu={ menu } setMenu={ setMenu } /> */ }
             <div className={ styles_box.container }>
                 {/* <SettingsNav selected={ "home" } menu={ menu } /> */ }
                 <div className={ styles_box.profile_details }>

@@ -50,7 +50,7 @@ const JoinRoomButton = styled.button`
     margin-bottom: 12px;
     cursor: pointer;
     font-family: 'street';
-    font-size: 60px;
+    font-size: 50px;
     padding: 20px;
     display: flex;
     flex-direction: column;
