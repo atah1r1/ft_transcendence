@@ -37,7 +37,6 @@ const ConversationBox = () =>
   return chats?.map( ( conv: any, i: number ) =>
   {
     // setCurrent_conv( conv );
-    console.log("conv.image: ", conv.image);
     return (
       <div key={ i }>
         <div

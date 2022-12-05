@@ -92,7 +92,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       // Send message and chats.
       await this.sendChatsToRoomMembers(client.data.id, payload.roomId);
-      this.server.to(payload.roomId).emit(EV_MESSAGE, formattedMessage);
+      // this.server.to(payload.roomId).emit(EV_MESSAGE, formattedMessage);
+      await this.sendMessageToRoomMembers(
+        client.data.id,
+        payload.roomId,
+        formattedMessage,
+      );
     } catch (err) {
       throw new WsException({
         error: EV_MESSAGE,
@@ -399,11 +404,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.userService.blockUser(client.data.id, payload.targetUserId);
       await this.sendChatsToUser(client.data.id);
-      if (dm)
-        await this.sendChatsToUser(payload.targetUserId);
+      if (dm) await this.sendChatsToUser(payload.targetUserId);
       await this.sendOnlineFriendsToUser(client.data.id);
-      if (dm)
-        await this.sendOnlineFriendsToUser(payload.targetUserId);
+      if (dm) await this.sendOnlineFriendsToUser(payload.targetUserId);
       await this.sendUserBlockedToUser(client.data.id, payload.targetUserId);
       await this.sendUserBlockedToUser(payload.targetUserId, client.data.id);
     } catch (err) {
@@ -488,6 +491,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const socket of sockets) {
       this.server.to(socket.id).emit(EV_CHAT_LIST, chats);
     }
+  }
+
+  private async sendMessageToRoomMembers(
+    userId: string,
+    roomId: string,
+    message: any,
+  ) {
+    // Send message to all users in roomId.
+    const memebers: any[] = await this.chatService.getRoomUsersByRoomId(
+      userId,
+      roomId,
+    );
+    // send message to other members.
+    memebers.forEach(async (member) => {
+      if (member.status === RoomUserStatus.BANNED) return;
+      const sockets = this.chatService.getConnectedUserById(member.userId);
+      if (!sockets || sockets.length === 0) return;
+      sockets.forEach((s) => {
+        this.server.to(s.id).emit(EV_MESSAGE, message);
+      });
+    });
   }
 
   private async sendChatsToRoomMembers(userId: string, roomId: string) {

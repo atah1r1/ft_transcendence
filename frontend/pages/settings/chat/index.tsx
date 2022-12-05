@@ -7,7 +7,7 @@ import styles_tree_p from "../../../styles/treeProints.module.css";
 import SettingsNav from "../../../components/settings_nav";
 import ConversationBox from "../../../components/conversation_box";
 import styles_c_b from "../../../styles/conversation_box.module.css";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
@@ -17,24 +17,20 @@ import { CloseSharp, LockClosedSharp } from "react-ionicons";
 import ConversationBody from "../../../components/conversation_body";
 import type { AppProps } from 'next/app'
 import { withRouter } from "next/router";
+import axios from "axios";
 
 const Chat = ( { router }: AppProps ) =>
 {
 
   const socket = useContext( SocketContext );
   const [ onlineFriends, setOnlineFriends ] = useContext( OnlineFriendsContext );
-
-  console.log( "isArray2: ", Array.isArray( onlineFriends ) );
-
   const [ group_box_index, set_g_b_i ] = useState( 0 );
-
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
-
+  const [ roomMembers, setRoomMembers ] = useState( [] );
   const [ value, setValue ] = useState( '' );
   const handleChange = ( e: any ) =>
   {
     const result = e.target.value.replace( /\D/g, '' );
-
     setValue( result );
   };
 
@@ -73,8 +69,22 @@ const Chat = ( { router }: AppProps ) =>
 
   const [ treePoints, setTreePoints ] = useState( false );
   const [ group_box, setGroupBox ] = useState( false );
-
   const [ menu, setMenu ] = useState( false );
+
+  useEffect( () =>
+  {
+    if (!currentConv?.roomId) return;
+    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/members`, {
+      withCredentials: true,
+    } ).then( ( res ) =>
+    {
+      setRoomMembers( res.data );
+      console.log( 'members: ', res.data );
+    } ).catch( ( err ) =>
+    {
+      console.log( 'error: ', err );
+    } );
+  }, [currentConv] );
 
   return (
     <div>
@@ -289,12 +299,11 @@ const Chat = ( { router }: AppProps ) =>
                     !currentConv.isDm && (
                       <div>
                         <div className={ styles_tree_p.treepoints_box }>
-                          { currentConv.members?.map(
-                            ( user: any, i: number ) =>
+                            { roomMembers?.map(
+                            ( member: any, i: number ) =>
                             {
-                              console.log( "user.avatar", user.avatar );
                               return (
-                                user.id !== localStorage.getItem( 'userId' ) && (
+                                member.user.id !== localStorage.getItem( 'userId' ) && (
                                   <div
                                     key={ i }
                                     className={ styles_tree_p.treepoints_box_row }
@@ -310,7 +319,7 @@ const Chat = ( { router }: AppProps ) =>
                                       }
                                     >
                                       <Image
-                                        src={ user?.avatar ?? "https://picsum.photos/300/300" }
+                                        src={ member.user?.avatar ?? "https://picsum.photos/300/300" }
                                         alt="friend_avatar"
                                         width={ "40px" }
                                         height={ "40px" }
@@ -319,7 +328,7 @@ const Chat = ( { router }: AppProps ) =>
                                         }
                                       />
                                     </div>
-                                    <p>{ user.username }</p>
+                                    <p>{ member.user.username }</p>
                                     <Image
                                       src="/settings_icon.svg"
                                       alt="invete_player_icon"

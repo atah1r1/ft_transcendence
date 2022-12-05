@@ -74,7 +74,6 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'chat_list', ( data: any ) =>
     {
-      console.log( "NEW CHATSSSSSSS: ", data );
       setChats( data );
     } );
 
@@ -119,7 +118,7 @@ function MyApp ( { Component, pageProps }: AppProps )
       const userId = localStorage.getItem( 'userId' );
       if ( data )
       {
-        setLastBlockedId(data);
+        setLastBlockedId( data );
         if ( userId === data )
         {
           toast.info( `User with Id: ${ data } blocked you.`, toastOptions );

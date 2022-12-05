@@ -14,7 +14,6 @@ export default function ConversationBody ()
   useEffect( () =>
   {
     if ( !currentConv.roomId ) return;
-    console.log( "USE EFF: CONV UPDATED", currentConv );
     axios.get( `http://localhost:9000/api/chat/messages/${ currentConv.roomId }`, {
       withCredentials: true,
     } ).then( ( res ) =>
@@ -30,7 +29,6 @@ export default function ConversationBody ()
 
   useEffect( () =>
   {
-    console.log( "USE EFF: MSGS UPDATED", currentConv );
     if ( currentConv && currentConv?.roomId )
     {
       socket?.emit( 'seen', {
@@ -65,7 +63,6 @@ export default function ConversationBody ()
       <div className={ styles.message_part_content }>
         { messages?.get( currentConv!.roomId )?.map( ( message: any, i: number ) =>
         {
-          console.log( "message.user?.avatar: ", message.user?.avatar );
           return (
             <div className={ styles.message_left } key={ i }>
               <div className={ styles.message_box }>

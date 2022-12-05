@@ -60,11 +60,6 @@ function Game ()
 
     useEffect( () =>
     {
-        console.log( 'USE EFF: REF', canvasRef );
-    }, [] );
-
-    useEffect( () =>
-    {
 
         socket.off( 'START_GAME' ).on( 'START_GAME', () =>
         {

@@ -636,7 +636,7 @@ export class ChatService {
   }
 
   /**
-   * find and return RoomUsers of a room except RoomUserStatus.LEFT users.
+   * find and return RoomUsers of a room except RoomUserStatus.LEFT users and blocked.
    * @param userId User excuting the action
    * @param roomId Target room
    * @param includeUser should the user object be included in the result
