@@ -2,7 +2,6 @@ import axios from "axios";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import styles from "../styles/chat.module.css";
-// import { MessagesContext } from "../stores/messages_store";
 import { CurrentConvContext, MessagesContext, SocketContext } from "../pages/_app";
 
 export default function ConversationBody ()

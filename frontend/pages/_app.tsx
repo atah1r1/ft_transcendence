@@ -24,6 +24,7 @@ export const MessagesContext = React.createContext<any[]>( [ new Map(), () => { 
 export const ChatContext = React.createContext<any[]>( [ [], () => { } ] );
 export const OnlineFriendsContext = React.createContext<any[]>( [ [], () => { } ] );
 export const CurrentConvContext = React.createContext<any[]>( [ {}, () => { } ] );
+export const LastBlockedContext = React.createContext<any[]>( [ null, () => { } ] );
 
 function MyApp ( { Component, pageProps }: AppProps )
 {
@@ -33,6 +34,7 @@ function MyApp ( { Component, pageProps }: AppProps )
   const [ messages, setMessages ] = useState( new Map<string, any[]>() );
   const [ onlineFriends, setOnlineFriends ] = useState( [] );
   const [ currentConv, setCurrentConv ] = useState<any>( {} );
+  const [ lastBlockedId, setLastBlockedId ] = useState<any>( null );
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -93,7 +95,6 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'message', ( data: any ) =>
     {
-      console.log( "NEW MESSAGE", data );
       const userId = localStorage.getItem( 'userId' );
       if ( userId !== data.user?.id )
       {
@@ -118,6 +119,7 @@ function MyApp ( { Component, pageProps }: AppProps )
       const userId = localStorage.getItem( 'userId' );
       if ( data )
       {
+        setLastBlockedId(data);
         if ( userId === data )
         {
           toast.info( `User with Id: ${ data } blocked you.`, toastOptions );
@@ -131,18 +133,20 @@ function MyApp ( { Component, pageProps }: AppProps )
   }, [] );
 
   return (
-    <CurrentConvContext.Provider value={ [ currentConv, setCurrentConv ] }>
-      <OnlineFriendsContext.Provider value={ [ onlineFriends, setOnlineFriends ] }>
-        <ChatContext.Provider value={ [ chats, setChats ] }>
-          <MessagesContext.Provider value={ [ messages, setMessages ] }>
-            <SocketContext.Provider value={ socket }>
-              <Component { ...pageProps } />
-              <ToastContainer style={ { fontSize: "1.2rem" } } />
-            </SocketContext.Provider>
-          </MessagesContext.Provider>
-        </ChatContext.Provider>
-      </OnlineFriendsContext.Provider>
-    </CurrentConvContext.Provider>
+    <LastBlockedContext.Provider value={ [ lastBlockedId, setLastBlockedId ] }>
+      <CurrentConvContext.Provider value={ [ currentConv, setCurrentConv ] }>
+        <OnlineFriendsContext.Provider value={ [ onlineFriends, setOnlineFriends ] }>
+          <ChatContext.Provider value={ [ chats, setChats ] }>
+            <MessagesContext.Provider value={ [ messages, setMessages ] }>
+              <SocketContext.Provider value={ socket }>
+                <Component { ...pageProps } />
+                <ToastContainer style={ { fontSize: "1.2rem" } } />
+              </SocketContext.Provider>
+            </MessagesContext.Provider>
+          </ChatContext.Provider>
+        </OnlineFriendsContext.Provider>
+      </CurrentConvContext.Provider>
+    </LastBlockedContext.Provider>
   );
 }
 

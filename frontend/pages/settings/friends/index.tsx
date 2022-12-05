@@ -5,18 +5,18 @@ import styles_s_l from "../../../styles/style_settings_nav.module.css";
 import SettingsNav from "../../../components/settings_nav";
 import Image from "next/image";
 import Friends_box from "../../../components/friend_box";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MenuNav from "../../../components/menuNav";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { LastBlockedContext } from "../../_app";
 
 const History = () =>
 {
 
   const [ menu, setMenu ] = useState( false );
   const [ inputForm, setInputForm ] = useState( "" );
-
-
+  const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
   const [ friends, setFriends ] = useState( [] );
 
   useEffect( () =>
@@ -31,7 +31,7 @@ const History = () =>
     {
       console.log( err );
     } );
-  }, [] );
+  }, [ lastBlockedId ] );
 
   return (
     <>
