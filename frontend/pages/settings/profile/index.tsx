@@ -54,7 +54,7 @@ const Profile = () =>
       );
       setData( response.data );
       localStorage.setItem( "user", JSON.stringify( response.data ) );
-      localStorage.setItem("userId", response.data?.id);
+      localStorage.setItem( "userId", response.data?.id );
     } catch ( error: any )
     {
     }
@@ -69,13 +69,9 @@ const Profile = () =>
     fetchData();
   }, [] )
 
-  if (!loader) {
-    console.log("data.avatar profile", "|||", data, "|||");
-  }
-
   return (
     <>
-      <MenuNav menu={menu} setMenu={setMenu}/>
+      <MenuNav menu={ menu } setMenu={ setMenu } />
       <div className={ styles_box.container }>
         {
           !loader &&

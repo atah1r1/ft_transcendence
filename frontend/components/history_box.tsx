@@ -5,7 +5,6 @@ const HistoryBox = ( { history }: any ) =>
 {
   return history.map( ( ele: any, i: any ) =>
   {
-    console.log( "ele.avatar: ", ele.avatar );
     return (
       <div className={ styles.history_box } key={ i }>
         <div className={ styles.history_avatar }>
@@ -26,7 +25,6 @@ const HistoryBox = ( { history }: any ) =>
         <div className={ styles.history_achievements }>
           { ele.achievements.map( ( ele: string, i: number ) =>
           {
-            console.log( "ele: ", ele );
             return ( <Image
               key={ i.toString() }
               src={ ele }

@@ -1,11 +1,12 @@
 import axios from "axios";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styles from "../styles/chat.module.css";
 import { CurrentConvContext, MessagesContext, SocketContext } from "../pages/_app";
 
 export default function ConversationBody ()
 {
+  const bottomRef = useRef<null | HTMLDivElement>( null );
   const [ messageInput, setMessageInput ] = useState( "" );
   const [ messages, setMessages ] = useContext( MessagesContext );
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
@@ -42,7 +43,6 @@ export default function ConversationBody ()
   {
     return () =>
     {
-      console.log( "CURRENT CONV RESET" );
       setCurrentConv( {} );
     };
   }, [] );
@@ -58,13 +58,19 @@ export default function ConversationBody ()
     setMessageInput( "" );
   };
 
+  useEffect( () =>
+  {
+    // 👇️ scroll to bottom every time messages change
+    bottomRef.current?.scrollIntoView( { behavior: 'smooth' } );
+  }, [ messages, messageInput ] );
+
   return (
     <div className={ styles.conversation_body }>
       <div className={ styles.message_part_content }>
         { messages?.get( currentConv!.roomId )?.map( ( message: any, i: number ) =>
         {
           return (
-            <div className={ styles.message_left } key={ i }>
+            <div className={ styles.message_left } key={ i } >
               <div className={ styles.message_box }>
                 <div className={ styles.message_avatar }>
                   <Image
@@ -88,11 +94,13 @@ export default function ConversationBody ()
                   </div>
                 </div>
               </div>
+              <div ref={ bottomRef } />
             </div>
           );
         } ) }
       </div>
-      { currentConv.roomId &&
+      {
+        currentConv.roomId &&
         <div className={ styles.message_part_send }>
           <div className={ styles.message_box_sender }>
 
@@ -122,6 +130,6 @@ export default function ConversationBody ()
           </div>
         </div>
       }
-    </div>
+    </div >
   )
 }

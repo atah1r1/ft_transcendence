@@ -31,8 +31,6 @@ const History = () =>
     setData( user );
   }, [] )
 
-  console.log("data.avatar history", data.avatar);
-
   return (
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />

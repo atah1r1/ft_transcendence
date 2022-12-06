@@ -18,6 +18,7 @@ const Container = styled.div`
     height: 100%;
     margin: 0;
     padding: 0;
+    border-radius: 2.2rem;
     @font-face {
         font-family: 'street';
         src: url("/Act_Of_Rejection.ttf") format("truetype");

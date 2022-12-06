@@ -73,18 +73,17 @@ const Chat = ( { router }: AppProps ) =>
 
   useEffect( () =>
   {
-    if (!currentConv?.roomId) return;
+    if ( !currentConv?.roomId ) return;
     axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/members`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
       setRoomMembers( res.data );
-      console.log( 'members: ', res.data );
     } ).catch( ( err ) =>
     {
       console.log( 'error: ', err );
     } );
-  }, [currentConv] );
+  }, [ currentConv ] );
 
   return (
     <div>
@@ -270,7 +269,6 @@ const Chat = ( { router }: AppProps ) =>
                 {
                   onlineFriends.map( ( friend: any ) =>
                   {
-                    console.log( "friend?.avatar", friend?.avatar );
                     return (
                       <div key={ friend } className={ styles.online }>
                         <Image
@@ -299,7 +297,7 @@ const Chat = ( { router }: AppProps ) =>
                     !currentConv.isDm && (
                       <div>
                         <div className={ styles_tree_p.treepoints_box }>
-                            { roomMembers?.map(
+                          { roomMembers?.map(
                             ( member: any, i: number ) =>
                             {
                               return (
@@ -353,20 +351,38 @@ const Chat = ( { router }: AppProps ) =>
                 }
               />
               <div className={ styles.conversation_head }>
-                <p
-                  className={ cn(
-                    styles_c_b.conversation_name,
-                    styles_c_b.conversation_name_current
-                  ) }
-                >
-                  { currentConv?.name }
-                </p>
-                <div
-                  className={ styles_tree_p.conversation_head_treepoints }
-                  onClick={ () => setTreePoints( true ) }
-                >
-                  ...
-                </div>
+                {
+                  Object.keys( currentConv ).length !== 0 &&
+                  <>
+                    <p
+                      onClick={ () =>
+                      {
+                        if ( currentConv.isDm )
+                        {
+                          router.push( {
+                            pathname: '/profile',
+                            query: {
+                              avatar: currentConv?.avatar,
+                              username: currentConv?.name
+                            }
+                          } )
+                        }
+                      } }
+                      className={ cn(
+                        styles_c_b.conversation_name,
+                        styles_c_b.conversation_name_current
+                      ) }
+                    >
+                      { currentConv?.name }
+                    </p>
+                    <div
+                      className={ styles_tree_p.conversation_head_treepoints }
+                      onClick={ () => setTreePoints( true ) }
+                    >
+                      ...
+                    </div>
+                  </>
+                }
               </div>
               <ConversationBody />
             </div>

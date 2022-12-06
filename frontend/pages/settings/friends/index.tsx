@@ -26,7 +26,6 @@ const History = () =>
     } ).then( ( res ) =>
     {
       setFriends( res.data );
-      console.log( 'friends: ', res.data );
     } ).catch( ( err ) =>
     {
       console.log( err );
