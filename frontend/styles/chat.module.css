@@ -163,15 +163,24 @@
 .conversation_body {
   display: flex;
   flex-direction: column;
-  margin-top: auto;
   border-radius: 1.2rem;
   background-color: rgba(255, 255, 255, 0.7);
-  min-height: 93%;
+  /* height: 93%; */
   align-items: flex-end;
   column-gap: 1.2rem;
   padding: 0 0.6rem;
+  overflow-y: scroll;
 }
 
+.conversation_body::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Handle */
+.conversation_body::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 10px;
+}
 .message_box {
   width: 90%;
 }
@@ -287,6 +296,16 @@
   margin-left: 1rem;
 }
 
+.test {
+  min-height: 93%;
+  width: inherit;
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.treePointsContent {
+  height: 100%;
+}
 /* media q--------------------- */
 
 @media (max-width: 1280px) {
@@ -354,7 +373,7 @@
   }
 
   .conversation_body {
-    min-height: 86%;
+    height: 93%;
   }
 
   .online_text {

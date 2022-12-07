@@ -2,7 +2,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "../styles/chat.module.css";
-import { CurrentConvContext, MessagesContext, SocketContext } from "../pages/_app";
+import { CurrentConvContext, MessagesContext, SocketContext, LastBlockedContext } from "../pages/_app";
 
 export default function ConversationBody ()
 {
@@ -10,6 +10,7 @@ export default function ConversationBody ()
   const [ messageInput, setMessageInput ] = useState( "" );
   const [ messages, setMessages ] = useContext( MessagesContext );
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
+  const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
   const socket = useContext( SocketContext );
 
   useEffect( () =>
@@ -45,7 +46,7 @@ export default function ConversationBody ()
     {
       setCurrentConv( {} );
     };
-  }, [] );
+  }, [ lastBlockedId ] );
 
   const handleSubmitMessages = ( e: any ) =>
   {
@@ -62,7 +63,7 @@ export default function ConversationBody ()
   {
     // 👇️ scroll to bottom every time messages change
     bottomRef.current?.scrollIntoView( { behavior: 'smooth' } );
-  }, [ messages, messageInput ] );
+  }, [ messages, messageInput === '' ] );
 
   return (
     <div className={ styles.conversation_body }>

@@ -13,19 +13,15 @@
 }
 
 .treepoints_box {
-  position: absolute;
-  right: 7rem;
-  top: 3.2%;
-  width: 22rem;
-  max-height: 36rem;
-  background-color: #0f3460;
+  width: 26rem;
+  height: 100%;
+  background-color: hsla(223, 48%, 16%, 0.8);
   padding: 1.6rem;
   font-family: "Pixeboy";
   font-size: 1.6rem;
   border-radius: 1rem;
   z-index: 1;
   overflow-y: scroll;
-  opacity: 0.9;
 }
 
 .treepoints_box::-webkit-scrollbar {
@@ -42,16 +38,38 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  cursor: pointer;
-  transition: all 0.3s;
+  width: 100%;
+  margin-bottom: 2.2rem;
+}
+
+.treepoints_box_row_details {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 4rem;
+  text-align: center;
+  font-size: 2.6rem;
 }
 
 .treepoints_box_row:not(:last-child) {
   margin-bottom: 1.4rem;
 }
 
-.treepoints_box_row:active {
-  transform: translateY(1.2px);
+.treepoints_settings {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.treepoints_owner {
+  text-align: center;
+  font-size: 2.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 2.6rem;
+  letter-spacing: 1.2px;
+}
+
+.treepoints_settings:active {
+  transform: translateY(2.4px);
 }
 
 .treePoints_box_avatar {
@@ -74,12 +92,11 @@
 
 @media (max-width: 1280px) {
   .treepoints_box {
-    top: 42%;
+    height: 93%;
   }
-}
-
-@media (max-width: 700px) {
-  .treepoints_box {
-    top: 41.5%;
+  .treepoints_box_row_details div {
+    width: 4.4rem;
+    height: 4.4rem;
+    margin: 0 auto;
   }
 }

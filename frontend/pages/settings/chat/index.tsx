@@ -18,6 +18,7 @@ import ConversationBody from "../../../components/conversation_body";
 import type { AppProps } from 'next/app'
 import { withRouter } from "next/router";
 import axios from "axios";
+import { LastBlockedContext } from "../../../pages/_app";
 
 const Chat = ( { router }: AppProps ) =>
 {
@@ -28,6 +29,7 @@ const Chat = ( { router }: AppProps ) =>
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
   const [ roomMembers, setRoomMembers ] = useState( [] );
   const [ value, setValue ] = useState( '' );
+  const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
   const handleChange = ( e: any ) =>
   {
     const result = e.target.value.replace( /\D/g, '' );
@@ -84,6 +86,11 @@ const Chat = ( { router }: AppProps ) =>
       console.log( 'error: ', err );
     } );
   }, [ currentConv ] );
+
+  useEffect( () =>
+  {
+    setTreePoints( false );
+  }, [ lastBlockedId ] );
 
   return (
     <div>
@@ -286,70 +293,6 @@ const Chat = ( { router }: AppProps ) =>
               </div>
             </div>
             <div className={ styles.chat_right }>
-              <ClickOutsidePoints
-                setTreePoints={ setTreePoints }
-                setGroupBox={ setGroupBox }
-                content={
-                  treePoints && currentConv.isDm ? (
-                    <TreePointsBox />
-                  ) : (
-                    treePoints &&
-                    !currentConv.isDm && (
-                      <div>
-                        <div className={ styles_tree_p.treepoints_box }>
-                          { roomMembers?.map(
-                            ( member: any, i: number ) =>
-                            {
-                              return (
-                                member.user.id !== localStorage.getItem( 'userId' ) && (
-                                  <div
-                                    key={ i }
-                                    className={ styles_tree_p.treepoints_box_row }
-                                    onClick={ () =>
-                                    {
-                                      setGroupBox( true );
-                                      set_g_b_i( i );
-                                    } }
-                                  >
-                                    <div
-                                      className={
-                                        styles_tree_p.treePoints_box_avatar
-                                      }
-                                    >
-                                      <Image
-                                        src={ member.user?.avatar ?? "https://picsum.photos/300/300" }
-                                        alt="friend_avatar"
-                                        width={ "40px" }
-                                        height={ "40px" }
-                                        className={
-                                          styles_tree_p.treePoints_box_avatar
-                                        }
-                                      />
-                                    </div>
-                                    <p>{ member.user.username }</p>
-                                    <Image
-                                      src="/settings_icon.svg"
-                                      alt="invete_player_icon"
-                                      width={ "20px" }
-                                      height={ "20px" }
-                                    />
-                                  </div>
-                                )
-                              );
-                            }
-                          ) }
-                        </div>
-                        { group_box && (
-                          <TreePointsBox
-                            group_box={ group_box }
-                            group_box_i={ group_box_index }
-                          />
-                        ) }
-                      </div>
-                    )
-                  )
-                }
-              />
               <div className={ styles.conversation_head }>
                 {
                   Object.keys( currentConv ).length !== 0 &&
@@ -377,14 +320,81 @@ const Chat = ( { router }: AppProps ) =>
                     </p>
                     <div
                       className={ styles_tree_p.conversation_head_treepoints }
-                      onClick={ () => setTreePoints( true ) }
+                      onClick={ () => setTreePoints( !treePoints ) }
                     >
                       ...
                     </div>
                   </>
                 }
               </div>
-              <ConversationBody />
+              <div className={ styles.test }>
+                <ConversationBody />
+                {
+                  <ClickOutsidePoints
+                    setTreePoints={ setTreePoints }
+                    setGroupBox={ setGroupBox }
+                    content={ treePoints && currentConv.isDm ? (
+                      <TreePointsBox />
+                    ) : (
+
+                      treePoints &&
+                      <div className={ styles.treePointsContent }>
+                        <div className={ styles_tree_p.treepoints_box }>
+                          { roomMembers?.map(
+                            ( member: any, i: number ) =>
+                            {
+                              return (
+                                <div
+                                  key={ i }
+                                >
+                                  {
+                                    member.user.id === localStorage.getItem( 'userId' ) &&
+                                    <p className={ styles_tree_p.treepoints_owner }>Owner</p>
+                                  }
+                                  {
+                                    i === 1 && <p className={ styles_tree_p.treepoints_owner }>Memebers</p>
+                                  }
+
+                                  <div className={ styles_tree_p.treepoints_box_row }>
+                                    <div
+                                      className={
+                                        styles_tree_p.treePoints_box_avatar
+                                      }
+                                    >
+                                      <Image
+                                        src={ member.user?.avatar ?? "https://picsum.photos/300/300" }
+                                        alt="friend_avatar"
+                                        width={ "40px" }
+                                        height={ "40px" }
+                                        className={
+                                          styles_tree_p.treePoints_box_avatar
+                                        }
+                                      />
+                                    </div>
+                                    <p>{ member.user.username }</p>
+                                    <div onClick={ () =>
+                                    {
+                                      setGroupBox( true );
+                                      set_g_b_i( i );
+                                    } }
+                                      className={ styles_tree_p.treepoints_settings }>
+                                      <Image
+                                        src="/settings_icon.svg"
+                                        alt="invete_player_icon"
+                                        width={ "20px" }
+                                        height={ "20px" }
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+                          ) }
+                        </div>
+                      </div>
+                    ) } />
+                }
+              </div>
             </div>
           </div>
         </div>
