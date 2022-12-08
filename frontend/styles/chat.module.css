@@ -65,6 +65,17 @@
   overflow-x: scroll;
 }
 
+.back_arrow {
+  position: fixed;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back_arrow:active {
+  transform: translateX(-2px);
+}
+
 .l_part_tree::-webkit-scrollbar {
   height: 6px;
 }

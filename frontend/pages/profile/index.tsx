@@ -11,7 +11,6 @@ import { withRouter } from 'next/router';
 const FriendProfile = ( props: any ) =>
 {
   const [ menu, setMenu ] = useState( false );
-
   return (
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />

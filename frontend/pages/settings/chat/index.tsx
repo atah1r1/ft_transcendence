@@ -19,6 +19,7 @@ import type { AppProps } from 'next/app'
 import { withRouter } from "next/router";
 import axios from "axios";
 import { LastBlockedContext } from "../../../pages/_app";
+import { ArrowBackOutline } from 'react-ionicons';
 
 const Chat = ( { router }: AppProps ) =>
 {
@@ -146,6 +147,7 @@ const Chat = ( { router }: AppProps ) =>
               <div>
                 <label>group name</label>
                 <input
+                  maxLength={ 16 }
                   type="text"
                   value={ chatroomInputs.groupName }
                   placeholder="pingpong"
@@ -263,6 +265,7 @@ const Chat = ( { router }: AppProps ) =>
                   } }
                 >
                   <input
+                    maxLength={ 16 }
                     type="search"
                     placeholder="Search..."
                     onChange={ ( e ) => setSearchInput( e.target.value ) }
@@ -305,8 +308,7 @@ const Chat = ( { router }: AppProps ) =>
                           router.push( {
                             pathname: '/profile',
                             query: {
-                              avatar: currentConv?.avatar,
-                              username: currentConv?.name
+                              id: currentConv?.id
                             }
                           } )
                         }
@@ -333,11 +335,26 @@ const Chat = ( { router }: AppProps ) =>
                   <ClickOutsidePoints
                     setTreePoints={ setTreePoints }
                     setGroupBox={ setGroupBox }
-                    content={ treePoints && currentConv.isDm ? (
-                      <TreePointsBox />
+                    content={ treePoints && currentConv.isDm || group_box ? (
+                      <>
+                        {
+                          group_box &&
+                          <div className={ styles.back_arrow } onClick={ () =>
+                          {
+                            setGroupBox( false );
+                          } }>
+                            <ArrowBackOutline
+                              color={ '#ffffff' }
+                              height="20px"
+                              width="20px"
+                            />
+                          </div>
+                        }
+                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } />
+                      </>
                     ) : (
 
-                      treePoints &&
+                      treePoints && !group_box &&
                       <div className={ styles.treePointsContent }>
                         <div className={ styles_tree_p.treepoints_box }>
                           { roomMembers?.map(
@@ -348,7 +365,7 @@ const Chat = ( { router }: AppProps ) =>
                                   key={ i }
                                 >
                                   {
-                                    member.user.id === localStorage.getItem( 'userId' ) &&
+                                    member.role === 'OWNER' &&
                                     <p className={ styles_tree_p.treepoints_owner }>Owner</p>
                                   }
                                   {

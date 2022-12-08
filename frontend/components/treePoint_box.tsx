@@ -1,50 +1,51 @@
 import Image from "next/image";
 import cn from "classnames";
 import styles from "../styles/treeProints.module.css";
-import { callbackify } from "util";
+import { useRouter } from "next/router";
 
-const TreePointsBox = ( { group_box, group_box_i }: any ) =>
+const TreePointsBox = ( { avatar, username }: any ) =>
 {
+  const router = useRouter();
   return (
     <div
-      className={ cn(
-        styles.treepoints_box,
-        group_box && styles.treepoints_box_group
-      ) }
-      style={ {
-        top: `calc(4.6rem + ${ group_box_i * 4 + group_box_i * 1.6 }rem)`
-      } }
+      className={ cn( styles.treepoints_box ) }
     >
-      <div className={ styles.treepoints_box_row_details }>
+      <div className={ styles.treepoints_box_row }>
         <p>invite player</p>
-        <div className={ styles.treepoints_settings }>
-          <Image
-            src="/invete_player.svg"
-            alt="invete_player_icon"
-            width={ "80px" }
-            height={ "80px" }
-          />
-        </div>
+        <Image
+          src="/invete_player.svg"
+          alt="invete_player_icon"
+          width={ "40px" }
+          height={ "40px" }
+        />
       </div>
-      <div className={ styles.treepoints_box_row_details }>
+      <div className={ styles.treepoints_box_row }>
         <p>block user</p>
-        <div className={ styles.treepoints_settings }>
-          <Image
-            src="/block_user.svg"
-            alt="block_user_icon"
-            width={ "80px" }
-            height={ "80px" }
-          />
-        </div>
+        <Image
+          src="/block_user.svg"
+          alt="block_user_icon"
+          width={ "40px" }
+          height={ "40px" }
+        />
       </div>
-      <div className={ styles.treepoints_box_row_details }>
+      <div className={ styles.treepoints_box_row }>
         <p>view profile</p>
-        <div className={ styles.treepoints_settings }>
+        <div className={ styles.treepoints_settings } onClick={ () =>
+        {
+          router.push( {
+            pathname: '/profile',
+            query: {
+              avatar,
+              username
+            }
+          } )
+
+        } }>
           <Image
             src="/view_profile.svg"
             alt="view_profile_icon"
-            width={ "80px" }
-            height={ "80px" }
+            width={ "40px" }
+            height={ "40px" }
           />
         </div>
       </div>

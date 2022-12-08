@@ -31,7 +31,7 @@ const SettingsNav = ( { selected, menu }: any ) =>
     return () => window.removeEventListener( 'resize', handleResize );
   }, [] );
 
-  const sections = [ "home", "profile", "chat", "history", "statistics", "friends" ];
+  const sections = [ "home", "profile", "chat", "history", "statistics", "friends", "rooms" ];
   const router = useRouter();
 
   const [ data, setData ] = useState(

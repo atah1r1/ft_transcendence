@@ -58,6 +58,10 @@
   border-radius: 50%;
 }
 
+.friends_userName {
+  width: 18rem;
+}
+
 .friends_fullName {
   width: 32rem;
 }
