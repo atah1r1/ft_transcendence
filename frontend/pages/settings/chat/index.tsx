@@ -117,7 +117,7 @@ const Chat = ( { router }: AppProps ) =>
           {
             room && !creat_room && !join_room && !protected_room &&
             <div className={ styles_r_w.creat_join_btn }>
-              <div className={ styles_r_w.create } onClick={ () => setCreat_room( true ) }>CREAT A CHAT ROOM</div>
+              <div className={ styles_r_w.create } onClick={ () => setCreat_room( true ) }>CREATE A CHAT ROOM</div>
               <div className={ styles_r_w.create } onClick={ () => setJoin_room( true ) }>JOIN A CHAT ROOM</div>
             </div>
           }

@@ -83,6 +83,7 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'room_created', ( data: any ) =>
     {
+      console.log( 'created data is: ', data );
       if ( data?.existing === false )
       {
         toast.info( `A new ${ data?.isDm === true ? "DM" : "Group Chat" } has been created.`, toastOptions );
@@ -90,6 +91,13 @@ function MyApp ( { Component, pageProps }: AppProps )
       setCurrentConv( data );
       router.push( `/settings/chat` );
     } );
+
+    socket.on( 'room_joined', ( data: any ) =>
+    {
+      console.log( 'joined data is: ', data );
+      setCurrentConv( data );
+      router.push( `/settings/chat` );
+    } )
 
     socket.on( 'message', ( data: any ) =>
     {

@@ -2,9 +2,27 @@
   background-color: #dc465e;
   padding: 1rem 4.4rem;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  display: inline-block;
 }
 
 .join_btn:hover,
 .join_btn:active {
   background-color: #da3e58;
+}
+
+.join_box {
+  text-align: center;
+  margin: 0 auto;
+}
+.join_box input {
+  width: 100%;
+  border-radius: 1.4rem;
+  border: none;
+  height: 3.8rem;
+  outline: none;
+  padding: 1.6rem;
+  font-size: 1.4rem;
+  background-color: #d9d9d9;
+  font-weight: bold;
+  color: #333;
 }

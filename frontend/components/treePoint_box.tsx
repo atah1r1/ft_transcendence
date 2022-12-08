@@ -13,6 +13,7 @@ const TreePointsBox = ( { avatar, username }: any ) =>
       <div className={ styles.treepoints_box_row }>
         <p>invite player</p>
         <Image
+          className={ styles.treepoints_settings }
           src="/invete_player.svg"
           alt="invete_player_icon"
           width={ "40px" }
@@ -22,6 +23,7 @@ const TreePointsBox = ( { avatar, username }: any ) =>
       <div className={ styles.treepoints_box_row }>
         <p>block user</p>
         <Image
+          className={ styles.treepoints_settings }
           src="/block_user.svg"
           alt="block_user_icon"
           width={ "40px" }
@@ -30,7 +32,7 @@ const TreePointsBox = ( { avatar, username }: any ) =>
       </div>
       <div className={ styles.treepoints_box_row }>
         <p>view profile</p>
-        <div className={ styles.treepoints_settings } onClick={ () =>
+        <div onClick={ () =>
         {
           router.push( {
             pathname: '/profile',
@@ -42,6 +44,7 @@ const TreePointsBox = ( { avatar, username }: any ) =>
 
         } }>
           <Image
+            className={ styles.treepoints_settings }
             src="/view_profile.svg"
             alt="view_profile_icon"
             width={ "40px" }
