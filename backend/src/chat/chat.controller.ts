@@ -44,7 +44,7 @@ export class ChatController {
 
   @Get('messages/:roomId')
   async getMessages(@Req() req: any) {
-    console.log('PARAMS: ', req.params);
+    // console.log('PARAMS: ', req.params);
     try {
       return await this.chatService.getMessagesByRoomIdFormatted(
         req.user.id,
@@ -90,7 +90,7 @@ export class ChatController {
     }
   }
 
-  @Get(':roomId/friendstoadd')
+  @Get('room/:roomId/friendstoadd')
   async getFriends(
     @Req() req: any,
     @Param('roomId') roomId: string,

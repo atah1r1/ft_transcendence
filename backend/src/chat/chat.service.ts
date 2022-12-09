@@ -12,6 +12,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
+import { table } from 'console';
 
 @Injectable()
 export class ChatService {
@@ -89,9 +90,18 @@ export class ChatService {
   async getFriendsForRoom(userId: string, roomId: string) {
     const friends = await this.userService.getFriends(userId);
     const members = await this.getRoomMembersByRoomId(userId, roomId);
+
     const membersUserIds = members?.map((m) => m.userId);
 
-    const friendsNotInRoom = friends?.filter((friend) => !(friend.id in membersUserIds));
+    console.table(membersUserIds);
+
+    const friendsNotInRoom = friends?.filter(
+      (friend) => {
+        const res = !(membersUserIds.includes(friend.id));
+        console.log("ID: ", friend.id, ", ", res);
+        return res;
+      },
+    );
     return friendsNotInRoom ?? [];
   }
 
@@ -107,7 +117,7 @@ export class ChatService {
     if (_existingDm) return await this.formatChat(userId, _existingDm, true);
 
     const otherUser = await this.userService.getUserById(userId, otherUserId);
-    console.log('OTHER USER: ', otherUser);
+    // console.log('OTHER USER: ', otherUser);
     if (!otherUser) throw new Error('User does not exist or blocked');
 
     const _room = await this.prisma.room.create({
@@ -688,10 +698,13 @@ export class ChatService {
    * @returns list of RoomUser objects or throws error
    */
   async getRoomMembersByRoomId(userId: string, roomId: string): Promise<any[]> {
+    const room = await this.getRoomById(roomId);
+    if (!room) throw new Error(`Room does not exist ${room}`);
+
     const ru = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
 
     if (!ru || ru.status === RoomUserStatus.LEFT)
-      throw new Error('You are not in room');
+      throw new Error(`You are not in room ${ru}`);
 
     if (ru.status === RoomUserStatus.BANNED)
       throw new Error('You are banned from room');
@@ -710,7 +723,7 @@ export class ChatService {
     }
     return members ?? [];
   }
-
+ 
   /**
    * Finds RoomUser by userId and roomId, returns null if not found.
    * DOES NOT CHECK RoomUserStatus.LEFT, must be checked by caller.
@@ -796,7 +809,7 @@ export class ChatService {
           every: {
             userId: {
               not: userId,
-            }
+            },
           },
         },
       },

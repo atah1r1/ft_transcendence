@@ -26,6 +26,7 @@ export const OnlineFriendsContext = React.createContext<any[]>( [ [], () => { } 
 export const CurrentConvContext = React.createContext<any[]>( [ {}, () => { } ] );
 export const LastBlockedContext = React.createContext<any[]>( [ null, () => { } ] );
 export const NewRoomContext = React.createContext<any[]>( [ null, () => { } ] );
+export const NewMemberAddedContext = React.createContext<any[]>( [ null, () => { } ] );
 
 function MyApp ( { Component, pageProps }: AppProps )
 {
@@ -36,6 +37,7 @@ function MyApp ( { Component, pageProps }: AppProps )
   const [ currentConv, setCurrentConv ] = useState<any>( {} );
   const [ lastBlockedId, setLastBlockedId ] = useState<any>( null );
   const [ newRoom, setNewRoom ] = useState<any>( null );
+  const [ newMemberAdded, setNewMemberAdded ] = useState<any>( null );
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -95,7 +97,7 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'room_created_notif', ( data: any ) =>
     {
-      setNewRoom(data);
+      setNewRoom( data );
     } );
 
     socket.on( 'room_joined', ( data: any ) =>
@@ -109,7 +111,13 @@ function MyApp ( { Component, pageProps }: AppProps )
       toast.info( `You have successfully joined room: ${ data.chat.name }`, toastOptions );
       setCurrentConv( data.chat );
       router.push( `/settings/chat` );
-    } )
+    } );
+
+    socket.on( 'member_added', ( data: any ) =>
+    {
+      toast.info( `User has been added successfully`, toastOptions );
+      setNewMemberAdded(data);
+    } );
 
     socket.on( 'message', ( data: any ) =>
     {
@@ -151,22 +159,24 @@ function MyApp ( { Component, pageProps }: AppProps )
   }, [] );
 
   return (
-    <NewRoomContext.Provider value={ [ newRoom, setNewRoom ] }>
-      <LastBlockedContext.Provider value={ [ lastBlockedId, setLastBlockedId ] }>
-        <CurrentConvContext.Provider value={ [ currentConv, setCurrentConv ] }>
-          <OnlineFriendsContext.Provider value={ [ onlineFriends, setOnlineFriends ] }>
-            <ChatContext.Provider value={ [ chats, setChats ] }>
-              <MessagesContext.Provider value={ [ messages, setMessages ] }>
-                <SocketContext.Provider value={ socket }>
-                  <Component { ...pageProps } />
-                  <ToastContainer style={ { fontSize: "1.2rem" } } />
-                </SocketContext.Provider>
-              </MessagesContext.Provider>
-            </ChatContext.Provider>
-          </OnlineFriendsContext.Provider>
-        </CurrentConvContext.Provider>
-      </LastBlockedContext.Provider>
-    </NewRoomContext.Provider>
+    <NewMemberAddedContext.Provider value={ [ newMemberAdded, setNewMemberAdded ] } >
+      <NewRoomContext.Provider value={ [ newRoom, setNewRoom ] }>
+        <LastBlockedContext.Provider value={ [ lastBlockedId, setLastBlockedId ] }>
+          <CurrentConvContext.Provider value={ [ currentConv, setCurrentConv ] }>
+            <OnlineFriendsContext.Provider value={ [ onlineFriends, setOnlineFriends ] }>
+              <ChatContext.Provider value={ [ chats, setChats ] }>
+                <MessagesContext.Provider value={ [ messages, setMessages ] }>
+                  <SocketContext.Provider value={ socket }>
+                    <Component { ...pageProps } />
+                    <ToastContainer style={ { fontSize: "1.2rem" } } />
+                  </SocketContext.Provider>
+                </MessagesContext.Provider>
+              </ChatContext.Provider>
+            </OnlineFriendsContext.Provider>
+          </CurrentConvContext.Provider>
+        </LastBlockedContext.Provider>
+      </NewRoomContext.Provider>
+    </NewMemberAddedContext.Provider>
   );
 }
 

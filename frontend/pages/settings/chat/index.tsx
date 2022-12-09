@@ -11,7 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
-import { CurrentConvContext, OnlineFriendsContext, SocketContext } from "../../_app";
+import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext } from "../../_app";
 import MenuNav from "../../../components/menuNav";
 import { AddOutline, CloseSharp, ArrowBackOutline } from "react-ionicons";
 import ConversationBody from "../../../components/conversation_body";
@@ -30,6 +30,7 @@ const Chat = ( { router }: AppProps ) =>
   const [ roomMembers, setRoomMembers ] = useState( [] );
   const [ value, setValue ] = useState( '' );
   const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
+  const [ newMemberAdded, setNewMemberAdded ] = useContext( NewMemberAddedContext );
   const handleChange = ( e: any ) =>
   {
     const result = e.target.value.replace( /\D/g, '' );
@@ -85,20 +86,22 @@ const Chat = ( { router }: AppProps ) =>
     {
       console.log( 'error: ', err );
     } );
-  }, [ currentConv ] );
+  }, [ currentConv, newMemberAdded ] );
 
   useEffect( () =>
   {
-    axios.get( "http://localhost:9000/api/user/friends", {
+    if ( !currentConv?.roomId || currentConv?.isDm ) return;
+    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/friendstoadd`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
+      console.log( "FR: ", res.data );
       setFriends( res.data );
     } ).catch( ( err ) =>
     {
       console.log( err );
     } );
-  }, [] );
+  }, [ currentConv, newMemberAdded ] );
 
   useEffect( () =>
   {
@@ -419,7 +422,7 @@ const Chat = ( { router }: AppProps ) =>
                                       }
                                     >
                                       <Image
-                                        src={ friend.avatar ?? "https://picsum.photos/300/300" }
+                                        src={ friend?.avatar ?? "https://picsum.photos/300/300" }
                                         alt="friend_avatar"
                                         width={ "40px" }
                                         height={ "40px" }
@@ -428,9 +431,13 @@ const Chat = ( { router }: AppProps ) =>
                                         }
                                       />
                                     </div>
-                                    <p>{ friend.username }</p>
+                                    <p>{ friend?.username }</p>
                                     <div onClick={ () =>
                                     {
+                                      socket?.emit( 'add_member', {
+                                        userToAddId: friend?.id,
+                                        roomId: currentConv?.roomId,
+                                      } );
                                     } }
                                       className={ styles_tree_p.treepoints_settings }>
                                       <AddOutline
