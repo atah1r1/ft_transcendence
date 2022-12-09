@@ -1,10 +1,9 @@
 import styles from "../styles/conversation_box.module.css";
 import cn from "classnames";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { ChatContext, CurrentConvContext } from "../pages/_app";
-// import { ChatContext } from "../stores/chat_store";
 
 const ConversationBox = () =>
 {

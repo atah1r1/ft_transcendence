@@ -7,9 +7,7 @@ const TreePointsBox = ( { avatar, username }: any ) =>
 {
   const router = useRouter();
   return (
-    <div
-      className={ cn( styles.treepoints_box ) }
-    >
+    <div className={ cn( styles.treepoints_box ) }>
       <div className={ styles.treepoints_box_row }>
         <p>invite player</p>
         <Image

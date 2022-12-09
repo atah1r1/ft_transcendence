@@ -13,13 +13,12 @@ import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
 import { CurrentConvContext, OnlineFriendsContext, SocketContext } from "../../_app";
 import MenuNav from "../../../components/menuNav";
-import { CloseSharp, LockClosedSharp } from "react-ionicons";
+import { AddOutline, CloseSharp, ArrowBackOutline } from "react-ionicons";
 import ConversationBody from "../../../components/conversation_body";
 import type { AppProps } from 'next/app'
 import { withRouter } from "next/router";
 import axios from "axios";
 import { LastBlockedContext } from "../../../pages/_app";
-import { ArrowBackOutline } from 'react-ionicons';
 
 const Chat = ( { router }: AppProps ) =>
 {
@@ -39,7 +38,6 @@ const Chat = ( { router }: AppProps ) =>
 
   const [ room, setRoom ] = useState( false );
   const [ creat_room, setCreat_room ] = useState( false );
-  const [ join_room, setJoin_room ] = useState( false );
   const [ protected_room, setProtected_room ] = useState( false );
 
   const [ chatroomInputs, setChatroomInputs ] = useState( {
@@ -62,7 +60,6 @@ const Chat = ( { router }: AppProps ) =>
       groupType: "PUBLIC",
       password: "",
     } );
-    setJoin_room( false );
     setRoom( false );
     setProtected_room( false );
     setCreat_room( false );
@@ -73,6 +70,8 @@ const Chat = ( { router }: AppProps ) =>
   const [ treePoints, setTreePoints ] = useState( false );
   const [ group_box, setGroupBox ] = useState( false );
   const [ menu, setMenu ] = useState( false );
+  const [ friends, setFriends ] = useState( [] );
+  const [ addFriends, setAddFriends ] = useState( false );
 
   useEffect( () =>
   {
@@ -90,6 +89,19 @@ const Chat = ( { router }: AppProps ) =>
 
   useEffect( () =>
   {
+    axios.get( "http://localhost:9000/api/user/friends", {
+      withCredentials: true,
+    } ).then( ( res ) =>
+    {
+      setFriends( res.data );
+    } ).catch( ( err ) =>
+    {
+      console.log( err );
+    } );
+  }, [] );
+
+  useEffect( () =>
+  {
     setTreePoints( false );
   }, [ lastBlockedId ] );
 
@@ -99,13 +111,12 @@ const Chat = ( { router }: AppProps ) =>
       { room && (
         <div className={ styles_r_w.add_btn_window }>
           <div className={ styles_r_w.part_up }>
-            { room && !creat_room && !join_room && !protected_room && <div className={ styles_r_w.text }>CREATE/JOIN A CHAT ROOM</div> }
+            { room && !creat_room && !protected_room && <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div> }
             { creat_room && <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div> }
-            { join_room && !protected_room && <div className={ styles_r_w.text }>JOIN A CHAT ROOM</div> }
             { protected_room && <div className={ styles_r_w.text }>JOIN CHAT_PROTECTED</div> }
             <div
               className={ styles_r_w.remove }
-              onClick={ () => { setCreat_room( false ); setJoin_room( false ); setRoom( false ); setProtected_room( false ) } }
+              onClick={ () => { setCreat_room( false ); setRoom( false ); setProtected_room( false ) } }
             >
               <CloseSharp
                 color={ '#ffffff' }
@@ -115,23 +126,9 @@ const Chat = ( { router }: AppProps ) =>
             </div>
           </div>
           {
-            room && !creat_room && !join_room && !protected_room &&
+            room && !creat_room && !protected_room &&
             <div className={ styles_r_w.creat_join_btn }>
-              <div className={ styles_r_w.create } onClick={ () => setCreat_room( true ) }>CREATE A CHAT ROOM</div>
-              <div className={ styles_r_w.create } onClick={ () => setJoin_room( true ) }>JOIN A CHAT ROOM</div>
-            </div>
-          }
-          {
-            join_room && !protected_room &&
-            <div className={ cn( styles_r_w.creat_join_btn, styles_r_w.join_box ) }>
-              <div className={ styles_r_w.create }
-                onClick={ () => setProtected_room( true ) }>CHAT_PROTECTED
-                <LockClosedSharp
-                  color={ '#00000' }
-                  height="30px"
-                  width="30px"
-                /></div>
-              <div className={ styles_r_w.create }>CHAT_PUBLIC</div>
+              <div className={ styles_r_w.create } onClick={ () => setCreat_room( true ) }>CREATE ROOM</div>
             </div>
           }
           {
@@ -201,26 +198,12 @@ const Chat = ( { router }: AppProps ) =>
             ) }
             <div className={ styles_r_w.part_down }>
               {
-                room && !creat_room && !join_room && !protected_room &&
+                room && !creat_room && !protected_room &&
                 <div
                   className={ styles_r_w.cancel }
                   onClick={ () => { setCreat_room( false ); setRoom( false ) } }
                 >
                   CANCEL
-                </div>
-              }
-              {
-                ( creat_room || join_room || protected_room ) &&
-                <div
-                  className={ styles_r_w.cancel }
-                  onClick={ () =>
-                  {
-                    creat_room && setCreat_room( false );
-                    join_room && !protected_room && setJoin_room( false );
-                    protected_room && setProtected_room( false )
-                  } }
-                >
-                  BACK
                 </div>
               }
               {
@@ -277,10 +260,10 @@ const Chat = ( { router }: AppProps ) =>
               </div>
               <div className={ styles.l_part_tree }>
                 {
-                  onlineFriends.map( ( friend: any ) =>
+                  onlineFriends.map( ( friend: any, i: number ) =>
                   {
                     return (
-                      <div key={ friend } className={ styles.online }>
+                      <div key={ i } className={ styles.online }>
                         <Image
                           src={ friend?.avatar ?? "https://picsum.photos/300/300" }
                           alt="online_friend_img"
@@ -342,6 +325,7 @@ const Chat = ( { router }: AppProps ) =>
                           <div className={ styles.back_arrow } onClick={ () =>
                           {
                             setGroupBox( false );
+                            setAddFriends( false );
                           } }>
                             <ArrowBackOutline
                               color={ '#ffffff' }
@@ -357,13 +341,27 @@ const Chat = ( { router }: AppProps ) =>
                       treePoints && !group_box &&
                       <div className={ styles.treePointsContent }>
                         <div className={ styles_tree_p.treepoints_box }>
-                          { roomMembers?.map(
+                          { !addFriends && roomMembers?.map(
                             ( member: any, i: number ) =>
                             {
                               return (
                                 <div
                                   key={ i }
                                 >
+                                  {
+                                    member.role === 'OWNER' &&
+                                    localStorage.getItem( 'userId' ) === member.userId &&
+                                    <div className={ styles.add_btn } onClick={ () =>
+                                    {
+                                      setAddFriends( true );
+                                    } }>
+                                      <AddOutline
+                                        color={ '#ffffff' }
+                                        height="40px"
+                                        width="40px"
+                                      />
+                                    </div>
+                                  }
                                   {
                                     member.role === 'OWNER' &&
                                     <p className={ styles_tree_p.treepoints_owner }>Owner</p>
@@ -407,6 +405,59 @@ const Chat = ( { router }: AppProps ) =>
                               );
                             }
                           ) }
+                          { addFriends && friends?.map(
+                            ( friend: any, i: number ) =>
+                            {
+                              return (
+                                <div
+                                  key={ i }
+                                >
+                                  <div className={ styles_tree_p.treepoints_box_row }>
+                                    <div
+                                      className={
+                                        styles_tree_p.treePoints_box_avatar
+                                      }
+                                    >
+                                      <Image
+                                        src={ friend.avatar ?? "https://picsum.photos/300/300" }
+                                        alt="friend_avatar"
+                                        width={ "40px" }
+                                        height={ "40px" }
+                                        className={
+                                          styles_tree_p.treePoints_box_avatar
+                                        }
+                                      />
+                                    </div>
+                                    <p>{ friend.username }</p>
+                                    <div onClick={ () =>
+                                    {
+                                    } }
+                                      className={ styles_tree_p.treepoints_settings }>
+                                      <AddOutline
+                                        color={ '#ffffff' }
+                                        height="30px"
+                                        width="30px"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+                          ) }
+                          {
+                            addFriends &&
+                            <div className={ styles.back_arrow_f } onClick={ () =>
+                            {
+                              setGroupBox( false );
+                              setAddFriends( false );
+                            } }>
+                              <ArrowBackOutline
+                                color={ '#ffffff' }
+                                height="20px"
+                                width="20px"
+                              />
+                            </div>
+                          }
                         </div>
                       </div>
                     ) } />

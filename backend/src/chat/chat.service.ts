@@ -86,6 +86,15 @@ export class ChatService {
     }
   }
 
+  async getFriendsForRoom(userId: string, roomId: string) {
+    const friends = await this.userService.getFriends(userId);
+    const members = await this.getRoomMembersByRoomId(userId, roomId);
+    const membersUserIds = members?.map((m) => m.userId);
+
+    const friendsNotInRoom = friends?.filter((friend) => !(friend.id in membersUserIds));
+    return friendsNotInRoom ?? [];
+  }
+
   // Rooms
   /**
    * Create new DM room between two users
@@ -701,23 +710,6 @@ export class ChatService {
     }
     return members ?? [];
   }
-
-  // async getRoomUsersByUserId(
-  //   userId: string,
-  //   includeUser = false,
-  //   includeRoom = false,
-  // ): Promise<any[]> {
-  //   const _roomUsers = await this.prisma.roomUser.findMany({
-  //     where: {
-  //       userId: userId,
-  //     },
-  //     include: {
-  //       user: includeUser,
-  //       room: includeRoom,
-  //     },
-  //   });
-  //   return _roomUsers;
-  // }
 
   /**
    * Finds RoomUser by userId and roomId, returns null if not found.

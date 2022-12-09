@@ -8,7 +8,7 @@ import { SocketContext } from "../pages/_app";
 
 const Rooms_box = ( { rooms }: any ) =>
 {
-  const [ Protected, setProtected ] = useState( false );
+  const [ isProtected, setProtected ] = useState( -1 );
   const [ value, setValue ] = useState( '' );
 
   const socket = useContext( SocketContext );
@@ -30,25 +30,24 @@ const Rooms_box = ( { rooms }: any ) =>
           {
             if ( room.privacy === 'PROTECTED' )
             {
-              setProtected( true );
-              if ( value )
+              setProtected( i );
+              if ( value && i === isProtected )
                 socket?.emit( "join_room", { roomId: room.id, password: value } );
             }
             else
               socket?.emit( "join_room", { roomId: room.id, password: '' } );
+            setValue( '' );
           } }
             className={ cn( styles_s_l.setting_btn, styles_room.join_btn ) }>
             JOIN
           </div>
           {
-            room.privacy === 'PROTECTED' && Protected &&
-            <form>
-              <input required type="text" placeholder="******" maxLength={ 16 } onChange={ ( e ) => setValue( e.target.value ) } value={ value }></input>
-            </form>
+            isProtected === i &&
+            <input required type="password" placeholder="******" maxLength={ 16 } onChange={ ( e ) => setValue( e.target.value ) } value={ value }></input>
           }
         </div>
       </div>
-    </div> )
+    </div > )
   } )
 };
 

@@ -76,6 +76,32 @@
   transform: translateX(-2px);
 }
 
+.back_arrow_f {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back_arrow_f:active {
+  transform: translateX(-2px);
+}
+
+.add_btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  padding: 1.2rem;
+  transition: all 0.3s;
+}
+
+.add_btn:active {
+  transform: translateY(1.2px);
+}
+
 .l_part_tree::-webkit-scrollbar {
   height: 6px;
 }
@@ -316,6 +342,7 @@
 
 .treePointsContent {
   height: 100%;
+  position: relative;
 }
 /* media q--------------------- */
 

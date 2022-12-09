@@ -87,8 +87,8 @@
   position: absolute;
   top: 10%;
   right: 4%;
-  color: rgba(0, 0, 0, 0.5);
-  font-size: 1rem;
+  color: rgba(0, 0, 0, 1);
+  font-size: 0.8rem;
 }
 
 .conversation_number {
