@@ -43,7 +43,7 @@ const Rooms_box = ( { rooms }: any ) =>
           {
             room.privacy === 'PROTECTED' && Protected &&
             <form>
-              <input type="text" placeholder="******" maxLength={ 16 } value={ value }></input>
+              <input required type="text" placeholder="******" maxLength={ 16 } onChange={ ( e ) => setValue( e.target.value ) } value={ value }></input>
             </form>
           }
         </div>

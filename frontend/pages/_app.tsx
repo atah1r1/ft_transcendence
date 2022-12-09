@@ -25,6 +25,7 @@ export const ChatContext = React.createContext<any[]>( [ [], () => { } ] );
 export const OnlineFriendsContext = React.createContext<any[]>( [ [], () => { } ] );
 export const CurrentConvContext = React.createContext<any[]>( [ {}, () => { } ] );
 export const LastBlockedContext = React.createContext<any[]>( [ null, () => { } ] );
+export const NewRoomContext = React.createContext<any[]>( [ null, () => { } ] );
 
 function MyApp ( { Component, pageProps }: AppProps )
 {
@@ -34,6 +35,7 @@ function MyApp ( { Component, pageProps }: AppProps )
   const [ onlineFriends, setOnlineFriends ] = useState( [] );
   const [ currentConv, setCurrentConv ] = useState<any>( {} );
   const [ lastBlockedId, setLastBlockedId ] = useState<any>( null );
+  const [ newRoom, setNewRoom ] = useState<any>( null );
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -83,19 +85,29 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'room_created', ( data: any ) =>
     {
-      console.log( 'created data is: ', data );
       if ( data?.existing === false )
       {
-        toast.info( `A new ${ data?.isDm === true ? "DM" : "Group Chat" } has been created.`, toastOptions );
+        toast.info( `A new ${ data?.isDm === true ? "DM" : "Room" } has been created`, toastOptions );
       }
       setCurrentConv( data );
       router.push( `/settings/chat` );
     } );
 
+    socket.on( 'room_created_notif', ( data: any ) =>
+    {
+      setNewRoom(data);
+    } );
+
     socket.on( 'room_joined', ( data: any ) =>
     {
-      console.log( 'joined data is: ', data );
-      setCurrentConv( data );
+      const userId = localStorage.getItem( 'userId' );
+      if ( userId !== data.roomUser.userId )
+      {
+        toast.info( `A new user has joined room: ${ data.chat.name }`, toastOptions );
+        return;
+      }
+      toast.info( `You have successfully joined room: ${ data.chat.name }`, toastOptions );
+      setCurrentConv( data.chat );
       router.push( `/settings/chat` );
     } )
 
@@ -139,20 +151,22 @@ function MyApp ( { Component, pageProps }: AppProps )
   }, [] );
 
   return (
-    <LastBlockedContext.Provider value={ [ lastBlockedId, setLastBlockedId ] }>
-      <CurrentConvContext.Provider value={ [ currentConv, setCurrentConv ] }>
-        <OnlineFriendsContext.Provider value={ [ onlineFriends, setOnlineFriends ] }>
-          <ChatContext.Provider value={ [ chats, setChats ] }>
-            <MessagesContext.Provider value={ [ messages, setMessages ] }>
-              <SocketContext.Provider value={ socket }>
-                <Component { ...pageProps } />
-                <ToastContainer style={ { fontSize: "1.2rem" } } />
-              </SocketContext.Provider>
-            </MessagesContext.Provider>
-          </ChatContext.Provider>
-        </OnlineFriendsContext.Provider>
-      </CurrentConvContext.Provider>
-    </LastBlockedContext.Provider>
+    <NewRoomContext.Provider value={ [ newRoom, setNewRoom ] }>
+      <LastBlockedContext.Provider value={ [ lastBlockedId, setLastBlockedId ] }>
+        <CurrentConvContext.Provider value={ [ currentConv, setCurrentConv ] }>
+          <OnlineFriendsContext.Provider value={ [ onlineFriends, setOnlineFriends ] }>
+            <ChatContext.Provider value={ [ chats, setChats ] }>
+              <MessagesContext.Provider value={ [ messages, setMessages ] }>
+                <SocketContext.Provider value={ socket }>
+                  <Component { ...pageProps } />
+                  <ToastContainer style={ { fontSize: "1.2rem" } } />
+                </SocketContext.Provider>
+              </MessagesContext.Provider>
+            </ChatContext.Provider>
+          </OnlineFriendsContext.Provider>
+        </CurrentConvContext.Provider>
+      </LastBlockedContext.Provider>
+    </NewRoomContext.Provider>
   );
 }
 

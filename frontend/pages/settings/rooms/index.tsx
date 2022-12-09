@@ -4,15 +4,17 @@ import styles_box from "../../../styles/style_box.module.css";
 import styles_s_l from "../../../styles/style_settings_nav.module.css";
 import SettingsNav from "../../../components/settings_nav";
 import Rooms_box from "../../../components/rooms_box";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MenuNav from "../../../components/menuNav";
 import axios from "axios";
+import { NewRoomContext } from "../../_app";
 
 const History = () =>
 {
   const [ menu, setMenu ] = useState( false );
   const [ inputForm, setInputForm ] = useState( "" );
   const [ rooms, setRooms ] = useState( [] );
+  const [ newRoom, setNewRoom ] = useContext( NewRoomContext );
 
   useEffect( () =>
   {
@@ -25,8 +27,8 @@ const History = () =>
     {
       console.log( err )
     } )
-  }, [] )
-  console.log( 'rooms is: ', rooms );
+  }, [ newRoom ] )
+
   return (
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />

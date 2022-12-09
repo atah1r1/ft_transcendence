@@ -797,12 +797,14 @@ export class ChatService {
     const _rooms = await this.prisma.room.findMany({
       where: {
         isDm: false,
-        NOT: {
-          privacy: RoomPrivacy.PRIVATE,
-          members: {
-            some: {
-              userId: userId,
-            },
+        privacy: {
+          not: RoomPrivacy.PRIVATE,
+        },
+        members: {
+          every: {
+            userId: {
+              not: userId,
+            }
           },
         },
       },

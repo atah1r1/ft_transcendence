@@ -37,6 +37,7 @@ const EV_EMIT_MEMBER_ADDED = 'member_added';
 const EV_EMIT_ADMIN_MADE = 'admin_made';
 const EV_EMIT_MEMBER_STATUS_CHANGED = 'member_status_changed';
 const EV_EMIT_USER_BLOCKED = 'user_blocked';
+const EV_EMIT_NEW_ROOM = 'room_created_notif';
 
 @WebSocketGateway({ namespace: 'chat', cors: true, origins: '*' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -584,6 +585,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sockets.forEach((s) => {
       this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, chat);
     });
+    this.server.emit(EV_EMIT_NEW_ROOM, chat);
   }
 
   private async sendRoomJoinedToClients(
@@ -591,13 +593,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     roomId: string,
     rUser: RoomUser,
   ) {
-    const members = await this.chatService.getRoomUsersByRoomId(userId, roomId);
-    members.forEach((member) => {
+    const room = await this.chatService.getRoomById(roomId, true);
+    const members = room.members;
+    members.forEach(async (member: any) => {
       if (member.status === RoomUserStatus.BANNED) return;
+      const chat = await this.chatService.formatChat(member.userId, room, true);
       const sockets = this.chatService.getConnectedUserById(member.userId);
       if (!sockets || sockets.length === 0) return;
       sockets.forEach((s) => {
-        this.server.to(s.id).emit(EV_EMIT_ROOM_JOINED, rUser);
+        this.server.to(s.id).emit(EV_EMIT_ROOM_JOINED, {"roomUser": rUser, "chat": chat});
       });
     });
   }
