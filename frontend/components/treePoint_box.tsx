@@ -2,6 +2,9 @@ import Image from "next/image";
 import cn from "classnames";
 import styles from "../styles/treeProints.module.css";
 import { useRouter } from "next/router";
+import { BanSharp } from 'react-ionicons'
+import { PersonSharp } from 'react-ionicons'
+import { VolumeMuteSharp } from 'react-ionicons'
 
 const TreePointsBox = ( { avatar, username }: any ) =>
 {
@@ -14,19 +17,29 @@ const TreePointsBox = ( { avatar, username }: any ) =>
           className={ styles.treepoints_settings }
           src="/invete_player.svg"
           alt="invete_player_icon"
-          width={ "40px" }
-          height={ "40px" }
+          width={ "32px" }
+          height={ "32px" }
         />
       </div>
       <div className={ styles.treepoints_box_row }>
-        <p>block user</p>
-        <Image
-          className={ styles.treepoints_settings }
-          src="/block_user.svg"
-          alt="block_user_icon"
-          width={ "40px" }
-          height={ "40px" }
-        />
+        <p>mute user</p>
+        <div className={ styles.treepoints_settings }>
+          <VolumeMuteSharp
+            color={ '#ffffff' }
+            height="32px"
+            width="32px"
+          />
+        </div>
+      </div>
+      <div className={ styles.treepoints_box_row }>
+        <p>ban user</p>
+        <div className={ styles.treepoints_settings }>
+          <BanSharp
+            color={ '#ffffff' }
+            height="32px"
+            width="32px"
+          />
+        </div>
       </div>
       <div className={ styles.treepoints_box_row }>
         <p>view profile</p>
@@ -41,13 +54,13 @@ const TreePointsBox = ( { avatar, username }: any ) =>
           } )
 
         } }>
-          <Image
-            className={ styles.treepoints_settings }
-            src="/view_profile.svg"
-            alt="view_profile_icon"
-            width={ "40px" }
-            height={ "40px" }
-          />
+          <div className={ styles.treepoints_settings }>
+            <PersonSharp
+              color={ '#ffffff' }
+              height="32px"
+              width="32px"
+            />
+          </div>
         </div>
       </div>
     </div>

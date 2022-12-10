@@ -331,9 +331,8 @@ const Chat = ( { router }: AppProps ) =>
                             setAddFriends( false );
                           } }>
                             <ArrowBackOutline
-                              color={ '#ffffff' }
-                              height="20px"
-                              width="20px"
+                              height="24px"
+                              width="24px"
                             />
                           </div>
                         }
@@ -396,12 +395,16 @@ const Chat = ( { router }: AppProps ) =>
                                       set_g_b_i( i );
                                     } }
                                       className={ styles_tree_p.treepoints_settings }>
-                                      <Image
-                                        src="/settings_icon.svg"
-                                        alt="invete_player_icon"
-                                        width={ "20px" }
-                                        height={ "20px" }
-                                      />
+                                      {
+                                        ( member.role === 'MEMBER' || ( member.role === 'OWNER' &&
+                                          localStorage.getItem( 'userId' ) !== member.userId ) ) &&
+                                        < Image
+                                          src="/settings_icon.svg"
+                                          alt="invete_player_icon"
+                                          width={ "20px" }
+                                          height={ "20px" }
+                                        />
+                                      }
                                     </div>
                                   </div>
                                 </div>
@@ -459,9 +462,8 @@ const Chat = ( { router }: AppProps ) =>
                               setAddFriends( false );
                             } }>
                               <ArrowBackOutline
-                                color={ '#ffffff' }
-                                height="20px"
-                                width="20px"
+                                height="24px"
+                                width="24px"
                               />
                             </div>
                           }

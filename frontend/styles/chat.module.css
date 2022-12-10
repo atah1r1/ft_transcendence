@@ -67,9 +67,13 @@
 
 .back_arrow {
   position: fixed;
-  padding: 1rem;
+  border-radius: 1rem;
+  margin-top: 0.6rem;
+  margin-left: 1.2rem;
   cursor: pointer;
   transition: all 0.3s;
+  background-color: #fff;
+  color: #16213e;
 }
 
 .back_arrow:active {
@@ -80,9 +84,13 @@
   position: absolute;
   top: 0;
   left: 0;
-  padding: 1rem;
+  border-radius: 1rem;
+  margin-top: 0.6rem;
+  margin-left: 1.2rem;
   cursor: pointer;
   transition: all 0.3s;
+  background-color: #fff;
+  color: #16213e;
 }
 
 .back_arrow_f:active {

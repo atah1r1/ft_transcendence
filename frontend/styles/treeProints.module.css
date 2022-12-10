@@ -17,7 +17,7 @@
   height: 100%;
   background-color: hsla(223, 48%, 16%, 0.8);
   padding: 1.6rem;
-  padding-top: 3.6rem;
+  padding-top: 4.4rem;
   font-family: "Pixeboy";
   font-size: 1.6rem;
   border-radius: 1rem;
@@ -54,7 +54,7 @@
 }
 
 .treepoints_owner {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-weight: bold;
   font-size: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
