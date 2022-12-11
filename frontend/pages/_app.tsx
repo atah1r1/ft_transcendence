@@ -7,8 +7,6 @@ import cookie from 'cookie';
 import { useRouter } from 'next/router';
 import { ToastContainer, ToastOptions, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { type } from 'os';
-// import ChatStore, { ChatContext } from "../stores/chat_store";
 
 const socket = io( "http://localhost:9000/chat", {
   auth: ( cb ) =>
@@ -115,12 +113,8 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'room_left', ( data: any ) =>
     {
-      console.log("ROOM_LEFT");
-      const ms = new Map( messages );
-      ms.set( currentConv?.roomId, [] );
-      setMessages( ms );
-      setCurrentConv( {} );
       setNewMemberAdded( data );
+      setCurrentConv( {} );
     } );
 
     socket.on( 'member_added', ( data: any ) =>

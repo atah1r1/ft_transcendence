@@ -15,7 +15,6 @@ export default function ConversationBody ()
 
   useEffect( () =>
   {
-    console.log("USE EFF CALLED");
     if ( !currentConv.roomId ) return;
     axios.get( `http://localhost:9000/api/chat/messages/${ currentConv.roomId }`, {
       withCredentials: true,
@@ -26,9 +25,6 @@ export default function ConversationBody ()
       setMessages( ms );
     } ).catch( ( err ) =>
     {
-      const ms = new Map( messages );
-      ms.set( currentConv?.roomId, [] );
-      setMessages( ms );
     } );
   }, [ currentConv ] );
 

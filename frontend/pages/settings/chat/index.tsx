@@ -375,6 +375,7 @@ const Chat = ( { router }: AppProps ) =>
                                       <p>leave room</p>
                                       <div className={ styles.leave_btn_c } onClick={ () =>
                                       {
+                                        setTreePoints( !treePoints );
                                         socket?.emit( 'leave_room', {
                                           roomId: currentConv?.roomId,
                                         } );
