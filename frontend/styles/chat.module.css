@@ -104,13 +104,17 @@
   font-size: 1.6rem;
 }
 
-.add_leave_btn_c {
+.add_btn_c,
+.leave_btn_c {
   cursor: pointer;
   transition: all 0.3s;
 }
 
-.add_leave_btn_c:active {
+.add_btn_c:active {
   transform: translateY(1.6px);
+}
+.leave_btn_c:active {
+  transform: translateX(1.6px);
 }
 
 .l_part_tree::-webkit-scrollbar {

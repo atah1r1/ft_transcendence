@@ -13,6 +13,7 @@ import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
 import { table } from 'console';
+import { use } from 'passport';
 
 @Injectable()
 export class ChatService {
@@ -805,13 +806,25 @@ export class ChatService {
         privacy: {
           not: RoomPrivacy.PRIVATE,
         },
-        members: {
-          every: {
-            userId: {
-              not: userId,
+        OR: [
+          {
+            members: {
+              every: {
+                userId: {
+                  not: userId,
+                },
+              },
             },
           },
-        },
+          {
+            members: {
+              some: {
+                userId: userId,
+                status: RoomUserStatus.LEFT,
+              }
+            }
+          },
+        ],
       },
     });
     return _rooms;
@@ -1001,6 +1014,8 @@ export class ChatService {
     if (!room) throw new Error('Room does not exist');
 
     const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
+    console.log("UID: ", userId);
+    console.log("RU: \n", _roomUser);
     if (!_roomUser || _roomUser.status === RoomUserStatus.LEFT)
       throw new Error('You are not in room');
 

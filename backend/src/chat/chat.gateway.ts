@@ -224,9 +224,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           message: 'Failed to leave room',
         });
       }
-      this.sendChatsToUser(client.data.id);
-      this.leaveIORoom(client.data.id, payload.roomId);
-      this.sendRoomLeftToClients(client.data.id, payload.roomId, ru);
+      await this.sendChatsToUser(client.data.id);
+      await this.leaveIORoom(client.data.id, payload.roomId);
+      await this.sendRoomLeftToClients(client.data.id, payload.roomId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_LEAVE_ROOM,
@@ -601,7 +601,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const sockets = this.chatService.getConnectedUserById(member.userId);
       if (!sockets || sockets.length === 0) return;
       sockets.forEach((s) => {
-        this.server.to(s.id).emit(EV_EMIT_ROOM_JOINED, {"roomUser": rUser, "chat": chat});
+        this.server
+          .to(s.id)
+          .emit(EV_EMIT_ROOM_JOINED, { roomUser: rUser, chat: chat });
       });
     });
   }
@@ -611,15 +613,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     roomId: string,
     rUser: RoomUser,
   ) {
-    const members = await this.chatService.getRoomUsersByRoomId(userId, roomId);
-    members.forEach((member) => {
-      if (member.status === RoomUserStatus.BANNED) return;
-      const sockets = this.chatService.getConnectedUserById(member.userId);
-      if (!sockets || sockets.length === 0) return;
-      sockets.forEach((s) => {
-        this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, rUser);
-      });
+    const sockets = this.chatService.getConnectedUserById(rUser.userId);
+    if (!sockets || sockets.length === 0) return;
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, rUser);
     });
+    // const members = await this.chatService.getRoomUsersByRoomId(userId, roomId);
+    // members.forEach((member) => {
+    //   if (member.status === RoomUserStatus.BANNED) return;
+    //   const sockets = this.chatService.getConnectedUserById(member.userId);
+    //   if (!sockets || sockets.length === 0) return;
+    //   sockets.forEach((s) => {
+    //     this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, rUser);
+    //   });
+    // });
   }
 
   private async sendAdminMadeToClients(

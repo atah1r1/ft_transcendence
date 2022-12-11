@@ -113,10 +113,20 @@ function MyApp ( { Component, pageProps }: AppProps )
       router.push( `/settings/chat` );
     } );
 
+    socket.on( 'room_left', ( data: any ) =>
+    {
+      console.log("ROOM_LEFT");
+      const ms = new Map( messages );
+      ms.set( currentConv?.roomId, [] );
+      setMessages( ms );
+      setCurrentConv( {} );
+      setNewMemberAdded( data );
+    } );
+
     socket.on( 'member_added', ( data: any ) =>
     {
       toast.info( `User has been added successfully`, toastOptions );
-      setNewMemberAdded(data);
+      setNewMemberAdded( data );
     } );
 
     socket.on( 'message', ( data: any ) =>

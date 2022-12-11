@@ -355,7 +355,7 @@ const Chat = ( { router }: AppProps ) =>
                                     localStorage.getItem( 'userId' ) === member.userId &&
                                     <div className={ styles.add_leave_btn } >
                                       <p>add members</p>
-                                      <div className={ styles.add_leave_btn_c }>
+                                      <div className={ styles.add_btn_c }>
                                         <AddOutline
                                           onClick={ () =>
                                           {
@@ -373,11 +373,13 @@ const Chat = ( { router }: AppProps ) =>
                                     localStorage.getItem( 'userId' ) === member.userId &&
                                     <div className={ styles.add_leave_btn }>
                                       <p>leave room</p>
-                                      <div className={ styles.add_leave_btn_c }>
+                                      <div className={ styles.leave_btn_c } onClick={ () =>
+                                      {
+                                        socket?.emit( 'leave_room', {
+                                          roomId: currentConv?.roomId,
+                                        } );
+                                      } }>
                                         <LogOutSharp
-                                          onClick={ () =>
-                                          {
-                                          } }
                                           color={ '#ffffff' }
                                           height="46px"
                                           width="46px"
@@ -389,10 +391,6 @@ const Chat = ( { router }: AppProps ) =>
                                     member.role === 'OWNER' &&
                                     <p className={ styles_tree_p.treepoints_owner }>Owner</p>
                                   }
-                                  {
-                                    i === 1 && <p className={ styles_tree_p.treepoints_owner }>Memebers</p>
-                                  }
-
                                   <div className={ styles_tree_p.treepoints_box_row }>
                                     <div
                                       className={
@@ -432,6 +430,10 @@ const Chat = ( { router }: AppProps ) =>
                                       }
                                     </div>
                                   </div>
+                                  {
+                                    member.role === 'OWNER' &&
+                                    <p className={ styles_tree_p.treepoints_owner }>Members</p>
+                                  }
                                 </div>
                               );
                             }
