@@ -17,7 +17,7 @@
   height: 100%;
   background-color: hsla(223, 48%, 16%, 0.8);
   padding: 1.6rem;
-  padding-top: 4.4rem;
+  padding-top: 6rem;
   font-family: "Pixeboy";
   font-size: 1.6rem;
   border-radius: 1rem;
@@ -57,9 +57,11 @@
   font-family: "Inter";
   font-weight: bold;
   font-size: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin-bottom: 2.6rem;
   letter-spacing: 1.2px;
+  padding: 0.6rem 0;
 }
 
 .treepoints_settings:active {

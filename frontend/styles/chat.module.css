@@ -72,8 +72,6 @@
   margin-left: 1.2rem;
   cursor: pointer;
   transition: all 0.3s;
-  background-color: #fff;
-  color: #16213e;
 }
 
 .back_arrow:active {
@@ -89,25 +87,30 @@
   margin-left: 1.2rem;
   cursor: pointer;
   transition: all 0.3s;
-  background-color: #fff;
-  color: #16213e;
 }
 
 .back_arrow_f:active {
   transform: translateX(-2px);
 }
 
-.add_btn {
+.add_leave_btn {
+  display: flex;
+  align-items: center;
   position: absolute;
   top: 0;
   right: 0;
+  padding: 0.6rem;
+  padding-right: 1.2rem;
+  font-size: 1.6rem;
+}
+
+.add_leave_btn_c {
   cursor: pointer;
-  padding: 1.2rem;
   transition: all 0.3s;
 }
 
-.add_btn:active {
-  transform: translateY(1.2px);
+.add_leave_btn_c:active {
+  transform: translateY(1.6px);
 }
 
 .l_part_tree::-webkit-scrollbar {
@@ -341,7 +344,7 @@
   margin-left: 1rem;
 }
 
-.test {
+.body {
   min-height: 93%;
   width: inherit;
   display: grid;

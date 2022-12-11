@@ -2,45 +2,15 @@ import Image from "next/image";
 import cn from "classnames";
 import styles from "../styles/treeProints.module.css";
 import { useRouter } from "next/router";
-import { BanSharp } from 'react-ionicons'
+import { BanSharp, PersonAddSharp } from 'react-ionicons'
 import { PersonSharp } from 'react-ionicons'
 import { VolumeMuteSharp } from 'react-ionicons'
 
-const TreePointsBox = ( { avatar, username }: any ) =>
+const TreePointsBox = ( { avatar, username, isgroup }: any ) =>
 {
   const router = useRouter();
   return (
     <div className={ cn( styles.treepoints_box ) }>
-      <div className={ styles.treepoints_box_row }>
-        <p>invite player</p>
-        <Image
-          className={ styles.treepoints_settings }
-          src="/invete_player.svg"
-          alt="invete_player_icon"
-          width={ "32px" }
-          height={ "32px" }
-        />
-      </div>
-      <div className={ styles.treepoints_box_row }>
-        <p>mute user</p>
-        <div className={ styles.treepoints_settings }>
-          <VolumeMuteSharp
-            color={ '#ffffff' }
-            height="32px"
-            width="32px"
-          />
-        </div>
-      </div>
-      <div className={ styles.treepoints_box_row }>
-        <p>ban user</p>
-        <div className={ styles.treepoints_settings }>
-          <BanSharp
-            color={ '#ffffff' }
-            height="32px"
-            width="32px"
-          />
-        </div>
-      </div>
       <div className={ styles.treepoints_box_row }>
         <p>view profile</p>
         <div onClick={ () =>
@@ -57,12 +27,61 @@ const TreePointsBox = ( { avatar, username }: any ) =>
           <div className={ styles.treepoints_settings }>
             <PersonSharp
               color={ '#ffffff' }
-              height="32px"
-              width="32px"
+              height="30px"
+              width="30px"
             />
           </div>
         </div>
       </div>
+      <div className={ styles.treepoints_box_row }>
+        <p>invite player</p>
+        <Image
+          className={ styles.treepoints_settings }
+          src="/invete_player.svg"
+          alt="invete_player_icon"
+          width={ "30px" }
+          height={ "30px" }
+        />
+      </div>
+      {
+        isgroup &&
+        <div className={ styles.treepoints_box_row }>
+          <p>mute user</p>
+          <div className={ styles.treepoints_settings }>
+            <VolumeMuteSharp
+              color={ '#ffffff' }
+              height="30px"
+              width="30px"
+            />
+          </div>
+        </div>
+      }
+      {
+        isgroup &&
+        <div className={ styles.treepoints_box_row }>
+          <p>ban user</p>
+          <div className={ styles.treepoints_settings }>
+            <BanSharp
+              color={ '#ffffff' }
+              height="30px"
+              width="30px"
+            />
+          </div>
+        </div>
+      }
+      {
+        isgroup &&
+        <div className={ styles.treepoints_box_row }>
+          <p>add Admine</p>
+          <div className={ styles.treepoints_settings }>
+            <PersonAddSharp
+              color={ '#ffffff' }
+              height="30px"
+              width="30px"
+            />
+          </div>
+        </div>
+      }
     </div>
   );
 };

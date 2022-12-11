@@ -13,7 +13,7 @@ import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
 import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext } from "../../_app";
 import MenuNav from "../../../components/menuNav";
-import { AddOutline, CloseSharp, ArrowBackOutline } from "react-ionicons";
+import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp } from "react-ionicons";
 import ConversationBody from "../../../components/conversation_body";
 import type { AppProps } from 'next/app'
 import { withRouter } from "next/router";
@@ -25,7 +25,6 @@ const Chat = ( { router }: AppProps ) =>
 
   const socket = useContext( SocketContext );
   const [ onlineFriends, setOnlineFriends ] = useContext( OnlineFriendsContext );
-  const [ group_box_index, set_g_b_i ] = useState( 0 );
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
   const [ roomMembers, setRoomMembers ] = useState( [] );
   const [ value, setValue ] = useState( '' );
@@ -315,7 +314,7 @@ const Chat = ( { router }: AppProps ) =>
                   </>
                 }
               </div>
-              <div className={ styles.test }>
+              <div className={ styles.body }>
                 <ConversationBody />
                 {
                   <ClickOutsidePoints
@@ -331,12 +330,13 @@ const Chat = ( { router }: AppProps ) =>
                             setAddFriends( false );
                           } }>
                             <ArrowBackOutline
-                              height="24px"
-                              width="24px"
+                              color={ '#ffffff' }
+                              height="28px"
+                              width="28px"
                             />
                           </div>
                         }
-                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } />
+                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box } />
                       </>
                     ) : (
 
@@ -353,15 +353,36 @@ const Chat = ( { router }: AppProps ) =>
                                   {
                                     member.role === 'OWNER' &&
                                     localStorage.getItem( 'userId' ) === member.userId &&
-                                    <div className={ styles.add_btn } onClick={ () =>
-                                    {
-                                      setAddFriends( true );
-                                    } }>
-                                      <AddOutline
-                                        color={ '#ffffff' }
-                                        height="40px"
-                                        width="40px"
-                                      />
+                                    <div className={ styles.add_leave_btn } >
+                                      <p>add members</p>
+                                      <div className={ styles.add_leave_btn_c }>
+                                        <AddOutline
+                                          onClick={ () =>
+                                          {
+                                            setAddFriends( true );
+                                          } }
+                                          color={ '#ffffff' }
+                                          height="52px"
+                                          width="52px"
+                                        />
+                                      </div>
+                                    </div>
+                                  }
+                                  {
+                                    member.role === 'MEMBER' &&
+                                    localStorage.getItem( 'userId' ) === member.userId &&
+                                    <div className={ styles.add_leave_btn }>
+                                      <p>leave room</p>
+                                      <div className={ styles.add_leave_btn_c }>
+                                        <LogOutSharp
+                                          onClick={ () =>
+                                          {
+                                          } }
+                                          color={ '#ffffff' }
+                                          height="46px"
+                                          width="46px"
+                                        />
+                                      </div>
                                     </div>
                                   }
                                   {
@@ -391,19 +412,23 @@ const Chat = ( { router }: AppProps ) =>
                                     <p>{ member.user.username }</p>
                                     <div onClick={ () =>
                                     {
-                                      setGroupBox( true );
-                                      set_g_b_i( i );
+
+                                      localStorage.getItem( 'userId' ) !== member.userId && setGroupBox( true );
                                     } }
                                       className={ styles_tree_p.treepoints_settings }>
                                       {
-                                        ( member.role === 'MEMBER' || ( member.role === 'OWNER' &&
-                                          localStorage.getItem( 'userId' ) !== member.userId ) ) &&
-                                        < Image
-                                          src="/settings_icon.svg"
-                                          alt="invete_player_icon"
-                                          width={ "20px" }
-                                          height={ "20px" }
-                                        />
+                                        localStorage.getItem( 'userId' ) !== member.userId ?
+                                          < Image
+                                            src="/settings_icon.svg"
+                                            alt="invete_player_icon"
+                                            width={ "20px" }
+                                            height={ "20px" }
+                                          />
+                                          : <PersonSharp
+                                            color={ '#ffffff' }
+                                            height="20px"
+                                            width="20px"
+                                          />
                                       }
                                     </div>
                                   </div>
@@ -462,8 +487,9 @@ const Chat = ( { router }: AppProps ) =>
                               setAddFriends( false );
                             } }>
                               <ArrowBackOutline
-                                height="24px"
-                                width="24px"
+                                color={ '#ffffff' }
+                                height="28px"
+                                width="28px"
                               />
                             </div>
                           }
