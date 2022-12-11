@@ -104,17 +104,24 @@ function MyApp ( { Component, pageProps }: AppProps )
       if ( userId !== data.roomUser.userId )
       {
         toast.info( `A new user has joined room: ${ data.chat.name }`, toastOptions );
-        return;
+      } else
+      {
+        toast.info( `You have successfully joined room: ${ data.chat.name }`, toastOptions );
+        setCurrentConv( data.chat );
+        router.push( `/settings/chat` );
       }
-      toast.info( `You have successfully joined room: ${ data.chat.name }`, toastOptions );
-      setCurrentConv( data.chat );
-      router.push( `/settings/chat` );
+      setNewMemberAdded( data.roomUser );
     } );
 
     socket.on( 'room_left', ( data: any ) =>
     {
+      console.log( "USER LEFT: ", data );
+      const userId = localStorage.getItem( 'userId' );
+      if ( userId === data.userId )
+      {
+        setCurrentConv( {} );
+      }
       setNewMemberAdded( data );
-      setCurrentConv( {} );
     } );
 
     socket.on( 'member_added', ( data: any ) =>

@@ -614,19 +614,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     rUser: RoomUser,
   ) {
     const sockets = this.chatService.getConnectedUserById(rUser.userId);
-    if (!sockets || sockets.length === 0) return;
     sockets.forEach((s) => {
       this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, rUser);
     });
-    // const members = await this.chatService.getRoomUsersByRoomId(userId, roomId);
-    // members.forEach((member) => {
-    //   if (member.status === RoomUserStatus.BANNED) return;
-    //   const sockets = this.chatService.getConnectedUserById(member.userId);
-    //   if (!sockets || sockets.length === 0) return;
-    //   sockets.forEach((s) => {
-    //     this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, rUser);
-    //   });
-    // });
+
+    const members = await this.chatService.getRoomUsersByRoomId(userId, roomId);
+    members.forEach((member) => {
+      if (member.status === RoomUserStatus.BANNED) return;
+      const sockets = this.chatService.getConnectedUserById(member.userId);
+      if (!sockets || sockets.length === 0) return;
+      sockets.forEach((s) => {
+        s.emit(EV_EMIT_ROOM_LEFT, rUser);
+      });
+    });
   }
 
   private async sendAdminMadeToClients(
