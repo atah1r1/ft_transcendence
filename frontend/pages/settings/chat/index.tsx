@@ -72,6 +72,7 @@ const Chat = ( { router }: AppProps ) =>
   const [ menu, setMenu ] = useState( false );
   const [ friends, setFriends ] = useState( [] );
   const [ addFriends, setAddFriends ] = useState( false );
+  const [ ismember, setIsMember ] = useState( false );
 
   useEffect( () =>
   {
@@ -336,7 +337,7 @@ const Chat = ( { router }: AppProps ) =>
                             />
                           </div>
                         }
-                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box } />
+                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box } ismember={ ismember } />
                       </>
                     ) : (
 
@@ -344,7 +345,7 @@ const Chat = ( { router }: AppProps ) =>
                       <div className={ styles.treePointsContent }>
                         <div className={ styles_tree_p.treepoints_box }>
                           { !addFriends && roomMembers?.map(
-                            ( member: any, i: number ) =>
+                            ( member: any, i: number, arr: any ) =>
                             {
                               return (
                                 <div
@@ -389,8 +390,16 @@ const Chat = ( { router }: AppProps ) =>
                                     </div>
                                   }
                                   {
-                                    member.role === 'OWNER' &&
+                                    member.role === 'OWNER' && arr[ i - 1 ]?.role !== 'OWNER' &&
                                     <p className={ styles_tree_p.treepoints_owner }>Owner</p>
+                                  }
+                                  {
+                                    member.role === 'ADMINE' && arr[ i - 1 ]?.role !== 'ADMINE' &&
+                                    <p className={ styles_tree_p.treepoints_owner }>Admine</p>
+                                  }
+                                  {
+                                    member.role === 'MEMBER' && arr[ i - 1 ]?.role !== 'MEMBER' &&
+                                    <p className={ styles_tree_p.treepoints_owner }>Members</p>
                                   }
                                   <div className={ styles_tree_p.treepoints_box_row }>
                                     <div
@@ -411,8 +420,12 @@ const Chat = ( { router }: AppProps ) =>
                                     <p>{ member.user.username }</p>
                                     <div onClick={ () =>
                                     {
-
-                                      localStorage.getItem( 'userId' ) !== member.userId && setGroupBox( true );
+                                      setGroupBox( true );
+                                      setIsMember( () =>
+                                      {
+                                        const user = arr.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) );
+                                        return user.role === 'MEMBER' ? true : false;
+                                      } );
                                     } }
                                       className={ styles_tree_p.treepoints_settings }>
                                       {
@@ -431,10 +444,6 @@ const Chat = ( { router }: AppProps ) =>
                                       }
                                     </div>
                                   </div>
-                                  {
-                                    member.role === 'OWNER' &&
-                                    <p className={ styles_tree_p.treepoints_owner }>Members</p>
-                                  }
                                 </div>
                               );
                             }

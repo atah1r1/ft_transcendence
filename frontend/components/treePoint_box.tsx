@@ -6,7 +6,7 @@ import { BanSharp, PersonAddSharp } from 'react-ionicons'
 import { PersonSharp } from 'react-ionicons'
 import { VolumeMuteSharp } from 'react-ionicons'
 
-const TreePointsBox = ( { avatar, username, isgroup }: any ) =>
+const TreePointsBox = ( { avatar, username, isgroup, ismember }: any ) =>
 {
   const router = useRouter();
   return (
@@ -44,7 +44,7 @@ const TreePointsBox = ( { avatar, username, isgroup }: any ) =>
         />
       </div>
       {
-        isgroup &&
+        isgroup && !ismember &&
         <div className={ styles.treepoints_box_row }>
           <p>mute user</p>
           <div className={ styles.treepoints_settings }>
@@ -57,7 +57,7 @@ const TreePointsBox = ( { avatar, username, isgroup }: any ) =>
         </div>
       }
       {
-        isgroup &&
+        isgroup && !ismember &&
         <div className={ styles.treepoints_box_row }>
           <p>ban user</p>
           <div className={ styles.treepoints_settings }>
@@ -70,7 +70,7 @@ const TreePointsBox = ( { avatar, username, isgroup }: any ) =>
         </div>
       }
       {
-        isgroup &&
+        isgroup && !ismember &&
         <div className={ styles.treepoints_box_row }>
           <p>add Admine</p>
           <div className={ styles.treepoints_settings }>
