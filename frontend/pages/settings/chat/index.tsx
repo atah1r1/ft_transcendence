@@ -73,6 +73,7 @@ const Chat = ( { router }: AppProps ) =>
   const [ friends, setFriends ] = useState( [] );
   const [ addFriends, setAddFriends ] = useState( false );
   const [ ismember, setIsMember ] = useState( false );
+  const [ roomUserId, setRoomUserId ] = useState( {} );
 
   useEffect( () =>
   {
@@ -337,7 +338,8 @@ const Chat = ( { router }: AppProps ) =>
                             />
                           </div>
                         }
-                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box } ismember={ ismember } />
+                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box }
+                          roomId={ currentConv?.roomId } roomUserId={ roomUserId } ismember={ ismember } />
                       </>
                     ) : (
 
@@ -370,7 +372,7 @@ const Chat = ( { router }: AppProps ) =>
                                     </div>
                                   }
                                   {
-                                    member.role === 'MEMBER' &&
+                                    ( member.role === 'MEMBER' || member.role === 'ADMIN' ) &&
                                     localStorage.getItem( 'userId' ) === member.userId &&
                                     <div className={ styles.add_leave_btn }>
                                       <p>leave room</p>
@@ -394,8 +396,8 @@ const Chat = ( { router }: AppProps ) =>
                                     <p className={ styles_tree_p.treepoints_owner }>Owner</p>
                                   }
                                   {
-                                    member.role === 'ADMINE' && arr[ i - 1 ]?.role !== 'ADMINE' &&
-                                    <p className={ styles_tree_p.treepoints_owner }>Admine</p>
+                                    member.role === 'ADMIN' && arr[ i - 1 ]?.role !== 'ADMIN' &&
+                                    <p className={ styles_tree_p.treepoints_owner }>Admin</p>
                                   }
                                   {
                                     member.role === 'MEMBER' && arr[ i - 1 ]?.role !== 'MEMBER' &&
@@ -418,25 +420,28 @@ const Chat = ( { router }: AppProps ) =>
                                       />
                                     </div>
                                     <p>{ member.user.username }</p>
-                                    <div onClick={ () =>
-                                    {
-                                      setGroupBox( true );
-                                      setIsMember( () =>
-                                      {
-                                        const user = arr.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) );
-                                        return user.role === 'MEMBER' ? true : false;
-                                      } );
-                                    } }
-                                      className={ styles_tree_p.treepoints_settings }>
+                                    <div>
                                       {
                                         localStorage.getItem( 'userId' ) !== member.userId ?
-                                          < Image
-                                            src="/settings_icon.svg"
-                                            alt="invete_player_icon"
-                                            width={ "20px" }
-                                            height={ "20px" }
-                                          />
-                                          : <PersonSharp
+                                          <div className={ styles_tree_p.treepoints_settings } onClick={ () =>
+                                          {
+                                            setGroupBox( true );
+                                            setIsMember( () =>
+                                            {
+                                              const user = arr.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) );
+                                              return user.role === 'MEMBER' ? true : false;
+                                            } );
+                                            setRoomUserId( member.userId );
+                                          } }>
+                                            < Image
+                                              src="/settings_icon.svg"
+                                              alt="invete_player_icon"
+                                              width={ "20px" }
+                                              height={ "20px" }
+                                            />
+                                          </div>
+                                          :
+                                          <PersonSharp
                                             color={ '#ffffff' }
                                             height="20px"
                                             width="20px"
