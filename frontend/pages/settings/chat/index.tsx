@@ -73,7 +73,7 @@ const Chat = ( { router }: AppProps ) =>
   const [ friends, setFriends ] = useState( [] );
   const [ addFriends, setAddFriends ] = useState( false );
   const [ ismember, setIsMember ] = useState( false );
-  const [ roomUserId, setRoomUserId ] = useState( {} );
+  const [ roomUser, setRoomUser ] = useState( {} );
 
   useEffect( () =>
   {
@@ -339,7 +339,7 @@ const Chat = ( { router }: AppProps ) =>
                           </div>
                         }
                         <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box }
-                          roomId={ currentConv?.roomId } roomUserId={ roomUserId } ismember={ ismember } />
+                          roomId={ currentConv?.roomId } roomUser={ roomUser } ismember={ ismember } />
                       </>
                     ) : (
 
@@ -431,7 +431,7 @@ const Chat = ( { router }: AppProps ) =>
                                               const user = arr.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) );
                                               return user.role === 'MEMBER' ? true : false;
                                             } );
-                                            setRoomUserId( member.userId );
+                                            setRoomUser( member );
                                           } }>
                                             < Image
                                               src="/settings_icon.svg"

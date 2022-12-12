@@ -5,13 +5,12 @@ import { useRouter } from "next/router";
 import { BanSharp, PersonAddSharp } from 'react-ionicons'
 import { PersonSharp } from 'react-ionicons'
 import { VolumeMuteSharp } from 'react-ionicons'
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { SocketContext } from "../pages/_app";
 
-const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUserId, ismember }: any ) =>
+const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, ismember }: any ) =>
 {
-  console.log( 'user id: ', roomUserId );
-  console.log( 'room id: ', roomId );
+  console.log( 'isme: ', ismember );
   const socket = useContext( SocketContext );
   const router = useRouter();
   return (
@@ -75,13 +74,13 @@ const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUserId, ismembe
         </div>
       }
       {
-        isgroup && !ismember &&
+        isgroup && !ismember && roomUser.role !== 'ADMIN' && roomUser.role !== 'OWNER' &&
         <div className={ styles.treepoints_box_row }>
           <p>add Admine</p>
           <div className={ styles.treepoints_settings } onClick={ () =>
           {
             socket?.emit( 'make_admin', {
-              targetUserId: roomUserId,
+              targetUserId: roomUser.userId,
               roomId: roomId,
             } );
           } }>
