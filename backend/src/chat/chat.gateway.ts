@@ -255,6 +255,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.leaveIORoom(payload.targetUserId, payload.roomId);
       await this.sendChatsToUser(client.data.id);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_BAN_USER,
@@ -284,6 +285,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.joinIORoom(payload.targetUserId, payload.roomId);
       await this.sendChatsToUser(client.data.id);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_UNBAN_USER,
@@ -311,6 +313,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.sendChatsToUser(client.data.id);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_MUTE_USER,
@@ -338,6 +341,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.sendChatsToUser(client.data.id);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_UNMUTE_USER,

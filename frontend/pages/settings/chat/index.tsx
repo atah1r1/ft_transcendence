@@ -72,7 +72,7 @@ const Chat = ( { router }: AppProps ) =>
   const [ menu, setMenu ] = useState( false );
   const [ friends, setFriends ] = useState( [] );
   const [ addFriends, setAddFriends ] = useState( false );
-  const [ ismember, setIsMember ] = useState( false );
+  const [ userStatus, setUserStatus ] = useState( '' );
   const [ roomUser, setRoomUser ] = useState( {} );
 
   useEffect( () =>
@@ -339,7 +339,7 @@ const Chat = ( { router }: AppProps ) =>
                           </div>
                         }
                         <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box }
-                          roomId={ currentConv?.roomId } roomUser={ roomUser } ismember={ ismember } />
+                          roomId={ currentConv?.roomId } roomUser={ roomUser } userStatus={ userStatus } />
                       </>
                     ) : (
 
@@ -426,11 +426,7 @@ const Chat = ( { router }: AppProps ) =>
                                           <div className={ styles_tree_p.treepoints_settings } onClick={ () =>
                                           {
                                             setGroupBox( true );
-                                            setIsMember( () =>
-                                            {
-                                              const user = arr.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) );
-                                              return user.role === 'MEMBER' ? true : false;
-                                            } );
+                                            setUserStatus( arr.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) ).role );
                                             setRoomUser( member );
                                           } }>
                                             < Image
