@@ -27,7 +27,7 @@ const Friends_box = ( { friends }: any ) =>
           <div onClick={ () =>
           {
             router.push( {
-              pathname: '/profile',
+              pathname: '/friendProfile',
               query: {
                 avatar: friends[ i ].avatar,
                 username: friends[ i ].username

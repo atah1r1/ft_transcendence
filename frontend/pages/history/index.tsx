@@ -1,13 +1,11 @@
-import cn from "classnames";
-import styles from "../../../styles/chat.module.css";
-import styles_box from "../../../styles/style_box.module.css";
-import styles_s_l from "../../../styles/style_settings_nav.module.css";
-import styles_h from "../../../styles/history.module.css";
-import SettingsNav from "../../../components/settings_nav";
-import Loader from "../../../components/Loading";
-import HistoryBox from "../../../components/history_box";
+
+import styles_box from "../../styles/style_box.module.css";
+import styles_h from "../../styles/history.module.css";
+import SettingsNav from "../../components/settings_nav";
+import HistoryBox from "../../components/history_box";
 import { useState } from "react";
-import MenuNav from "../../../components/menuNav";
+import MenuNav from "../../components/menuNav";
+import Logout from "../../components/logout";
 
 const History = () =>
 {
@@ -185,7 +183,7 @@ const History = () =>
       <div className={ styles_box.container }>
         <SettingsNav selected={ "history" } menu={ menu } />
         <div className={ styles_box.profile_details }>
-          <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
+          <Logout />
           <div className={ styles_h.history }>
             <HistoryBox history={ history }></HistoryBox>
           </div>

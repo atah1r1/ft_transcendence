@@ -1,24 +1,24 @@
 import cn from "classnames";
-import styles from "../../../styles/chat.module.css";
-import styles_box from "../../../styles/style_box.module.css";
-import styles_s_l from "../../../styles/style_settings_nav.module.css";
-import styles_r_w from "../../../styles/chatroom_window.module.css";
-import styles_tree_p from "../../../styles/treeProints.module.css";
-import SettingsNav from "../../../components/settings_nav";
-import ConversationBox from "../../../components/conversation_box";
-import styles_c_b from "../../../styles/conversation_box.module.css";
+import styles from "../../styles/chat.module.css";
+import styles_box from "../../styles/style_box.module.css";
+import styles_r_w from "../../styles/chatroom_window.module.css";
+import styles_tree_p from "../../styles/treeProints.module.css";
+import SettingsNav from "../../components/settings_nav";
+import ConversationBox from "../../components/conversation_box";
+import styles_c_b from "../../styles/conversation_box.module.css";
 import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import ClickOutsidePoints from "../../../components/clickOutsidePoints";
-import TreePointsBox from "../../../components/treePoint_box";
-import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext, UserStatusContext } from "../../_app";
-import MenuNav from "../../../components/menuNav";
+import ClickOutsidePoints from "../../components/clickOutsidePoints";
+import TreePointsBox from "../../components/treePoint_box";
+import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext, UserStatusContext } from "../_app";
+import MenuNav from "../../components/menuNav";
 import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp } from "react-ionicons";
-import ConversationBody from "../../../components/conversation_body";
+import ConversationBody from "../../components/conversation_body";
 import type { AppProps } from 'next/app'
 import { withRouter } from "next/router";
 import axios from "axios";
-import { LastBlockedContext } from "../../../pages/_app";
+import { LastBlockedContext } from "../_app";
+import Logout from "../../components/logout";
 
 const Chat = ( { router }: AppProps ) =>
 {
@@ -232,7 +232,7 @@ const Chat = ( { router }: AppProps ) =>
       >
         <SettingsNav selected={ "chat" } menu={ menu } />
         <div className={ styles_box.profile_details }>
-          <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
+          <Logout />
           <div className={ styles.chat_box }>
             <div className={ styles.chat_left }>
               <div className={ styles.l_part_one }>

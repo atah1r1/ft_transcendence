@@ -20,7 +20,7 @@ const TreePointsBox = ( { avatar, username, group, roomId, roomUser, userStatus 
         <div onClick={ () =>
         {
           router.push( {
-            pathname: '/profile',
+            pathname: '/friendProfile',
             query: {
               avatar,
               username

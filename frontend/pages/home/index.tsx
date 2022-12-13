@@ -1,11 +1,10 @@
 import { useRouter } from "next/router";
-import styles_box from "../../../styles/style_box.module.css";
-import styles_s_l from "../../../styles/style_settings_nav.module.css";
-import cn from "classnames";
+import styles_box from "../../styles/style_box.module.css";
 import React, { useState, } from "react";
 import styled from "styled-components";
-import MenuNav from "../../../components/menuNav";
-import SettingsNav from "../../../components/settings_nav";
+import MenuNav from "../../components/menuNav";
+import SettingsNav from "../../components/settings_nav";
+import Logout from "../../components/logout";
 
 const Container = styled.div`
     background-image: url("/bg.jpeg");
@@ -92,7 +91,7 @@ function Home ()
     const playGame = ( e: any ) =>
     {
         e.preventDefault();
-        router.push( '/settings/home/game' );
+        router.push( '/home/game' );
         // socket.emit('join_game');
         console.log( "join game" );
     }
@@ -100,7 +99,7 @@ function Home ()
     const singlePmode = ( e: any ) =>
     {
         e.preventDefault();
-        router.push( '/settings/home/game/vbot' );
+        router.push( '/home/game/vbot' );
     }
 
 
@@ -111,7 +110,7 @@ function Home ()
             <div className={ styles_box.container }>
                 <SettingsNav selected={ "home" } menu={ menu } />
                 <div className={ styles_box.profile_details }>
-                    <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
+                    <Logout />
                     <Container>
                         <form>
                             <JoinRoomButton

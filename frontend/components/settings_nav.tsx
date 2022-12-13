@@ -74,7 +74,7 @@ const SettingsNav = ( { selected, menu }: any ) =>
           return (
             <div
               key={ i }
-              onClick={ () => router.push( `/settings/${ section }` ) }
+              onClick={ () => router.push( `/${ section }` ) }
               className={ cn(
                 styles_s_l.setting_btn,
                 selected === section && styles_s_l.current_btn

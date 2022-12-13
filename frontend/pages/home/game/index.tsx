@@ -1,14 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import paddle from "./paddle";
-import { JoinRoom } from "../../../../components/Joinroom";
-import Score, { p1_points, p2_points } from "../../../../components/score";
+import { JoinRoom } from "../../../components/Joinroom";
+import Score, { p1_points, p2_points } from "../../../components/score";
 import styled from "styled-components";
 import { io, Socket } from "socket.io-client";
-import styles_box from "../../../../styles/style_box.module.css";
-import styles_s_l from "../../../../styles/style_settings_nav.module.css";
-import cn from "classnames";
-import SettingsNav from "../../../../components/settings_nav";
-import MenuNav from "../../../../components/menuNav";
+import styles_box from "../../../styles/style_box.module.css";
 export const socket = io( '0.0.0.0:3001', {
     query: {
         userLogin: 'mougnou',
@@ -213,7 +209,6 @@ function Game ()
             <div className={ styles_box.container }>
                 {/* <SettingsNav selected={ "home" } menu={ menu } /> */ }
                 <div className={ styles_box.profile_details }>
-                    <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
                     { !gameOn && <JoinRoom /> }
                     <Container>
                         <GameContainer id="game" ref={ canvasRef }

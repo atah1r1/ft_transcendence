@@ -2,11 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import paddle from "../paddle";
 import styled from "styled-components";
 import { io, Socket } from "socket.io-client";
-import MenuNav from "../../../../../components/menuNav";
-import SettingsNav from "../../../../../components/settings_nav";
-import styles_box from "../../../../../styles/style_box.module.css";
-import styles_s_l from "../../../../../styles/style_settings_nav.module.css";
-import cn from "classnames";
+import styles_box from "../../../../styles/style_box.module.css";
 // export const socket = io('0.0.0.0:3001', {
 //     query: {
 //         userLogin: 'mougnou',
@@ -319,7 +315,6 @@ function Bot_game ()
             <div className={ styles_box.container }>
                 {/* <SettingsNav selected={ "home" } menu={ menu } /> */ }
                 <div className={ styles_box.profile_details }>
-                    <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
                     <Container>
                         <GameContainer id="game" ref={ canvasRef }
                             tabIndex={ 0 }

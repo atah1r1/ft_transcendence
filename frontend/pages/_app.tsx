@@ -1,7 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import React, { useContext, useEffect, useState } from 'react';
-import axios, { AxiosError } from "axios";
+import React, { useEffect, useState } from 'react';
 import { io, Socket } from "socket.io-client";
 import cookie from 'cookie';
 import { useRouter } from 'next/router';
@@ -97,7 +96,7 @@ function MyApp ( { Component, pageProps }: AppProps )
         toast.info( `A new ${ data?.isDm === true ? "DM" : "Room" } has been created`, toastOptions );
       }
       setCurrentConv( data );
-      router.push( `/settings/chat` );
+      router.push( `/chat` );
     } );
 
     socket.on( 'room_created_notif', ( data: any ) =>
@@ -117,7 +116,7 @@ function MyApp ( { Component, pageProps }: AppProps )
       {
         toast.info( `You have successfully joined room: ${ data.chat.name }`, toastOptions );
         setCurrentConv( data.chat );
-        router.push( `/settings/chat` );
+        router.push( `/chat` );
       }
       setNewMemberAdded( data.roomUser );
     } );

@@ -1,13 +1,12 @@
-import cn from "classnames";
-import styles from "../../../styles/friends.module.css";
-import styles_box from "../../../styles/style_box.module.css";
-import styles_s_l from "../../../styles/style_settings_nav.module.css";
-import SettingsNav from "../../../components/settings_nav";
-import Rooms_box from "../../../components/rooms_box";
+import styles from "../../styles/friends.module.css";
+import styles_box from "../../styles/style_box.module.css";
+import SettingsNav from "../../components/settings_nav";
+import Rooms_box from "../../components/rooms_box";
 import { useContext, useEffect, useState } from "react";
-import MenuNav from "../../../components/menuNav";
+import MenuNav from "../../components/menuNav";
 import axios from "axios";
-import { NewRoomContext } from "../../_app";
+import { NewRoomContext } from "../_app";
+import Logout from "../../components/logout";
 
 const History = () =>
 {
@@ -35,7 +34,7 @@ const History = () =>
       <div className={ styles_box.container }>
         <SettingsNav selected={ "rooms" } menu={ menu } />
         <div className={ styles_box.profile_details }>
-          <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
+          <Logout />
           <form
             className={ styles.search }
             onSubmit={ ( e ) =>
