@@ -6,12 +6,11 @@ import { BanSharp, PersonAddSharp } from 'react-ionicons'
 import { PersonSharp } from 'react-ionicons'
 import { VolumeMuteSharp } from 'react-ionicons'
 import { useContext, useEffect, useState } from "react";
-import { SocketContext, UserStatusContext } from "../pages/_app";
+import { SocketContext } from "../pages/_app";
 
-const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, userStatus }: any ) =>
+const TreePointsBox = ( { avatar, username, group, roomId, roomUser, userStatus }: any ) =>
 {
   const socket = useContext( SocketContext );
-  const [ member, setMember ] = useContext( UserStatusContext );
   const router = useRouter();
 
   return (
@@ -27,6 +26,7 @@ const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, userStatu
               username
             }
           } )
+          group.setGroupBox( false );
 
         } }>
           <div className={ styles.treepoints_settings }>
@@ -49,12 +49,12 @@ const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, userStatu
         />
       </div>
       {
-        isgroup && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
+        group.group_box && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
         <div className={ styles.treepoints_box_row }>
-          { member?.status === 'MUTED' ? <p>unmute user</p> : <p>mute user</p> }
+          { roomUser.status === 'MUTED' ? <p>unmute user</p> : <p>mute user</p> }
           <div className={ styles.treepoints_settings } onClick={ () =>
           {
-            member?.status === 'MUTED' ?
+            roomUser.status === 'MUTED' ?
               socket?.emit( 'unmute_user', {
                 targetUserId: roomUser.userId,
                 roomId: roomId,
@@ -62,6 +62,7 @@ const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, userStatu
                 targetUserId: roomUser.userId,
                 roomId: roomId,
               } )
+            group.setGroupBox( false );
           } }>
             <VolumeMuteSharp
               color={ '#ffffff' }
@@ -72,18 +73,19 @@ const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, userStatu
         </div>
       }
       {
-        isgroup && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
+        group.group_box && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
         <div className={ styles.treepoints_box_row }>
-          { member?.status === 'BANNED' ? <p>unban user</p> : <p>ban user</p> }
+          { roomUser.status === 'BANNED' ? <p>unban user</p> : <p>ban user</p> }
           <div className={ styles.treepoints_settings } onClick={ () =>
           {
-            member?.status === 'BANNED' ? socket?.emit( 'unban_user', {
+            roomUser.status === 'BANNED' ? socket?.emit( 'unban_user', {
               targetUserId: roomUser.userId,
               roomId: roomId,
             } ) : socket?.emit( 'ban_user', {
               targetUserId: roomUser.userId,
               roomId: roomId,
             } )
+            group.setGroupBox( false );
           } }>
             <BanSharp
               color={ '#ffffff' }
@@ -94,7 +96,7 @@ const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, userStatu
         </div>
       }
       {
-        isgroup && userStatus === 'OWNER' && roomUser.role !== 'ADMIN' && roomUser.role !== 'OWNER' &&
+        group.group_box && userStatus === 'OWNER' && roomUser.role !== 'ADMIN' && roomUser.role !== 'OWNER' &&
         <div className={ styles.treepoints_box_row }>
           <p>add Admine</p>
           <div className={ styles.treepoints_settings } onClick={ () =>
@@ -103,6 +105,7 @@ const TreePointsBox = ( { avatar, username, isgroup, roomId, roomUser, userStatu
               targetUserId: roomUser.userId,
               roomId: roomId,
             } );
+            group.setGroupBox( false );
           } }>
             <PersonAddSharp
               color={ '#ffffff' }

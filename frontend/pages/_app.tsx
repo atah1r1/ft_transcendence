@@ -65,6 +65,7 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( "connect_error", () =>
     {
+      console.log( 'connect_error: ', socket.id );
       toast.error( 'Websocket connection failed.', toastOptions );
       // TODO: redirect to login page.
       socket.connect();
@@ -72,21 +73,25 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( "exception", ( exception ) =>
     {
+      console.log( 'exception: ', socket.id );
       toast.error( `Error: ${ exception.error }: ${ exception.message }`, toastOptions );
     } );
 
     socket.on( 'chat_list', ( data: any ) =>
     {
+      console.log( 'chat_list: ', socket.id );
       setChats( data );
     } );
 
     socket.on( 'online_friends', ( data: any ) =>
     {
+      console.log( 'online_friends: ', socket.id );
       setOnlineFriends( data );
     } );
 
     socket.on( 'room_created', ( data: any ) =>
     {
+      console.log( 'room_created: ', socket.id );
       if ( data?.existing === false )
       {
         toast.info( `A new ${ data?.isDm === true ? "DM" : "Room" } has been created`, toastOptions );
@@ -97,11 +102,13 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'room_created_notif', ( data: any ) =>
     {
+      console.log( 'room_created_notif: ', socket.id );
       setNewRoom( data );
     } );
 
     socket.on( 'room_joined', ( data: any ) =>
     {
+      console.log( 'room_joined: ', socket.id );
       const userId = localStorage.getItem( 'userId' );
       if ( userId !== data.roomUser.userId )
       {
@@ -117,6 +124,7 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'room_left', ( data: any ) =>
     {
+      console.log( 'room_left: ', socket.id );
       const userId = localStorage.getItem( 'userId' );
       if ( userId === data.userId )
       {
@@ -127,12 +135,14 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'member_added', ( data: any ) =>
     {
+      console.log( 'member_added: ', socket.id );
       toast.info( `User has been added successfully`, toastOptions );
       setNewMemberAdded( data );
     } );
 
     socket.on( 'admin_made', ( data: any ) =>
     {
+      console.log( 'admin_made: ', socket.id );
       const userId = localStorage.getItem( 'userId' );
       if ( userId === data.userId )
         toast.info( `You have been made an admin`, toastOptions );
@@ -141,22 +151,27 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'member_status_changed', ( data: any ) =>
     {
-      // const userId = localStorage.getItem( 'userId' );
-      // if ( userId === data.userId && data.status === 'MUTED' )
-      //   toast.info( `You have been muted from room: `, toastOptions );
-      // if ( userId === data.userId && data.status === 'BANNED' )
-      //   toast.info( `You have been banned from room: `, toastOptions );
+      console.log( 'member_status_changed: ', socket.id );
       const userId = localStorage.getItem( 'userId' );
       if ( userId === data.userId && data.status === 'BANNED' )
       {
-        setCurrentConv( {} );
+        setCurrentConv( ( prev: any ) =>
+        {
+          if ( data.roomId === prev?.roomId )
+          {
+            console.log( "DOOOONE" );
+            return {};
+          }
+          console.log( "NOT DOOOONE" );
+          return prev;
+        } );
       }
-      setNewMemberAdded( data );
       setStatus( data );
     } );
 
     socket.on( 'message', ( data: any ) =>
     {
+      console.log( 'message: ', socket.id );
       const userId = localStorage.getItem( 'userId' );
       if ( userId !== data.user?.id )
       {
@@ -178,6 +193,7 @@ function MyApp ( { Component, pageProps }: AppProps )
 
     socket.on( 'user_blocked', ( data: any ) =>
     {
+      console.log( 'user_blocked: ', socket.id );
       const userId = localStorage.getItem( 'userId' );
       if ( data )
       {

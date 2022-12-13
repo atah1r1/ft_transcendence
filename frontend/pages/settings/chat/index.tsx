@@ -11,7 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../../components/clickOutsidePoints";
 import TreePointsBox from "../../../components/treePoint_box";
-import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext } from "../../_app";
+import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext, UserStatusContext } from "../../_app";
 import MenuNav from "../../../components/menuNav";
 import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp } from "react-ionicons";
 import ConversationBody from "../../../components/conversation_body";
@@ -30,6 +30,7 @@ const Chat = ( { router }: AppProps ) =>
   const [ value, setValue ] = useState( '' );
   const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
   const [ newMemberAdded, setNewMemberAdded ] = useContext( NewMemberAddedContext );
+  const [ memberStatus, setMemberStatus ] = useContext( UserStatusContext );
   const handleChange = ( e: any ) =>
   {
     const result = e.target.value.replace( /\D/g, '' );
@@ -87,7 +88,7 @@ const Chat = ( { router }: AppProps ) =>
     {
       console.log( 'error: ', err );
     } );
-  }, [ currentConv, newMemberAdded ] );
+  }, [ currentConv, newMemberAdded, memberStatus ] );
 
   useEffect( () =>
   {
@@ -338,7 +339,7 @@ const Chat = ( { router }: AppProps ) =>
                             />
                           </div>
                         }
-                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } isgroup={ group_box }
+                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } group={ { setGroupBox: setGroupBox, group_box: group_box } }
                           roomId={ currentConv?.roomId } roomUser={ roomUser } userStatus={ userStatus } />
                       </>
                     ) : (

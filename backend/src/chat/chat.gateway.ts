@@ -254,6 +254,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.leaveIORoom(payload.targetUserId, payload.roomId);
       await this.sendChatsToUser(client.data.id);
+      await this.sendChatsToUser(ru.userId);
       await this.sendMemberStatusToClient(client.data.id, ru);
       await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
@@ -284,6 +285,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       this.joinIORoom(payload.targetUserId, payload.roomId);
       await this.sendChatsToUser(client.data.id);
+      await this.sendChatsToUser(ru.userId);
       await this.sendMemberStatusToClient(client.data.id, ru);
       await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
