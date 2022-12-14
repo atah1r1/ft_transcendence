@@ -8,6 +8,8 @@ import MenuNav from "../../components/menuNav";
 import SettingsNav from "../../components/settings_nav";
 import { useRouter } from "next/router";
 import axios from "axios";
+import requireAuthentication from "../../hooks/requiredAuthentication";
+import Logout from "../../components/logout";
 
 const FriendProfile = () =>
 {
@@ -47,7 +49,7 @@ const FriendProfile = () =>
         <SettingsNav selected={ "friends" } menu={ menu } />
         <div className={ styles_box.profile_details }>
           <div>
-            <div className={ cn( styles_s_l.setting_btn, styles_s_l.current_btn, styles_box.logout_btn ) }>logout</div>
+            <Logout />
             <div className={ styles.details_up }>
               <div className={ styles.details_level }>
                 <p>LEVEL</p>
@@ -107,3 +109,11 @@ const FriendProfile = () =>
 };
 
 export default FriendProfile;
+
+export const getServerSideProps = requireAuthentication( async () =>
+{
+  return {
+    props: {
+    }, // will be passed to the page component as props
+  }
+} )
