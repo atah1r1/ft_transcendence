@@ -2,14 +2,44 @@ import cn from "classnames";
 import styles from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import styles_s_l from "../../styles/style_settings_nav.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import MenuNav from "../../components/menuNav";
 import SettingsNav from "../../components/settings_nav";
+import { useRouter } from "next/router";
+import axios from "axios";
 
-const FriendProfile = ( props: any ) =>
+const FriendProfile = () =>
 {
+  const [ data, setData ] = useState(
+    {
+      avatar: "",
+      createdAt: "",
+      first_name: "",
+      id: "",
+      last_name: "",
+      two_factor_auth: false,
+      updateAt: "",
+      username: "",
+    }
+  );
   const [ menu, setMenu ] = useState( false );
+  const router = useRouter()
+  const { id } = router.query;
+
+  useEffect( () =>
+  {
+    axios.get( `http://localhost:9000/api/user/${ id }`, {
+      withCredentials: true,
+    } ).then( ( res ) =>
+    {
+      setData( res.data );
+    } ).catch( ( err ) =>
+    {
+      console.log( 'error', err );
+    } )
+  }, [] )
+
   return (
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />
@@ -26,13 +56,13 @@ const FriendProfile = ( props: any ) =>
               <div className={ styles.details_avatar }>
                 <div className={ styles.profile_box }>
                   <Image
-                    src={ props?.router.query.avatar || "https://picsum.photos/300/300" }
+                    src={ data?.avatar || "https://picsum.photos/300/300" }
                     alt="avatar"
                     width="180px"
                     height="180px"
                   ></Image>
                 </div>
-                { <p>{ props?.router.query.username }</p> }
+                { <p>{ data?.username }</p> }
               </div>
               <div className={ styles.details_medals }>
                 <div>

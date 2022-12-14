@@ -8,7 +8,7 @@ import { VolumeMuteSharp } from 'react-ionicons'
 import { useContext } from "react";
 import { SocketContext } from "../pages/_app";
 
-const TreePointsBox = ( { avatar, username, group, roomId, roomUser, userStatus }: any ) =>
+const TreePointsBox = ( { userId, group, roomId, roomUser, userStatus }: any ) =>
 {
   const socket = useContext( SocketContext );
   const router = useRouter();
@@ -19,13 +19,8 @@ const TreePointsBox = ( { avatar, username, group, roomId, roomUser, userStatus 
         <p>view profile</p>
         <div onClick={ () =>
         {
-          router.push( {
-            pathname: '/friendProfile',
-            query: {
-              avatar,
-              username
-            }
-          } )
+          group.group_box ? router.push( `/profile/${ roomUser.userId }` )
+            : router.push( `/profile/${ userId }` )
           group.setGroupBox( false );
 
         } }>

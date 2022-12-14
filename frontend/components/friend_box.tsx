@@ -26,13 +26,7 @@ const Friends_box = ( { friends }: any ) =>
         <div className={ styles.friends_options }>
           <div onClick={ () =>
           {
-            router.push( {
-              pathname: '/friendProfile',
-              query: {
-                avatar: friends[ i ].avatar,
-                username: friends[ i ].username
-              }
-            } )
+            router.push( `/profile/${ friends[ i ].id }` )
           } }>
             <PersonCircleOutline
               color={ '#ffffff' }

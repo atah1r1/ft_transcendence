@@ -340,7 +340,7 @@ const Chat = ( { router }: AppProps ) =>
                             />
                           </div>
                         }
-                        <TreePointsBox avatar={ currentConv?.avatar } username={ currentConv?.name } group={ { setGroupBox: setGroupBox, group_box: group_box } }
+                        <TreePointsBox userId={ currentConv.members[ 0 ].id } group={ { setGroupBox: setGroupBox, group_box: group_box } }
                           roomId={ currentConv?.roomId } roomUser={ roomUser } userStatus={ userStatus } />
                       </>
                     ) : (
