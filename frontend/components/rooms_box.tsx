@@ -3,7 +3,7 @@ import styles_room from "../styles/rooms.module.css";
 import Image from "next/image";
 import styles_s_l from "../styles/style_settings_nav.module.css";
 import cn from "classnames";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { SocketContext } from "../pages/_app";
 
 const Rooms_box = ( { rooms }: any ) =>

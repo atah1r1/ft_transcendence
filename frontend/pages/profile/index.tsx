@@ -3,20 +3,12 @@ import styles from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import styles_s_l from "../../styles/style_settings_nav.module.css";
 import SettingsNav from "../../components/settings_nav";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
-
-export const getServerSideProps = requireAuthentication( async ( context: any ) =>
-{
-  return {
-    props: {
-    }, // will be passed to the page component as props
-  }
-} )
 
 const Profile = () =>
 {
@@ -199,3 +191,11 @@ const Profile = () =>
 };
 
 export default Profile;
+
+export const getServerSideProps = requireAuthentication( async () =>
+{
+  return {
+    props: {
+    }, // will be passed to the page component as props
+  }
+} )

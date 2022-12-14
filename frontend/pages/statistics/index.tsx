@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
+import requireAuthentication from "../../hooks/requiredAuthentication";
 
 const History = () =>
 {
@@ -121,3 +122,11 @@ const History = () =>
 };
 
 export default History;
+
+export const getServerSideProps = requireAuthentication( async () =>
+{
+  return {
+    props: {
+    }, // will be passed to the page component as props
+  }
+} )

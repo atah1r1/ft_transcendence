@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import paddle from "./paddle";
 import { JoinRoom } from "../../../components/Joinroom";
-import Score, { p1_points, p2_points } from "../../../components/score";
+import Score from "../../../components/score";
 import styled from "styled-components";
 import { io, Socket } from "socket.io-client";
 import styles_box from "../../../styles/style_box.module.css";
+import requireAuthentication from "../../../hooks/requiredAuthentication";
 export const socket = io( '0.0.0.0:3001', {
     query: {
         userLogin: 'mougnou',
@@ -225,3 +226,10 @@ function Game ()
 }
 export default Game;
 
+export const getServerSideProps = requireAuthentication( async () =>
+{
+    return {
+        props: {
+        }, // will be passed to the page component as props
+    }
+} )

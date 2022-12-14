@@ -1,8 +1,6 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-// import { socket } from "../../game/game";
-import background from "../assets/bg.jpeg";
 
 const ContainerBaground = styled.div`
     width: 100%;

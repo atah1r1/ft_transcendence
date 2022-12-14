@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { BanSharp, PersonAddSharp } from 'react-ionicons'
 import { PersonSharp } from 'react-ionicons'
 import { VolumeMuteSharp } from 'react-ionicons'
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { SocketContext } from "../pages/_app";
 
 const TreePointsBox = ( { avatar, username, group, roomId, roomUser, userStatus }: any ) =>

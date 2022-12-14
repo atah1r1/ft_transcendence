@@ -19,6 +19,7 @@ import { withRouter } from "next/router";
 import axios from "axios";
 import { LastBlockedContext } from "../_app";
 import Logout from "../../components/logout";
+import requireAuthentication from "../../hooks/requiredAuthentication";
 
 const Chat = ( { router }: AppProps ) =>
 {
@@ -521,3 +522,11 @@ const Chat = ( { router }: AppProps ) =>
 };
 
 export default withRouter( Chat );
+
+export const getServerSideProps = requireAuthentication( async () =>
+{
+  return {
+    props: {
+    }, // will be passed to the page component as props
+  }
+} )

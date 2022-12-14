@@ -5,6 +5,7 @@ import styled from "styled-components";
 import MenuNav from "../../components/menuNav";
 import SettingsNav from "../../components/settings_nav";
 import Logout from "../../components/logout";
+import requireAuthentication from "../../hooks/requiredAuthentication";
 
 const Container = styled.div`
     background-image: url("/bg.jpeg");
@@ -134,3 +135,11 @@ function Home ()
 }
 
 export default Home;
+
+export const getServerSideProps = requireAuthentication( async () =>
+{
+    return {
+        props: {
+        }, // will be passed to the page component as props
+    }
+} )

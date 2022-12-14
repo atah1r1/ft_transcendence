@@ -1,8 +1,17 @@
 import Link from "next/link";
 import styles from "../styles/login_page.module.css";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const loginPage = () =>
 {
+  const router = useRouter();
+
+  useEffect( () =>
+  {
+    router.push( '/profile' );
+  }, [] )
+
   return (
     <div className={ styles.container }>
       <p className={ styles.welcom }>WELCOME TO</p>

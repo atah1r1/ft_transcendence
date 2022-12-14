@@ -6,7 +6,6 @@ import { useState } from "react";
 import Image from "next/image";
 import MenuNav from "../../components/menuNav";
 import SettingsNav from "../../components/settings_nav";
-import { withRouter } from 'next/router';
 
 const FriendProfile = ( props: any ) =>
 {
@@ -77,4 +76,4 @@ const FriendProfile = ( props: any ) =>
   );
 };
 
-export default withRouter( FriendProfile );
+export default FriendProfile;
