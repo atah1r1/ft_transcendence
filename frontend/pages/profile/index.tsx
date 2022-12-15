@@ -69,6 +69,20 @@ const Profile = () =>
     fetchData();
   }, [] )
 
+  const userToPatch = {
+    first_name: value.firstName,
+    last_name: value.lastName,
+    username: value.username,
+  };
+
+  const handleClick = async () =>
+  {
+    await axios
+      .patch( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/profile`, userToPatch )
+      .catch( ( error ) => console.log( 'Error: ', error ) );
+    setValue( { firstName: '', lastName: '', username: '' } );
+  };
+
   return (
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />
@@ -177,7 +191,7 @@ const Profile = () =>
                 </label>
                 { s_witch && <img src="/QR.png" width="15%" /> }
               </div>
-              <div className={ styles.save_box }>
+              <div className={ styles.save_box } onClick={ handleClick }>
                 <div className={ cn( styles_s_l.setting_btn, styles.save_btn, `${ !value.firstName && !value.lastName && !value.username && styles.save_unclick }` ) }>
                   SAVE
                 </div>
