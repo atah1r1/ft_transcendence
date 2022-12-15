@@ -6,7 +6,7 @@ import styles_tree_p from "../../styles/treeProints.module.css";
 import SettingsNav from "../../components/settings_nav";
 import ConversationBox from "../../components/conversation_box";
 import styles_c_b from "../../styles/conversation_box.module.css";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ClickOutsidePoints from "../../components/clickOutsidePoints";
 import TreePointsBox from "../../components/treePoint_box";
@@ -23,6 +23,8 @@ import requireAuthentication from "../../hooks/requiredAuthentication";
 
 const Chat = ( { router }: AppProps ) =>
 {
+
+  const ref = useRef<null | HTMLDivElement>( null );
 
   const socket = useContext( SocketContext );
   const [ onlineFriends, setOnlineFriends ] = useContext( OnlineFriendsContext );
@@ -263,7 +265,7 @@ const Chat = ( { router }: AppProps ) =>
                 </form>
               </div>
               <div className={ styles.l_part_two }>
-                <ConversationBox searchInput={ searchInput } />
+                <ConversationBox searchInput={ searchInput } ref={ref} />
               </div>
               <div className={ styles.l_part_tree }>
                 {
