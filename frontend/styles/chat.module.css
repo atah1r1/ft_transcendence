@@ -96,12 +96,16 @@
 .add_leave_btn {
   display: flex;
   align-items: center;
+  justify-content: right;
   position: absolute;
   top: 0;
   right: 0;
-  padding: 0.6rem;
-  padding-right: 1.2rem;
   font-size: 1.6rem;
+  background-color: #16213e;
+  width: 100%;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  z-index: 1;
 }
 
 .add_btn_c,
@@ -356,7 +360,7 @@
 }
 
 .treePointsContent {
-  height: 100%;
+  height: 65rem;
   position: relative;
 }
 /* media q--------------------- */
@@ -432,6 +436,10 @@
   .online_text {
     display: block;
   }
+
+  .treePointsContent {
+    height: 38rem;
+  }
 }
 
 @media (max-width: 700px) {
@@ -441,5 +449,8 @@
 
   .conversation_body {
     min-height: 89%;
+  }
+  .treePointsContent {
+    height: 48rem;
   }
 }

@@ -15,7 +15,7 @@
 .treepoints_box {
   width: 26rem;
   height: 100%;
-  background-color: hsla(223, 48%, 16%, 0.8);
+  background-color: #16213e;
   padding: 1.6rem;
   padding-top: 6rem;
   font-family: "Pixeboy";
@@ -33,6 +33,7 @@
 .treepoints_box::-webkit-scrollbar-thumb {
   background: #aaa;
   border-radius: 10px;
+  display: none;
 }
 
 .treepoints_box_row {
