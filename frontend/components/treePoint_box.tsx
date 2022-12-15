@@ -8,8 +8,10 @@ import { VolumeMuteSharp } from 'react-ionicons'
 import { useContext } from "react";
 import { SocketContext } from "../pages/_app";
 
-const TreePointsBox = ( { userId, group, roomId, roomUser, userStatus }: any ) =>
+const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) =>
 {
+  const userId = localStorage.getItem( 'userId' );
+  const friendId = members.find( ( member: any ) => member.id != userId )?.id;
   const socket = useContext( SocketContext );
   const router = useRouter();
 
@@ -20,9 +22,8 @@ const TreePointsBox = ( { userId, group, roomId, roomUser, userStatus }: any ) =
         <div onClick={ () =>
         {
           group.group_box ? router.push( `/profile/${ roomUser.userId }` )
-            : router.push( `/profile/${ userId }` )
+            : router.push( `/profile/${ friendId }` )
           group.setGroupBox( false );
-
         } }>
           <div className={ styles.treepoints_settings }>
             <PersonSharp
@@ -93,7 +94,7 @@ const TreePointsBox = ( { userId, group, roomId, roomUser, userStatus }: any ) =
       {
         group.group_box && userStatus === 'OWNER' && roomUser.role !== 'ADMIN' && roomUser.role !== 'OWNER' &&
         <div className={ styles.treepoints_box_row }>
-          <p>add Admine</p>
+          <p>add Admin</p>
           <div className={ styles.treepoints_settings } onClick={ () =>
           {
             socket?.emit( 'make_admin', {

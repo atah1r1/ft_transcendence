@@ -258,11 +258,12 @@ const Chat = ( { router }: AppProps ) =>
                     type="search"
                     placeholder="Search..."
                     onChange={ ( e ) => setSearchInput( e.target.value ) }
+                    value={ searchInput }
                   ></input>
                 </form>
               </div>
               <div className={ styles.l_part_two }>
-                <ConversationBox />
+                <ConversationBox searchInput={ searchInput } />
               </div>
               <div className={ styles.l_part_tree }>
                 {
@@ -340,7 +341,7 @@ const Chat = ( { router }: AppProps ) =>
                             />
                           </div>
                         }
-                        <TreePointsBox userId={ currentConv.members[ 0 ].id } group={ { setGroupBox: setGroupBox, group_box: group_box } }
+                        <TreePointsBox members={ currentConv.members } group={ { setGroupBox: setGroupBox, group_box: group_box } }
                           roomId={ currentConv?.roomId } roomUser={ roomUser } userStatus={ userStatus } />
                       </>
                     ) : (

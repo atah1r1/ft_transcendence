@@ -43,7 +43,8 @@ const Rooms_box = ( { rooms }: any ) =>
           </div>
           {
             isProtected === i &&
-            <input required type="password" placeholder="******" maxLength={ 16 } onChange={ ( e ) => setValue( e.target.value ) } value={ value }></input>
+            <input required type="password" placeholder="******" maxLength={ 16 }
+              onChange={ ( e ) => setValue( e.target.value ) } value={ value }></input>
           }
         </div>
       </div>

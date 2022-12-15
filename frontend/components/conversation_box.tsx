@@ -5,7 +5,7 @@ import Image from "next/image";
 import axios from "axios";
 import { ChatContext, CurrentConvContext } from "../pages/_app";
 
-const ConversationBox = () =>
+const ConversationBox = ( { searchInput }: any ) =>
 {
   // format date
   const formatDateAndTime = ( date: string ) =>
@@ -33,51 +33,50 @@ const ConversationBox = () =>
     } );
   }, [] );
 
-  return chats?.map( ( conv: any, i: number ) =>
-  {
-    // setCurrent_conv( conv );
-    return (
-      <div key={ i }>
-        <div
-          onClick={ () =>
-          {
-            // console.log( "onclick conv is:", conv );
-            setCurrentConv( conv );
-          } }
-          className={ cn(
-            styles.conversation, ` ${ conv.roomId === currentConv.roomId && styles.current_conv }`
-          ) }
-        >
-          <div className={ styles.conversation_img }>
-            <Image
-              src={ conv.image === null ? "https://ui-avatars.com/api/?name=John+Doe" : conv.image }
-              alt="conversation_image"
-              width={ "42px" }
-              height={ "42px" }
-            ></Image>
-          </div>
-          <div>
-            <p className={ styles.conversation_name }>
-              { conv.name }
-            </p>
-            <p className={ styles.conversation_text }>{ conv.lastMessage?.message }</p>
-          </div>
-          <div>
-            <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
-            { conv.wasRead !== true && (
-              <p
-                className={ cn(
-                  styles.conversation_number
-                ) }
-              >
-                { conv.wasRead ? "" : "" }
-              </p> )
-            }
+  return chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput ) )
+    .map( ( conv: any, i: number ) =>
+    {
+      return (
+        <div key={ i }>
+          <div
+            onClick={ () =>
+            {
+              setCurrentConv( conv );
+            } }
+            className={ cn(
+              styles.conversation, ` ${ conv.roomId === currentConv.roomId && styles.current_conv }`
+            ) }
+          >
+            <div className={ styles.conversation_img }>
+              <Image
+                src={ conv.image === null ? "https://ui-avatars.com/api/?name=John+Doe" : conv.image }
+                alt="conversation_image"
+                width={ "42px" }
+                height={ "42px" }
+              ></Image>
+            </div>
+            <div>
+              <p className={ styles.conversation_name }>
+                { conv.name }
+              </p>
+              <p className={ styles.conversation_text }>{ conv.lastMessage?.message }</p>
+            </div>
+            <div>
+              <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
+              { conv.wasRead !== true && (
+                <p
+                  className={ cn(
+                    styles.conversation_number
+                  ) }
+                >
+                  { conv.wasRead ? "" : "" }
+                </p> )
+              }
+            </div>
           </div>
         </div>
-      </div>
-    );
-  } );
+      );
+    } )
 };
 
 export default ConversationBox;
