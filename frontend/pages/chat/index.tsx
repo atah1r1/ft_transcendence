@@ -14,17 +14,17 @@ import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, Socket
 import MenuNav from "../../components/menuNav";
 import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp } from "react-ionicons";
 import ConversationBody from "../../components/conversation_body";
-import type { AppProps } from 'next/app'
-import { withRouter } from "next/router";
 import axios from "axios";
 import { LastBlockedContext } from "../_app";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
+import { useRouter } from "next/router";
 
-const Chat = ( { router }: AppProps ) =>
+const Chat = () =>
 {
 
   const ref = useRef<null | HTMLDivElement>( null );
+  const router = useRouter();
 
   const socket = useContext( SocketContext );
   const [ onlineFriends, setOnlineFriends ] = useContext( OnlineFriendsContext );
@@ -265,7 +265,7 @@ const Chat = ( { router }: AppProps ) =>
                 </form>
               </div>
               <div className={ styles.l_part_two }>
-                <ConversationBox searchInput={ searchInput } ref={ref} />
+                <ConversationBox searchInput={ searchInput } ref={ ref } />
               </div>
               <div className={ styles.l_part_tree }>
                 {
@@ -295,15 +295,9 @@ const Chat = ( { router }: AppProps ) =>
                     <p
                       onClick={ () =>
                       {
-                        if ( currentConv.isDm )
-                        {
-                          router.push( {
-                            pathname: '/profile',
-                            query: {
-                              id: currentConv?.id
-                            }
-                          } )
-                        }
+                        const userId = localStorage.getItem( 'userId' );
+                        const friendId = currentConv.members.find( ( member: any ) => member.id != userId )?.id;
+                        router.push( `/profile/${ friendId }` );
                       } }
                       className={ cn(
                         styles_c_b.conversation_name,
@@ -524,7 +518,7 @@ const Chat = ( { router }: AppProps ) =>
   );
 };
 
-export default withRouter( Chat );
+export default Chat;
 
 export const getServerSideProps = requireAuthentication( async () =>
 {
