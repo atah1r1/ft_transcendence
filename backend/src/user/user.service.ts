@@ -43,8 +43,11 @@ export class UserService {
     return false;
   }
 
-  async checkIfUsernameExists(username: string) {
-    const user = await this.prisma.user.findUnique({ where: { username } });
+  async checkIfUsernameExists(currentUserName: string, username: string): Promise<boolean> {
+    if (currentUserName === username) return false;
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+    });
     console.log(user);
     if (user) {
       return true;
@@ -53,11 +56,16 @@ export class UserService {
   }
 
   async updateProfile(user: any, body: any) {
+    const currentUser = await this.getUserById(user.id, user.id);
     const { first_name, last_name, username } = body;
-    console.log("body body", body);
-    const data = { first_name, last_name, username };
-    if (await this.checkIfUsernameExists(username)) {
-       throw new HttpException('Username already exists', HttpStatus.NOT_FOUND);
+    console.log('body body', body);
+    const data: any = {};
+    if (first_name) data.first_name = first_name;
+    if (last_name) data.last_name = last_name;
+    if (username) data.username = username;
+
+    if (username && await this.checkIfUsernameExists(currentUser.username, username)) {
+      throw new HttpException('Username already exists', HttpStatus.NOT_FOUND);
     }
     return await this.prisma.user.update({
       where: { id: user.id },

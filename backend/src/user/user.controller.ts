@@ -80,13 +80,14 @@ export class UserController {
   ) {
     try {
       const { secure_url } = await this.cloudinary.uploadImage(file);
+      console.log('secure_url', secure_url);
       const user = await this.prisma.user.update({
         where: { id: req.user.id },
         data: { avatar: secure_url },
       });
       return { avatar: user.avatar };
-    } catch {
-      throw new BadRequestException('Error uploading image');
+    } catch(e) {
+      throw new BadRequestException('Error uploading image' + e.message);
     }
   }
 

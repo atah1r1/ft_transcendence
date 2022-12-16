@@ -295,9 +295,12 @@ const Chat = () =>
                     <p
                       onClick={ () =>
                       {
-                        const userId = localStorage.getItem( 'userId' );
-                        const friendId = currentConv.members.find( ( member: any ) => member.id != userId )?.id;
-                        router.push( `/profile/${ friendId }` );
+                        if ( currentConv.isDm )
+                        {
+                          const userId = localStorage.getItem( 'userId' );
+                          const friendId = currentConv.members.find( ( member: any ) => member.id != userId )?.id;
+                          router.push( `/profile/${ friendId }` );
+                        }
                       } }
                       className={ cn(
                         styles_c_b.conversation_name,

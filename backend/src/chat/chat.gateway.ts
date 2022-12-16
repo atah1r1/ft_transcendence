@@ -9,7 +9,7 @@ import {
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from './chat.service';
 import { Socket, Server } from 'socket.io';
-import { RoomUser, RoomUserStatus } from '@prisma/client';
+import { RoomPrivacy, RoomUser, RoomUserStatus } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 
 const EV_CHAT_LIST = 'chat_list';
@@ -28,6 +28,7 @@ const EV_ADD_MEMBER = 'add_member';
 const EV_MAKE_ADMIN = 'make_admin';
 const EV_FIND_ROOM = 'find_room';
 const EV_BLOCK_USER = 'block_user';
+const EV_PROTECT_ROOM = 'protect_room';
 
 const EV_EMIT_ONLINE_FRIENDS = 'online_friends';
 const EV_EMIT_ROOM_CREATED = 'room_created';
@@ -38,6 +39,7 @@ const EV_EMIT_ADMIN_MADE = 'admin_made';
 const EV_EMIT_MEMBER_STATUS_CHANGED = 'member_status_changed';
 const EV_EMIT_USER_BLOCKED = 'user_blocked';
 const EV_EMIT_NEW_ROOM = 'room_created_notif';
+const EV_EMIT_ROOM_PROTECTED = 'room_protected';
 
 @WebSocketGateway({ namespace: 'chat', cors: true, origins: '*' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -458,6 +460,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage(EV_PROTECT_ROOM)
+  async protectRoom(client: Socket, payload: any) {
+    this.validateProtectRoom(payload);
+    try {
+      const chat = await this.chatService.makeRoomProtected(
+        client.data.id,
+        payload.roomId,
+        payload.password,
+      );
+      if (!chat) {
+        throw new Error('Failed to protect room');
+      }
+      await this.sendChatsToClient(client.data.id);
+      await this.sendRoomProtectedToClient(client.data.id, chat);
+    } catch (e) {
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: e.message,
+      });
+    }
+  }
+
   /* *******************
    *  HELPER METHODS   *
    ******************* */
@@ -590,6 +614,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!sockets || sockets.length === 0) return;
     sockets.forEach((s) => {
       this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, chat);
+    });
+    this.server.emit(EV_EMIT_NEW_ROOM, chat);
+  }
+
+  private async sendRoomProtectedToClient(userId: string, chat: any) {
+    const sockets = this.chatService.getConnectedUserById(userId);
+    if (!sockets || sockets.length === 0) return;
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_ROOM_PROTECTED, chat);
     });
     this.server.emit(EV_EMIT_NEW_ROOM, chat);
   }
@@ -738,6 +771,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         message: 'Invalid create room object',
       });
     }
+    if (payload.privacy === RoomPrivacy.PROTECTED) {
+      if (payload.password === '') {
+        throw new WsException({
+          error: EV_PROTECT_ROOM,
+          message: "password can't be empty",
+        });
+      }
+    }
   }
 
   private validateJoinRoom(payload: any) {
@@ -833,6 +874,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         error: EV_BLOCK_USER,
         message: 'Invalid block user object',
       });
+    }
+  }
+
+  private validateProtectRoom(payload: any) {
+    if (!('roomId' in payload && 'password' in payload)) {
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: 'Invalid protect room object',
+      });
+    }
+    if (
+      typeof payload.roomId !== 'string' ||
+      typeof payload.password !== 'string'
+    ) {
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: 'Invalid protect room object',
+      });
+    }
+    if (payload.password === '') {
+       throw new WsException({
+         error: EV_PROTECT_ROOM,
+         message: "password can't be empty",
+       });
     }
   }
 }

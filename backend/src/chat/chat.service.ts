@@ -96,13 +96,11 @@ export class ChatService {
 
     console.table(membersUserIds);
 
-    const friendsNotInRoom = friends?.filter(
-      (friend) => {
-        const res = !(membersUserIds.includes(friend.id));
-        console.log("ID: ", friend.id, ", ", res);
-        return res;
-      },
-    );
+    const friendsNotInRoom = friends?.filter((friend) => {
+      const res = !membersUserIds.includes(friend.id);
+      console.log('ID: ', friend.id, ', ', res);
+      return res;
+    });
     return friendsNotInRoom ?? [];
   }
 
@@ -724,7 +722,7 @@ export class ChatService {
     }
     return members ?? [];
   }
- 
+
   /**
    * Finds RoomUser by userId and roomId, returns null if not found.
    * DOES NOT CHECK RoomUserStatus.LEFT, must be checked by caller.
@@ -821,13 +819,54 @@ export class ChatService {
               some: {
                 userId: userId,
                 status: RoomUserStatus.LEFT,
-              }
-            }
+              },
+            },
           },
         ],
       },
     });
     return _rooms;
+  }
+
+  async makeRoomProtected(
+    userId: string,
+    roomId: string,
+    password: string,
+  ): Promise<any> {
+    const room: Room = await this.getRoomById(roomId);
+    if (!room) throw new Error('Room does not exist');
+    const ru: RoomUser = await this.getRoomUserByUserIdAndRoomId(
+      userId,
+      roomId,
+    );
+    if (!ru || ru.status === RoomUserStatus.LEFT)
+      throw new Error('You are not in room');
+    if (ru.role !== RoomRole.OWNER) throw new Error('You are not an owner');
+
+    if (room.isDm) throw new Error('Room is a dm');
+    if (room.privacy === RoomPrivacy.PRIVATE)
+      throw new Error('Room is private');
+    if (room.privacy === RoomPrivacy.PROTECTED)
+      throw new Error('Room is already protected');
+
+    const r = await this.prisma.room.update({
+      where: {
+        id: roomId,
+      },
+      data: {
+        privacy: RoomPrivacy.PROTECTED,
+        password: password,
+      },
+      include: {
+        members: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    return await this.formatChat(userId, r, true);
   }
 
   /**
@@ -873,6 +912,7 @@ export class ChatService {
       wasRead: _wasRead,
       existing: existing,
       members: _members,
+      privacy: room.privacy,
     };
   }
 
@@ -1014,8 +1054,8 @@ export class ChatService {
     if (!room) throw new Error('Room does not exist');
 
     const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
-    console.log("UID: ", userId);
-    console.log("RU: \n", _roomUser);
+    console.log('UID: ', userId);
+    console.log('RU: \n', _roomUser);
     if (!_roomUser || _roomUser.status === RoomUserStatus.LEFT)
       throw new Error('You are not in room');
 

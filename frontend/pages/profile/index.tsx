@@ -9,6 +9,7 @@ import Image from "next/image";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
+import { CameraOutline } from "react-ionicons";
 
 const Profile = () =>
 {
@@ -29,6 +30,7 @@ const Profile = () =>
   const [ value, setValue ] = useState( { firstName: '', lastName: '', username: '' } );
   const [ usernameExist, setUsernameExist ] = useState( false );
   const [ menu, setMenu ] = useState( false );
+  const [ selectedFile, setSelectedFile ] = useState<Blob>();
 
   const handleFirstName = ( e: any ) =>
   {
@@ -92,7 +94,7 @@ const Profile = () =>
         url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/profile`,
         withCredentials: true,
         data: userToPatch
-      } ).then( ( response ) =>
+      } ).then( () =>
       {
         fetchData();
         setUsernameExist( false );
@@ -106,6 +108,31 @@ const Profile = () =>
       } );
     setValue( { firstName: '', lastName: '', username: '' } );
   };
+
+
+  useEffect( () =>
+  {
+    const formData = new FormData();
+    formData.append( "image", selectedFile as Blob );
+    axios
+      ( {
+        method: 'post',
+        url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/upload`,
+        withCredentials: true,
+        data: formData
+      } ).then( ( response ) =>
+      {
+        console.log( 'res is: ', response );
+        setData( prev =>
+        {
+          return { ...prev, avatar: response.data.avatar }
+        } )
+      } )
+      .catch( ( error ) =>
+      {
+        console.log( 'error: ', error );
+      } );
+  }, [ selectedFile ] )
 
   return (
     <>
@@ -126,24 +153,27 @@ const Profile = () =>
                   <span> 2</span>
                 </div>
                 <div className={ styles.details_avatar }>
-                  <div className={ styles.upload_avatar }>
-                    <Image
-                      src="/upload_avatar.png"
-                      alt="upload_avatar_img"
-                      width="100%"
-                      height="100%"
-                    ></Image>
+                  <div className={ styles.upload_avatar } style={ { backgroundColor: '#000000', borderRadius: '50%' } }>
+                    <CameraOutline
+                      color={ '#ffffff' }
+                      height="30px"
+                      width="30px"
+                    />
+
                   </div>
-                  <div className={ styles.profile_box }>
-                    <div className={ styles.profile_slide }>change picture</div>
-                    <input type="file"></input>
-                    <Image
-                      src={ data?.avatar ?? "https://picsum.photos/300/300" }
-                      alt="avatar"
-                      width="180px"
-                      height="180px"
-                    ></Image>
-                  </div>
+                  <form>
+                    <div className={ styles.profile_box }>
+                      <div className={ styles.profile_slide }>change picture</div>
+                      <input type="file"
+                        onChange={ ( e: any ) => setSelectedFile( e.target.files[ 0 ] ) }></input>
+                      <Image
+                        src={ data?.avatar ?? "https://picsum.photos/300/300" }
+                        alt="avatar"
+                        width="180px"
+                        height="180px"
+                      ></Image>
+                    </div>
+                  </form>
                   <p>{ data.username }</p>
                 </div>
                 <div className={ styles.details_medals }>
@@ -228,7 +258,8 @@ const Profile = () =>
                 { s_witch && <img src="/QR.png" width="15%" /> }
               </div>
               <div className={ styles.save_box } onClick={ handleClick }>
-                <div className={ cn( styles_s_l.setting_btn, styles.save_btn, `${ !value.firstName && !value.lastName && !value.username && styles.save_unclick }` ) }>
+                <div className={ cn( styles_s_l.setting_btn, styles.save_btn,
+                  `${ value.firstName.length < 4 && value.lastName.length < 4 && value.username.length < 4 && styles.save_unclick }` ) }>
                   SAVE
                 </div>
               </div>
