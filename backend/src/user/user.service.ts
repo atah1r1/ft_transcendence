@@ -54,9 +54,10 @@ export class UserService {
 
   async updateProfile(user: any, body: any) {
     const { first_name, last_name, username } = body;
+    console.log("body body", body);
     const data = { first_name, last_name, username };
     if (await this.checkIfUsernameExists(username)) {
-      return { message: 'Username already exists' };
+       throw new HttpException('Username already exists', HttpStatus.NOT_FOUND);
     }
     return await this.prisma.user.update({
       where: { id: user.id },

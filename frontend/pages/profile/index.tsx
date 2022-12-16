@@ -27,6 +27,7 @@ const Profile = () =>
   const [ loader, setLoader ] = useState( true );
   const [ s_witch, setSwitch ] = useState( false );
   const [ value, setValue ] = useState( { firstName: '', lastName: '', username: '' } );
+  const [ usernameExist, setUsernameExist ] = useState( false );
   const [ menu, setMenu ] = useState( false );
 
   const handleFirstName = ( e: any ) =>
@@ -69,17 +70,40 @@ const Profile = () =>
     fetchData();
   }, [] )
 
-  const userToPatch = {
+  const userToPatch: {
+    first_name?: string,
+    last_name?: string,
+    username?: string,
+  } = {
     first_name: value.firstName,
     last_name: value.lastName,
     username: value.username,
   };
 
+  !value.firstName && delete userToPatch.first_name;
+  !value.lastName && delete userToPatch.last_name;
+  !value.username && delete userToPatch.username;
+
   const handleClick = async () =>
   {
     await axios
-      .patch( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/profile`, userToPatch )
-      .catch( ( error ) => console.log( 'Error: ', error ) );
+      ( {
+        method: 'patch',
+        url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/profile`,
+        withCredentials: true,
+        data: userToPatch
+      } ).then( ( response ) =>
+      {
+        fetchData();
+        setUsernameExist( false );
+      } )
+      .catch( ( error ) =>
+      {
+        console.log( 'user: ', userToPatch )
+        console.log( 'error: ', error.response.data );
+        if ( error.response.data.message === 'Username already exists' )
+          setUsernameExist( true );
+      } );
     setValue( { firstName: '', lastName: '', username: '' } );
   };
 
@@ -173,6 +197,18 @@ const Profile = () =>
                     <label>USERNAME</label>
                     <input type="text" placeholder={ data.username } maxLength={ 12 } value={ value.username }
                       onChange={ handleUsername }></input>
+                    {
+                      usernameExist &&
+                      <div className={ styles.error_box }>
+                        <Image
+                          src="/input_exist.svg"
+                          alt="medal_img"
+                          width="20px"
+                          height="20px"
+                        ></Image>
+                        <p className={ styles.error_msg }>Username already exist !</p>
+                      </div>
+                    }
                   </div>
                 </form>
               </div>

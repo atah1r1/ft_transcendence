@@ -152,6 +152,16 @@
   letter-spacing: 1px;
 }
 
+.error_box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.error_msg {
+  color: #EF9A9A;
+  font-size: 1.4rem;
+}
 /* Swich Botton ---------------*/
 
 .switch {
