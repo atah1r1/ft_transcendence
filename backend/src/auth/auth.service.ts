@@ -10,7 +10,7 @@ config();
 @Injectable()
 export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService) { }
-    async Login(username: string, name: object, photos: object): Promise<any> {
+    async Login(username: string, name: object, photos: string): Promise<any> {
         const user = await this.prisma.user.findUnique({
             where: { username: username },
         });
@@ -22,7 +22,7 @@ export class AuthService {
                 username: username,
                 first_name: name['givenName'],
                 last_name: name['familyName'],
-                avatar: photos[0]['value'],
+                avatar: photos,
                 two_factor_auth_key: authenticator.generateSecret(),
             },
         });
