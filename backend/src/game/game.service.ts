@@ -36,6 +36,10 @@ export class GameService {
     return this.players.get(userId);
   }
 
+  getSpectatorById(userId: string): Socket {
+    return this.spectators.get(userId);
+  }
+
   addConnectedUser(userId: string, socket: Socket) {
     const sockets = this.connectedUsers.get(userId);
     if (sockets) {
@@ -130,6 +134,10 @@ export class GameService {
       throw new Error('This user is already in a match.');
     if (this.spectators.has(otherId))
       throw new Error('This user is spectating a match.');
+    if (this.requests.has(userId))
+      throw new Error('You already have a pending request.');
+    if (this.requests.has(otherId))
+      throw new Error('This user already has a pending request.');
     this.addRequest(userId, otherId);
     return true;
   }
