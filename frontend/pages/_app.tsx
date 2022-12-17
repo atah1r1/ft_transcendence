@@ -134,6 +134,15 @@ function MyApp ( { Component, pageProps }: AppProps )
       setNewMemberAdded( data );
     } );
 
+    socket.on( 'room_protected', ( data: any ) =>
+    {
+      console.log( 'room_protected: ', socket.id );
+      console.log( 'data: ', data );
+      const userId = localStorage.getItem( 'userId' );
+      toast.info( `You have successfully protected this room: ${ data.name }`, toastOptions );
+      setCurrentConv( data );
+    } );
+
     socket.on( 'member_added', ( data: any ) =>
     {
       console.log( 'member_added: ', socket.id );

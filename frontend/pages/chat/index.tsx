@@ -13,7 +13,7 @@ import ClickOutsidePoints from "../../components/clickOutsidePoints";
 import TreePointsBox from "../../components/treePoint_box";
 import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext, UserStatusContext } from "../_app";
 import MenuNav from "../../components/menuNav";
-import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp, BagAddOutline, BagAddSharp, SendSharp, CheckboxSharp, CheckmarkCircleSharp, ShieldCheckmarkSharp } from "react-ionicons";
+import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp, BagAddSharp, ShieldCheckmarkSharp } from "react-ionicons";
 import ConversationBody from "../../components/conversation_body";
 import axios from "axios";
 import { LastBlockedContext } from "../_app";
@@ -44,7 +44,6 @@ const Chat = () =>
   const [ room, setRoom ] = useState( false );
   const [ creat_room, setCreat_room ] = useState( false );
   const [ protected_room, setProtected_room ] = useState( false );
-
   const [ chatroomInputs, setChatroomInputs ] = useState( {
     groupName: "",
     groupType: "PUBLIC",
@@ -71,7 +70,6 @@ const Chat = () =>
   };
 
   const [ searchInput, setSearchInput ] = useState( "" );
-
   const [ treePoints, setTreePoints ] = useState( false );
   const [ group_box, setGroupBox ] = useState( false );
   const [ menu, setMenu ] = useState( false );
@@ -103,7 +101,6 @@ const Chat = () =>
       withCredentials: true,
     } ).then( ( res ) =>
     {
-      console.log( "FR: ", res.data );
       setFriends( res.data );
     } ).catch( ( err ) =>
     {
@@ -385,13 +382,12 @@ const Chat = () =>
                                     localStorage.getItem( 'userId' ) === member.userId &&
                                     <div className={ styles.room_input_box }>
                                       <input required type="password" placeholder="******" maxLength={ 16 }
-                                        onChange={ ( e ) => setPassValue( e.target.value ) } value={ passValue }></input>
+                                        onChange={ ( e ) => setPassValue( e.target.value.trim() ) } value={ passValue }></input>
                                       {
                                         passValue && <div className={ styles_tree_p.treepoints_settings } onClick={ () =>
                                         {
-                                          console.log( 'pass is: ', passValue );
-                                          console.log( 'ri is: ', currentConv?.roomId );
                                           socket?.emit( "protect_room", { roomId: currentConv?.roomId, password: passValue } );
+                                          setPassValue( '' );
                                           setAddPassToProtectedRoom( false );
                                         } }>
                                           <ShieldCheckmarkSharp

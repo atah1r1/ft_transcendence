@@ -8,7 +8,6 @@ import { ChatContext, CurrentConvContext } from "../pages/_app";
 
 const ConversationBox = ( { searchInput, ref }: any ) =>
 {
-
   // format date
   const formatDateAndTime = ( date: string ) =>
   {
