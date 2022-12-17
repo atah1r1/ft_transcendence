@@ -1,4 +1,5 @@
 import styles from "../../styles/statistics.module.css";
+import styles_p from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import SettingsNav from "../../components/settings_nav";
 import Image from "next/image";
@@ -45,6 +46,7 @@ const History = () =>
                     alt="user_img"
                     width={ "100px" }
                     height={ "100px" }
+                    className={ styles_p.profile_avatar }
                   ></Image>
                 </div>
                 <div>

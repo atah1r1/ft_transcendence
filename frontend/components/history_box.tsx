@@ -1,4 +1,5 @@
 import styles from "../styles/history.module.css";
+import styles_p from "../styles/profile.module.css";
 import Image from "next/image";
 
 const HistoryBox = ( { history }: any ) =>
@@ -8,7 +9,7 @@ const HistoryBox = ( { history }: any ) =>
     return (
       <div className={ styles.history_box } key={ i }>
         <div className={ styles.history_avatar }>
-          <Image src={ ele?.avatar ?? "https://picsum.photos/300/300" } alt={ "avatar" } width={ 54 } height={ 54 } />
+          <Image src={ ele?.avatar ?? "https://picsum.photos/300/300" } alt={ "avatar" } width={ 54 } height={ 54 } className={ styles_p.profile_avatar } />
           <div className={ styles.history_numberGame }>{ ele.numberGame }</div>
         </div>
         <div className={ styles.history_score_points }>

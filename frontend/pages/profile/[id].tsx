@@ -81,6 +81,7 @@ const FriendProfile = () =>
                     alt="avatar"
                     width="180px"
                     height="180px"
+                    className={ styles.profile_avatar }
                   ></Image>
                 </div>
                 { <p>{ data?.username }</p> }

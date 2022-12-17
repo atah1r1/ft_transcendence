@@ -1,4 +1,5 @@
 import styles from "../styles/friends.module.css";
+import styles_p from "../styles/profile.module.css";
 import Image from "next/image";
 import { useContext } from "react";
 import { SocketContext } from "../pages/_app";
@@ -15,7 +16,7 @@ const Friends_box = ( { friends }: any ) =>
     return (
       <div className={ styles.friends_box } key={ i }>
         <div className={ styles.friends_avatar }>
-          <Image src={ ele?.avatar ?? "https://picsum.photos/300/300" } alt="avatar" width="68" height="68" />
+          <Image src={ ele?.avatar ?? "https://picsum.photos/300/300" } alt="avatar" width="68" height="68" className={ styles_p.profile_avatar }/>
         </div>
         <div className={ styles.friends_userName }>
           <p>{ ele.username }</p>

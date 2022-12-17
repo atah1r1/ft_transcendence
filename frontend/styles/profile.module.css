@@ -34,6 +34,10 @@
   opacity: 1;
 }
 
+.profile_avatar {
+  object-fit: cover;
+}
+
 .details_avatar input,
 .profile_slide {
   position: absolute;
@@ -56,13 +60,15 @@
 }
 
 .upload_avatar {
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 3.8rem;
+  height: 3.8rem;
   position: absolute;
   bottom: 24%;
-  left: 62%;
+  left: 60%;
   z-index: 1;
   opacity: 0.8;
+  background-color: #333;
+  border-radius: 50%;
 }
 
 .details_avatar img {
@@ -159,7 +165,7 @@
 }
 
 .error_msg {
-  color: #EF9A9A;
+  color: #ef9a9a;
   font-size: 1.4rem;
 }
 /* Swich Botton ---------------*/

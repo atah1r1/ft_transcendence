@@ -2,6 +2,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "../styles/chat.module.css";
+import styles_p from "../styles/profile.module.css";
 import { CurrentConvContext, MessagesContext, SocketContext, LastBlockedContext, UserStatusContext } from "../pages/_app";
 
 export default function ConversationBody() {
@@ -68,6 +69,7 @@ export default function ConversationBody() {
                     alt="message_avatar"
                     width={"42px"}
                     height={"42px"}
+                    className={ styles_p.profile_avatar }
                   />
                 </div>
                 <div style={{ width: "100%" }}>

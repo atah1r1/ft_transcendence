@@ -1,5 +1,6 @@
 import cn from "classnames";
 import { useRouter } from "next/router";
+import styles from "../styles/profile.module.css";
 import styles_box from "../styles/style_box.module.css";
 import styles_s_l from "../styles/style_settings_nav.module.css";
 import Image from "next/image";
@@ -7,29 +8,6 @@ import { useEffect, useState } from "react";
 
 const SettingsNav = ( { selected, menu }: any ) =>
 {
-  function getWindowDimensions ()
-  {
-    if ( typeof window !== "undefined" )
-    {
-      const { innerWidth: width, innerHeight: height } = window;
-      return {
-        width,
-        height
-      };
-    }
-  }
-
-  const [ windowDimensions, setWindowDimensions ] = useState( getWindowDimensions() );
-  useEffect( () =>
-  {
-    function handleResize ()
-    {
-      setWindowDimensions( getWindowDimensions() );
-    }
-
-    window.addEventListener( 'resize', handleResize );
-    return () => window.removeEventListener( 'resize', handleResize );
-  }, [] );
 
   const sections = [ "home", "profile", "chat", "history", "statistics", "friends", "rooms" ];
   const router = useRouter();
@@ -51,18 +29,18 @@ const SettingsNav = ( { selected, menu }: any ) =>
   {
     const user = JSON.parse( localStorage.getItem( "user" ) as string );
     setData( user );
-  }, [] )
+  }, [ localStorage.getItem( "user" ) ] )
 
   return (
-    <div className={ cn( styles_box.profile_setting, `${ menu && windowDimensions!.width < 1000 && styles_box.navOpen }` ) }>
+    <div className={ cn( styles_box.profile_setting, `${ menu && styles_box.navOpen }` ) }>
       <div className={ styles_s_l.profile_info }>
         <div className={ styles_s_l.profile_image_wrap }>
           <Image
-            src={ data?.avatar ?? "https://picsum.photos/300/300" }
+            src={ data?.avatar ? data.avatar : "https://picsum.photos/300/300" }
             alt="avatar"
             width="100px"
             height="100px"
-            className={ styles_s_l.profile_image }
+            className={ cn( styles_s_l.profile_image, styles.profile_avatar ) }
           ></Image>
         </div>
         <p className={ styles_s_l.profile_info_login }>{ data?.username }</p>

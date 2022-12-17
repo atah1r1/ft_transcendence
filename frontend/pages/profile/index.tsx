@@ -3,16 +3,19 @@ import styles from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import styles_s_l from "../../styles/style_settings_nav.module.css";
 import SettingsNav from "../../components/settings_nav";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import { CameraOutline } from "react-ionicons";
+import Loader from "../../components/Loading";
+import { UploadAvatarContext } from "../_app";
 
 const Profile = () =>
 {
+  const [ uploadAvatar, setUploadAvatar ] = useContext( UploadAvatarContext );
   const [ data, setData ] = useState(
     {
       avatar: "",
@@ -26,9 +29,10 @@ const Profile = () =>
     }
   );
   const [ loader, setLoader ] = useState( true );
+  const [ me, setMe ] = useState( true );
   const [ s_witch, setSwitch ] = useState( false );
   const [ value, setValue ] = useState( { firstName: '', lastName: '', username: '' } );
-  const [ usernameExist, setUsernameExist ] = useState( false );
+  const [ usernameError, setUsernameError ] = useState( '' );
   const [ menu, setMenu ] = useState( false );
   const [ selectedFile, setSelectedFile ] = useState<Blob>();
 
@@ -44,33 +48,6 @@ const Profile = () =>
   {
     setValue( { ...value, username: e.target.value } );
   };
-
-  const fetchData = async () =>
-  {
-    try
-    {
-      const response = await axios.get(
-        `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`,
-        {
-          withCredentials: true,
-        }
-      );
-      setData( response.data );
-      localStorage.setItem( "user", JSON.stringify( response.data ) );
-      localStorage.setItem( "userId", response.data?.id );
-    } catch ( error: any )
-    {
-    }
-    finally
-    {
-      setLoader( false );
-    }
-  };
-
-  useEffect( () =>
-  {
-    fetchData();
-  }, [] )
 
   const userToPatch: {
     first_name?: string,
@@ -94,24 +71,40 @@ const Profile = () =>
         url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/profile`,
         withCredentials: true,
         data: userToPatch
-      } ).then( () =>
+      } ).then( ( res ) =>
       {
-        fetchData();
-        setUsernameExist( false );
+        setUsernameError( '' );
+        setUploadAvatar( res );
       } )
       .catch( ( error ) =>
       {
-        console.log( 'user: ', userToPatch )
-        console.log( 'error: ', error.response.data );
         if ( error.response.data.message === 'Username already exists' )
-          setUsernameExist( true );
+          setUsernameError( 'Username already exists' );
+        if ( error.response.data.message[ 0 ] === 'username must be longer than or equal to 4 characters' )
+          setUsernameError( 'Username too short' );
       } );
     setValue( { firstName: '', lastName: '', username: '' } );
   };
 
+  useEffect( () =>
+  {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
+      withCredentials: true,
+    } ).then( ( response ) =>
+    {
+      setData( response.data );
+      localStorage.setItem( "user", JSON.stringify( response.data ) );
+      localStorage.setItem( "userId", response.data?.id );
+    } ).catch( ( err ) =>
+    {
+      console.log( 'error: ', err );
+    } ).finally( () => setMe( false ) );
+  }, [ usernameError, uploadAvatar ] )
+
 
   useEffect( () =>
   {
+    setLoader( true );
     const formData = new FormData();
     formData.append( "image", selectedFile as Blob );
     axios
@@ -122,16 +115,16 @@ const Profile = () =>
         data: formData
       } ).then( ( response ) =>
       {
-        console.log( 'res is: ', response );
         setData( prev =>
         {
           return { ...prev, avatar: response.data.avatar }
         } )
+        setUploadAvatar( response );
       } )
       .catch( ( error ) =>
       {
         console.log( 'error: ', error );
-      } );
+      } ).finally( () => setLoader( false ) );
   }, [ selectedFile ] )
 
   return (
@@ -139,39 +132,44 @@ const Profile = () =>
       <MenuNav menu={ menu } setMenu={ setMenu } />
       <div className={ styles_box.container }>
         {
-          !loader &&
+          !me &&
           <SettingsNav selected={ "profile" } menu={ menu } />
         }
         <div className={ styles_box.profile_details }>
           {
-            !loader &&
+            !me &&
             <div>
               <Logout />
               <div className={ styles.details_up }>
                 <div className={ styles.details_level }>
                   <p>LEVEL</p>
-                  <span> 2</span>
+                  <span>2</span>
                 </div>
                 <div className={ styles.details_avatar }>
-                  <div className={ styles.upload_avatar } style={ { backgroundColor: '#000000', borderRadius: '50%' } }>
+                  <div className={ styles.upload_avatar }>
                     <CameraOutline
                       color={ '#ffffff' }
-                      height="30px"
-                      width="30px"
+                      height="36px"
+                      width="36px"
                     />
-
                   </div>
                   <form>
                     <div className={ styles.profile_box }>
                       <div className={ styles.profile_slide }>change picture</div>
                       <input type="file"
                         onChange={ ( e: any ) => setSelectedFile( e.target.files[ 0 ] ) }></input>
-                      <Image
-                        src={ data?.avatar ?? "https://picsum.photos/300/300" }
-                        alt="avatar"
-                        width="180px"
-                        height="180px"
-                      ></Image>
+                      {
+                        loader ?
+                          <Loader />
+                          :
+                          <Image
+                            className={ styles.profile_avatar }
+                            src={ data?.avatar ? data.avatar : "https://picsum.photos/300/300" }
+                            alt="avatar"
+                            width="180px"
+                            height="180px"
+                          ></Image>
+                      }
                     </div>
                   </form>
                   <p>{ data.username }</p>
@@ -228,7 +226,7 @@ const Profile = () =>
                     <input type="text" placeholder={ data.username } maxLength={ 12 } value={ value.username }
                       onChange={ handleUsername }></input>
                     {
-                      usernameExist &&
+                      usernameError &&
                       <div className={ styles.error_box }>
                         <Image
                           src="/input_exist.svg"
@@ -236,7 +234,7 @@ const Profile = () =>
                           width="20px"
                           height="20px"
                         ></Image>
-                        <p className={ styles.error_msg }>Username already exist !</p>
+                        <p className={ styles.error_msg }>{ usernameError }</p>
                       </div>
                     }
                   </div>
@@ -259,7 +257,7 @@ const Profile = () =>
               </div>
               <div className={ styles.save_box } onClick={ handleClick }>
                 <div className={ cn( styles_s_l.setting_btn, styles.save_btn,
-                  `${ value.firstName.length < 4 && value.lastName.length < 4 && value.username.length < 4 && styles.save_unclick }` ) }>
+                  `${ !value.firstName && !value.lastName && !value.username && styles.save_unclick }` ) }>
                   SAVE
                 </div>
               </div>

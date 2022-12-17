@@ -1,4 +1,5 @@
 import styles from "../styles/conversation_box.module.css";
+import styles_p from "../styles/profile.module.css";
 import cn from "classnames";
 import { useContext, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -34,9 +35,10 @@ const ConversationBox = ( { searchInput, ref }: any ) =>
     } );
   }, [] );
 
-  useEffect(() => {
-    ref?.current?.scrollIntoView({ behavior: 'smooth', top: 0 })
-  }, [chats])
+  useEffect( () =>
+  {
+    ref?.current?.scrollIntoView( { behavior: 'smooth', top: 0 } )
+  }, [ chats ] )
 
   return chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput ) )
     .map( ( conv: any, i: number ) =>
@@ -58,6 +60,7 @@ const ConversationBox = ( { searchInput, ref }: any ) =>
                 alt="conversation_image"
                 width={ "42px" }
                 height={ "42px" }
+                className={ styles_p.profile_avatar }
               ></Image>
             </div>
             <div>

@@ -1,5 +1,6 @@
 import cn from "classnames";
 import styles from "../../styles/chat.module.css";
+import styles_p from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import styles_r_w from "../../styles/chatroom_window.module.css";
 import styles_tree_p from "../../styles/treeProints.module.css";
@@ -279,6 +280,7 @@ const Chat = () =>
                           width={ "34px" }
                           height={ "34px" }
                           layout={ "fixed" }
+                          className={ styles_p.profile_avatar }
                         ></Image>
                       </div>
                     )
@@ -416,8 +418,7 @@ const Chat = () =>
                                         alt="friend_avatar"
                                         width={ "40px" }
                                         height={ "40px" }
-                                        className={
-                                          styles_tree_p.treePoints_box_avatar
+                                        className={ cn( styles_tree_p.treePoints_box_avatar, styles_p.profile_avatar )
                                         }
                                       />
                                     </div>
@@ -469,8 +470,7 @@ const Chat = () =>
                                         alt="friend_avatar"
                                         width={ "40px" }
                                         height={ "40px" }
-                                        className={
-                                          styles_tree_p.treePoints_box_avatar
+                                        className={ cn( styles_tree_p.treePoints_box_avatar, styles_p.profile_avatar )
                                         }
                                       />
                                     </div>
