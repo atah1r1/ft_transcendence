@@ -13,9 +13,11 @@ import { ChatService } from './chat/chat.service';
 import { ChatGateway } from './chat/chat.gateway';
 import { ChatController } from './chat/chat.controller';
 import { ChatModule } from './chat/chat.module';
+import { GameModule } from './game/game.module';
+import { GameGateway } from './game/game.gateway';
 
 @Module({
-  imports: [UserModule, AuthModule, ChatModule],
+  imports: [UserModule, AuthModule, ChatModule, GameModule],
   controllers: [UserController, AuthController, ChatController],
   providers: [
     UserService,
@@ -25,6 +27,7 @@ import { ChatModule } from './chat/chat.module';
     CloudinaryService,
     ChatService,
     ChatGateway,
+    GameGateway,
   ],
 })
 export class AppModule {}
