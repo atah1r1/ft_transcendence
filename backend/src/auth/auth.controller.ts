@@ -14,10 +14,7 @@ export class AuthController {
     async fortyTwoAuthRedirect(@Req() req: any, @Res({ passthrough: true }) res: any) {
         console.log(req.user["_json"].image?.link);
         const { username, name, _json } = req.user;
-        const image  = _json?.image?.link;
-        // if (await this.AuthService.checkUserTwoFactor(username)) {
-        //     throw new BadRequestException('Two factor authentication is enabled');
-        // }
+        const image  = _json?.image?.link; 
         const jwt = await this.AuthService.Login(username, name, image);
         res.cookie('jwt', jwt);
         return res.redirect('http://localhost:3000/profile');
