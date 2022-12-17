@@ -92,6 +92,7 @@ const Profile = () =>
       withCredentials: true,
     } ).then( ( response ) =>
     {
+      setUploadAvatar( response );
       setData( response.data );
       localStorage.setItem( "user", JSON.stringify( response.data ) );
       localStorage.setItem( "userId", response.data?.id );

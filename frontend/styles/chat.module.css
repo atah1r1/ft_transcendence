@@ -93,6 +93,40 @@
   transform: translateX(-2px);
 }
 
+.room_privacy_box, .room_input_box {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.room_input_box input {
+  width: 100%;
+  border-radius: 1.4rem;
+  border: none;
+  height: 3.2rem;
+  outline: none;
+  padding: 1.6rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.room_privacy {
+  font-size: 2rem;
+}
+
+.public_room {
+  color: #37b24d;
+}
+
+.protected_room {
+  color: #f59f00;
+}
+
+.private_room {
+  color: #f03e3e;
+}
+
 .add_leave_btn {
   display: flex;
   align-items: center;

@@ -13,7 +13,7 @@ import ClickOutsidePoints from "../../components/clickOutsidePoints";
 import TreePointsBox from "../../components/treePoint_box";
 import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext, UserStatusContext } from "../_app";
 import MenuNav from "../../components/menuNav";
-import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp } from "react-ionicons";
+import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp, BagAddOutline, BagAddSharp, SendSharp, CheckboxSharp, CheckmarkCircleSharp, ShieldCheckmarkSharp } from "react-ionicons";
 import ConversationBody from "../../components/conversation_body";
 import axios from "axios";
 import { LastBlockedContext } from "../_app";
@@ -79,6 +79,8 @@ const Chat = () =>
   const [ addFriends, setAddFriends ] = useState( false );
   const [ userStatus, setUserStatus ] = useState( '' );
   const [ roomUser, setRoomUser ] = useState( {} );
+  const [ addPassToProtectedRoom, setAddPassToProtectedRoom ] = useState( false );
+  const [ passValue, setPassValue ] = useState( '' );
 
   useEffect( () =>
   {
@@ -357,6 +359,50 @@ const Chat = () =>
                                 <div
                                   key={ i }
                                 >
+                                  <div className={ styles.room_privacy_box }>
+                                    {
+                                      i === 0 &&
+                                      <p className={ cn( styles.room_privacy,
+                                        `${ ( currentConv.privacy === 'PUBLIC' && styles.public_room ) ||
+                                        ( currentConv.privacy === 'PROTECTED' && styles.protected_room ) ||
+                                        ( currentConv.privacy === 'PRIVATE' && styles.private_room ) }` ) } >
+                                        { currentConv.privacy } ROOM</p>
+                                    }
+                                    {
+                                      currentConv.privacy === 'PUBLIC' && member.role === 'OWNER' &&
+                                      localStorage.getItem( 'userId' ) === member.userId &&
+                                      <div className={ styles_tree_p.treepoints_settings } onClick={ () => setAddPassToProtectedRoom( true ) }>
+                                        <BagAddSharp
+                                          color={ '#ffffff' }
+                                          height="28px"
+                                          width="28px"
+                                        />
+                                      </div>
+                                    }
+                                  </div>
+                                  {
+                                    addPassToProtectedRoom && currentConv.privacy === 'PUBLIC' && member.role === 'OWNER' &&
+                                    localStorage.getItem( 'userId' ) === member.userId &&
+                                    <div className={ styles.room_input_box }>
+                                      <input required type="password" placeholder="******" maxLength={ 16 }
+                                        onChange={ ( e ) => setPassValue( e.target.value ) } value={ passValue }></input>
+                                      {
+                                        passValue && <div className={ styles_tree_p.treepoints_settings } onClick={ () =>
+                                        {
+                                          console.log( 'pass is: ', passValue );
+                                          console.log( 'ri is: ', currentConv?.roomId );
+                                          socket?.emit( "protect_room", { roomId: currentConv?.roomId, password: passValue } );
+                                          setAddPassToProtectedRoom( false );
+                                        } }>
+                                          <ShieldCheckmarkSharp
+                                            color={ '#ffffff' }
+                                            height="28px"
+                                            width="28px"
+                                          />
+                                        </div>
+                                      }
+                                    </div>
+                                  }
                                   {
                                     member.role === 'OWNER' &&
                                     localStorage.getItem( 'userId' ) === member.userId &&
