@@ -43,7 +43,10 @@ export class UserService {
     return false;
   }
 
-  async checkIfUsernameExists(currentUserName: string, username: string): Promise<boolean> {
+  async checkIfUsernameExists(
+    currentUserName: string,
+    username: string,
+  ): Promise<boolean> {
     if (currentUserName === username) return false;
     const user = await this.prisma.user.findUnique({
       where: { username },
@@ -64,7 +67,10 @@ export class UserService {
     if (last_name) data.last_name = last_name;
     if (username) data.username = username;
 
-    if (username && await this.checkIfUsernameExists(currentUser.username, username)) {
+    if (
+      username &&
+      (await this.checkIfUsernameExists(currentUser.username, username))
+    ) {
       throw new HttpException('Username already exists', HttpStatus.NOT_FOUND);
     }
     return await this.prisma.user.update({

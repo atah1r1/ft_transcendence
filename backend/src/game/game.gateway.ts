@@ -12,9 +12,11 @@ import { GameService } from './game.service';
 
 const EV_PLAY_AGAINST = 'play_against';
 const EV_PLAY_AGAINST_ACCEPT = 'play_against_accept';
+const EV_PLAY_AGAINST_DECLINE = 'play_against_decline';
 
 const EV_EMIT_PLAY_AGAINST_REQUEST = 'emit_play_against_request';
 const EV_EMIT_GAME_ID = 'emit_game_id';
+const EV_EMIT_DECLINE = 'emit_decline';
 
 @WebSocketGateway({ namespace: 'game', cors: true, origins: '*' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {

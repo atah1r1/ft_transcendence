@@ -173,4 +173,22 @@ export class GameService {
     await this.startGame(gameId);
     return gameId;
   }
+
+  async declinePlayAgainst(userId: string, otherId: string) {
+    if (userId === otherId)
+      throw new Error('You cannot play against yourself.');
+    if (this.players.has(userId))
+      throw new Error('You are already in a match.');
+    if (this.spectators.has(userId))
+      throw new Error('You are spectating a match.');
+    if (this.players.has(otherId))
+      throw new Error('This user is already in a match.');
+    if (this.spectators.has(otherId))
+      throw new Error('This user is spectating a match.');
+    if (!this.requests.has(userId))
+      throw new Error('You do not have a pending request.');
+    if (this.requests.get(userId) !== otherId)
+      throw new Error('You do not have a pending request.');
+    this.removeRequest(userId, otherId);
+  }
 }

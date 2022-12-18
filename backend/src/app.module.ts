@@ -15,6 +15,7 @@ import { ChatController } from './chat/chat.controller';
 import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
 import { GameGateway } from './game/game.gateway';
+import { GameService } from './game/game.service';
 
 @Module({
   imports: [UserModule, AuthModule, ChatModule, GameModule],
@@ -28,6 +29,7 @@ import { GameGateway } from './game/game.gateway';
     ChatService,
     ChatGateway,
     GameGateway,
+    GameService,
   ],
 })
 export class AppModule {}
