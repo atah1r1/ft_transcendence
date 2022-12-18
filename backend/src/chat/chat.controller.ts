@@ -95,7 +95,10 @@ export class ChatController {
     @Param('roomId') roomId: string,
   ): Promise<User[]> {
     try {
-      const friends = await this.chatService.getFriendsForRoom(req.user.id, roomId);
+      const friends = await this.chatService.getFriendsForRoom(
+        req.user.id,
+        roomId,
+      );
       if (friends) {
         return friends;
       }

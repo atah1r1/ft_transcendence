@@ -847,13 +847,15 @@ export class ChatService {
     if (room.privacy === RoomPrivacy.PROTECTED)
       throw new Error('Room is already protected');
 
+    const hashed = await this.encryptRoomPassword(password);
+
     const r = await this.prisma.room.update({
       where: {
         id: roomId,
       },
       data: {
         privacy: RoomPrivacy.PROTECTED,
-        password: password,
+        password: hashed,
       },
       include: {
         members: {
