@@ -4,8 +4,8 @@ import styles from "../styles/profile.module.css";
 import styles_box from "../styles/style_box.module.css";
 import styles_s_l from "../styles/style_settings_nav.module.css";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
-import { DataContext, UploadAvatarContext } from "../pages/_app";
+import { useContext } from "react";
+import { DataContext } from "../pages/_app";
 
 const SettingsNav = ( { selected, menu }: any ) =>
 {
@@ -13,27 +13,6 @@ const SettingsNav = ( { selected, menu }: any ) =>
   const [ data, setData ] = useContext( DataContext );
   const sections = [ "home", "profile", "chat", "history", "statistics", "friends", "rooms" ];
   const router = useRouter();
-
-  // const [ user, setUser ] = useState(
-  //   {
-  //     avatar: "",
-  //     createdAt: "",
-  //     first_name: "",
-  //     id: "",
-  //     last_name: "",
-  //     two_factor_auth: false,
-  //     updateAt: "",
-  //     username: "",
-  //   }
-  // )
-
-  // useEffect( () =>
-  // {
-  //   const user = JSON.parse( localStorage.getItem( "user" ) as string );
-  //   console.log( 'data avatar is: ', data.avatar );
-  //   console.log( 'user avatar is: ', user.avatar )
-  //   setUser( user );
-  // }, [] )
 
   return (
     <div className={ cn( styles_box.profile_setting, `${ menu && styles_box.navOpen }` ) }>
