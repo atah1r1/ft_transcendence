@@ -6,6 +6,7 @@ import cookie from 'cookie';
 import { useRouter } from 'next/router';
 import { ToastContainer, ToastOptions, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const socket = io( "http://localhost:9000/chat", {
   auth: ( cb ) =>
@@ -40,7 +41,7 @@ function MyApp ( { Component, pageProps }: AppProps )
   const [ newRoom, setNewRoom ] = useState<any>( null );
   const [ newMemberAdded, setNewMemberAdded ] = useState<any>( null );
   const [ status, setStatus ] = useState<any>( null );
-  const [ uploadAvatar, setUploadAvatar ] = useState<any>( null );
+  // const [ uploadAvatar, setUploadAvatar ] = useState<any>( null );
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -222,8 +223,29 @@ function MyApp ( { Component, pageProps }: AppProps )
 
   }, [] );
 
+
+
+
+  useEffect( () =>
+  {
+    axios
+      .get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
+        withCredentials: true,
+      } )
+      .then( ( response ) =>
+      {
+        setData( response.data );
+        localStorage.setItem( "user", JSON.stringify( response.data ) );
+        localStorage.setItem( "userId", response.data?.id );
+      } )
+      .catch( ( err ) =>
+      {
+        console.log( "error: ", err );
+      } )
+  }, [] );
+
   return (
-    <UploadAvatarContext.Provider value={ [ uploadAvatar, setUploadAvatar ] } >
+    // <UploadAvatarContext.Provider value={ [ uploadAvatar, setUploadAvatar ] } >
       <UserStatusContext.Provider value={ [ status, setStatus ] } >
         <NewMemberAddedContext.Provider value={ [ newMemberAdded, setNewMemberAdded ] } >
           <NewRoomContext.Provider value={ [ newRoom, setNewRoom ] }>
@@ -246,7 +268,7 @@ function MyApp ( { Component, pageProps }: AppProps )
           </NewRoomContext.Provider>
         </NewMemberAddedContext.Provider>
       </UserStatusContext.Provider>
-    </UploadAvatarContext.Provider>
+    // </UploadAvatarContext.Provider>
   );
 }
 

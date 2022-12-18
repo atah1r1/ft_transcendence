@@ -15,6 +15,7 @@ model User {
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
   username              String     @unique @db.VarChar(50)
+  intra_name            String     @unique @db.VarChar(50)
   first_name            String?    @db.VarChar(50)
   last_name             String?    @db.VarChar(50)
   avatar                String?    @db.VarChar(255)

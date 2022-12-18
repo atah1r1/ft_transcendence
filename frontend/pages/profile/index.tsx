@@ -15,7 +15,7 @@ import { DataContext, UploadAvatarContext } from "../_app";
 
 const Profile = () =>
 {
-  const [ uploadAvatar, setUploadAvatar ] = useContext( UploadAvatarContext );
+  // const [ uploadAvatar, setUploadAvatar ] = useContext( UploadAvatarContext );
   const [ data, setData ] = useContext( DataContext );
   console.log( 'data avatar: ', data.avatar );
   // const [ data, setData ] = useState( {
@@ -29,7 +29,7 @@ const Profile = () =>
   //   username: "",
   // } );
   const [ loader, setLoader ] = useState( true );
-  const [ me, setMe ] = useState( true );
+  // const [ me, setMe ] = useState( true );
   const [ s_witch, setSwitch ] = useState( false );
   const [ value, setValue ] = useState( {
     firstName: "",
@@ -78,7 +78,8 @@ const Profile = () =>
       .then( ( res ) =>
       {
         setUsernameError( "" );
-        setUploadAvatar( res );
+        setData(res.data);
+        console.log('res', res);
       } )
       .catch( ( error ) =>
       {
@@ -93,24 +94,24 @@ const Profile = () =>
     setValue( { firstName: "", lastName: "", username: "" } );
   };
 
-  useEffect( () =>
-  {
-    axios
-      .get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
-        withCredentials: true,
-      } )
-      .then( ( response ) =>
-      {
-        setData( response.data );
-        localStorage.setItem( "user", JSON.stringify( response.data ) );
-        localStorage.setItem( "userId", response.data?.id );
-      } )
-      .catch( ( err ) =>
-      {
-        console.log( "error: ", err );
-      } )
-      .finally( () => setMe( false ) );
-  }, [ uploadAvatar ] );
+  // useEffect( () =>
+  // {
+  //   axios
+  //     .get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
+  //       withCredentials: true,
+  //     } )
+  //     .then( ( response ) =>
+  //     {
+  //       setData( response.data );
+  //       localStorage.setItem( "user", JSON.stringify( response.data ) );
+  //       localStorage.setItem( "userId", response.data?.id );
+  //     } )
+  //     .catch( ( err ) =>
+  //     {
+  //       console.log( "error: ", err );
+  //     } )
+  //   // .finally( () => setMe( false ) );
+  // }, [ uploadAvatar ] );
 
   useEffect( () =>
   {
@@ -129,7 +130,6 @@ const Profile = () =>
         {
           return { ...prev, avatar: response.data.avatar };
         } );
-        setUploadAvatar( response );
       } )
       .catch( ( error ) =>
       {
@@ -142,9 +142,9 @@ const Profile = () =>
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />
       <div className={ styles_box.container }>
-        { !me && <SettingsNav selected={ "profile" } menu={ menu } /> }
+        { <SettingsNav selected={ "profile" } menu={ menu } /> }
         <div className={ styles_box.profile_details }>
-          { !me && (
+          { (
             <div>
               <Logout />
               <div className={ styles.details_up }>
@@ -182,7 +182,7 @@ const Profile = () =>
                               ? data.avatar
                               : "https://picsum.photos/300/300"
                           }
-                          alt="avatar"
+                          alt="avatar_profile"
                           width="180px"
                           height="180px"
                         ></Image>
