@@ -12,13 +12,14 @@ export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService) { }
     async Login(username: string, name: object, photos: string): Promise<any> {
         const user = await this.prisma.user.findUnique({
-            where: { username: username },
+            where: { intra_name: username },
         });
-        if (user?.username === username) {
+        if (user?.intra_name === username) {
             return this.SignToken(user.id);
         }
         const user_created = await this.prisma.user.create({
             data: {
+                intra_name: username,
                 username: username,
                 first_name: name['givenName'],
                 last_name: name['familyName'],
