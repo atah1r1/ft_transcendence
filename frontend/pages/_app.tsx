@@ -17,6 +17,7 @@ const socket = io( "http://localhost:9000/chat", {
 } );
 
 export const SocketContext = React.createContext<Socket>( socket );
+export const DataContext = React.createContext<any[]>( [ null, () => { } ] );
 export const MessagesContext = React.createContext<any[]>( [ new Map(), () => { } ] );
 export const ChatContext = React.createContext<any[]>( [ [], () => { } ] );
 export const OnlineFriendsContext = React.createContext<any[]>( [ [], () => { } ] );
@@ -30,6 +31,7 @@ export const UploadAvatarContext = React.createContext<any[]>( [ null, () => { }
 function MyApp ( { Component, pageProps }: AppProps )
 {
   const router = useRouter();
+  const [ data, setData ] = useState( [] );
   const [ chats, setChats ] = useState( [] );
   const [ messages, setMessages ] = useState( new Map<string, any[]>() );
   const [ onlineFriends, setOnlineFriends ] = useState( [] );
@@ -231,8 +233,10 @@ function MyApp ( { Component, pageProps }: AppProps )
                   <ChatContext.Provider value={ [ chats, setChats ] }>
                     <MessagesContext.Provider value={ [ messages, setMessages ] }>
                       <SocketContext.Provider value={ socket }>
-                        <Component { ...pageProps } />
-                        <ToastContainer style={ { fontSize: "1.2rem" } } />
+                        <DataContext.Provider value={ [ data, setData ] }>
+                          <Component { ...pageProps } />
+                          <ToastContainer style={ { fontSize: "1.2rem" } } />
+                        </DataContext.Provider>
                       </SocketContext.Provider>
                     </MessagesContext.Provider>
                   </ChatContext.Provider>
