@@ -11,45 +11,52 @@ import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import { CameraOutline } from "react-ionicons";
 import Loader from "../../components/Loading";
-import { UploadAvatarContext } from "../_app";
+import { DataContext, UploadAvatarContext } from "../_app";
 import QRCode from "react-qr-code";
 
 const Profile = () => {
-  const [uploadAvatar, setUploadAvatar] = useContext(UploadAvatarContext);
-  const [data, setData] = useState(
-    {
-      avatar: "",
-      createdAt: "",
-      first_name: "",
-      id: "",
-      last_name: "",
-      two_factor_auth: false,
-      updateAt: "",
-      username: "",
-    }
-  );
-  const [loader, setLoader] = useState(true);
-  const [me, setMe] = useState(true);
-  const [s_witch, setSwitch] = useState(false);
-  const [value, setValue] = useState({ firstName: '', lastName: '', username: '' });
-  const [usernameError, setUsernameError] = useState('');
-  const [menu, setMenu] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<Blob>();
+  const [ uploadAvatar, setUploadAvatar ] = useContext( UploadAvatarContext );
+  const [ data, setData ] = useContext( DataContext );
+  console.log( 'data avatar: ', data.avatar );
+  // const [ data, setData ] = useState( {
+  //   avatar: "",
+  //   createdAt: "",
+  //   first_name: "",
+  //   id: "",
+  //   last_name: "",
+  //   two_factor_auth: false,
+  //   updateAt: "",
+  //   username: "",
+  // } );
+  const [ loader, setLoader ] = useState( true );
+  const [ me, setMe ] = useState( true );
+  const [ s_witch, setSwitch ] = useState( false );
+  const [ value, setValue ] = useState( {
+    firstName: "",
+    lastName: "",
+    username: "",
+  } );
+  const [ usernameError, setUsernameError ] = useState( "" );
+  const [ menu, setMenu ] = useState( false );
+  const [ selectedFile, setSelectedFile ] = useState<Blob>();
 
-  const handleFirstName = (e: any) => {
-    setValue({ ...value, firstName: e.target.value });
+  const handleFirstName = ( e: any ) =>
+  {
+    setValue( { ...value, firstName: e.target.value } );
   };
-  const handleLastName = (e: any) => {
-    setValue({ ...value, lastName: e.target.value });
+  const handleLastName = ( e: any ) =>
+  {
+    setValue( { ...value, lastName: e.target.value } );
   };
-  const handleUsername = (e: any) => {
-    setValue({ ...value, username: e.target.value });
+  const handleUsername = ( e: any ) =>
+  {
+    setValue( { ...value, username: e.target.value } );
   };
 
   const userToPatch: {
-    first_name?: string,
-    last_name?: string,
-    username?: string,
+    first_name?: string;
+    last_name?: string;
+    username?: string;
   } = {
     first_name: value.firstName,
     last_name: value.lastName,
@@ -60,60 +67,76 @@ const Profile = () => {
   !value.lastName && delete userToPatch.last_name;
   !value.username && delete userToPatch.username;
 
-  const handleClick = async () => {
-    await axios
-      ({
-        method: 'patch',
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
-        withCredentials: true,
-        data: userToPatch
-      }).then((res) => {
-        setUsernameError('');
-        setUploadAvatar(res);
-      })
-      .catch((error) => {
-        if (error.response.data.message === 'Username already exists')
-          setUsernameError('Username already exists');
-        if (error.response.data.message[0] === 'username must be longer than or equal to 4 characters')
-          setUsernameError('Username too short');
-      });
-    setValue({ firstName: '', lastName: '', username: '' });
+  const handleClick = async () =>
+  {
+    await axios( {
+      method: "patch",
+      url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/profile`,
+      withCredentials: true,
+      data: userToPatch,
+    } )
+      .then( ( res ) =>
+      {
+        setUsernameError( "" );
+        setUploadAvatar( res );
+      } )
+      .catch( ( error ) =>
+      {
+        if ( error.response.data.message === "Username already exists" )
+          setUsernameError( "Username already exists" );
+        if (
+          error.response.data.message[ 0 ] ===
+          "username must be longer than or equal to 4 characters"
+        )
+          setUsernameError( "Username too short" );
+      } );
+    setValue( { firstName: "", lastName: "", username: "" } );
   };
 
-  useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`, {
-      withCredentials: true,
-    }).then((response) => {
-      setUploadAvatar(response);
-      setData(response.data);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      localStorage.setItem("userId", response.data?.id);
-    }).catch((err) => {
-      console.log('error: ', err);
-    }).finally(() => setMe(false));
-  }, [usernameError, uploadAvatar])
-
-
-  useEffect(() => {
-    setLoader(true);
-    const formData = new FormData();
-    formData.append("image", selectedFile as Blob);
+  useEffect( () =>
+  {
     axios
-      ({
-        method: 'post',
-        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/upload`,
+      .get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
         withCredentials: true,
-        data: formData
-      }).then((response) => {
-        setData(prev => {
-          return { ...prev, avatar: response.data.avatar }
-        })
-        setUploadAvatar(response);
-      })
-      .catch((error) => {
-        console.log('error: ', error);
-      }).finally(() => setLoader(false));
-  }, [selectedFile])
+      } )
+      .then( ( response ) =>
+      {
+        setData( response.data );
+        localStorage.setItem( "user", JSON.stringify( response.data ) );
+        localStorage.setItem( "userId", response.data?.id );
+      } )
+      .catch( ( err ) =>
+      {
+        console.log( "error: ", err );
+      } )
+      .finally( () => setMe( false ) );
+  }, [ uploadAvatar ] );
+
+  useEffect( () =>
+  {
+    setLoader( true );
+    const formData = new FormData();
+    formData.append( "image", selectedFile as Blob );
+    axios( {
+      method: "post",
+      url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/upload`,
+      withCredentials: true,
+      data: formData,
+    } )
+      .then( ( response ) =>
+      {
+        setData( ( prev: any ) =>
+        {
+          return { ...prev, avatar: response.data.avatar };
+        } );
+        setUploadAvatar( response );
+      } )
+      .catch( ( error ) =>
+      {
+        console.log( "error: ", error );
+      } )
+      .finally( () => setLoader( false ) );
+  }, [ selectedFile ] );
 
   // 2fa authentication code
 
@@ -263,7 +286,7 @@ const Profile = () => {
                     <QRCode
                       size={512}
                       style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                      value={TwoFaUri}
+                      value={TwoFaUri === undefined ? '' : TwoFaUri}
                       viewBox={`0 0 256 256`}
                     />
                   </div>
