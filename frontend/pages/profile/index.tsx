@@ -17,6 +17,7 @@ const Profile = () =>
 {
   const [ uploadAvatar, setUploadAvatar ] = useContext( UploadAvatarContext );
   const [ data, setData ] = useContext( DataContext );
+  console.log( 'data avatar: ', data.avatar );
   // const [ data, setData ] = useState( {
   //   avatar: "",
   //   createdAt: "",
@@ -94,7 +95,6 @@ const Profile = () =>
 
   useEffect( () =>
   {
-    console.log( 'here1' );
     axios
       .get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
         withCredentials: true,
