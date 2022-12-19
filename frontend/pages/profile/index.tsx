@@ -10,26 +10,13 @@ import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import { CameraOutline } from "react-ionicons";
-import Loader from "../../components/Loading";
-import { DataContext, UploadAvatarContext } from "../_app";
+import { DataContext } from "../_app";
 
 const Profile = () =>
 {
-  // const [ uploadAvatar, setUploadAvatar ] = useContext( UploadAvatarContext );
+  const [ loader, setLoader ] = useState( true );
   const [ data, setData ] = useContext( DataContext );
   console.log( 'data avatar: ', data.avatar );
-  // const [ data, setData ] = useState( {
-  //   avatar: "",
-  //   createdAt: "",
-  //   first_name: "",
-  //   id: "",
-  //   last_name: "",
-  //   two_factor_auth: false,
-  //   updateAt: "",
-  //   username: "",
-  // } );
-  const [ loader, setLoader ] = useState( true );
-  // const [ me, setMe ] = useState( true );
   const [ s_witch, setSwitch ] = useState( false );
   const [ value, setValue ] = useState( {
     firstName: "",
@@ -78,8 +65,7 @@ const Profile = () =>
       .then( ( res ) =>
       {
         setUsernameError( "" );
-        setData(res.data);
-        console.log('res', res);
+        setData( res.data );
       } )
       .catch( ( error ) =>
       {
@@ -90,28 +76,9 @@ const Profile = () =>
           "username must be longer than or equal to 4 characters"
         )
           setUsernameError( "Username too short" );
-      } );
+      } )
     setValue( { firstName: "", lastName: "", username: "" } );
   };
-
-  // useEffect( () =>
-  // {
-  //   axios
-  //     .get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
-  //       withCredentials: true,
-  //     } )
-  //     .then( ( response ) =>
-  //     {
-  //       setData( response.data );
-  //       localStorage.setItem( "user", JSON.stringify( response.data ) );
-  //       localStorage.setItem( "userId", response.data?.id );
-  //     } )
-  //     .catch( ( err ) =>
-  //     {
-  //       console.log( "error: ", err );
-  //     } )
-  //   // .finally( () => setMe( false ) );
-  // }, [ uploadAvatar ] );
 
   useEffect( () =>
   {
@@ -134,8 +101,7 @@ const Profile = () =>
       .catch( ( error ) =>
       {
         console.log( "error: ", error );
-      } )
-      .finally( () => setLoader( false ) );
+      } ).finally( () => setLoader( false ) )
   }, [ selectedFile ] );
 
   return (
@@ -153,16 +119,13 @@ const Profile = () =>
                   <span>2</span>
                 </div>
                 <div className={ styles.details_avatar }>
-                  {
-                    loader ? <Loader /> :
-                      <div className={ styles.upload_avatar }>
-                        <CameraOutline
-                          color={ "#ffffff" }
-                          height="36px"
-                          width="36px"
-                        />
-                      </div>
-                  }
+                  <div className={ styles.upload_avatar }>
+                    <CameraOutline
+                      color={ "#ffffff" }
+                      height="36px"
+                      width="36px"
+                    />
+                  </div>
                   <form>
                     <div className={ styles.profile_box }>
                       <div className={ styles.profile_slide }>change picture</div>
@@ -172,21 +135,25 @@ const Profile = () =>
                           setSelectedFile( e.target.files[ 0 ] )
                         }
                       ></input>
-                      { loader ? (
-                        <Loader />
-                      ) : (
-                        <Image
-                          className={ styles.profile_avatar }
-                          src={
-                            data?.avatar
-                              ? data.avatar
-                              : "https://picsum.photos/300/300"
-                          }
-                          alt="avatar_profile"
+                      {
+                        loader ? <Image
+                          src="/spinner.svg"
+                          alt="spinner"
                           width="180px"
                           height="180px"
-                        ></Image>
-                      ) }
+                        ></Image> :
+                          <Image
+                            className={ styles.profile_avatar }
+                            src={
+                              data?.avatar
+                                ? data.avatar
+                                : "https://picsum.photos/300/300"
+                            }
+                            alt="avatar_profile"
+                            width="180px"
+                            height="180px"
+                          ></Image>
+                      }
                     </div>
                   </form>
                   <p>{ data.username }</p>

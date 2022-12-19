@@ -3,32 +3,16 @@ import styles_p from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import SettingsNav from "../../components/settings_nav";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
+import { DataContext } from "../_app";
 
 const History = () =>
 {
+  const [ data, setData ] = useContext( DataContext );
   const [ menu, setMenu ] = useState( false );
-  const [ data, setData ] = useState(
-    {
-      avatar: "",
-      createdAt: "",
-      first_name: "",
-      id: "",
-      last_name: "",
-      two_factor_auth: false,
-      updateAt: "",
-      username: "",
-    }
-  )
-
-  useEffect( () =>
-  {
-    const user = JSON.parse( localStorage.getItem( "user" ) as string );
-    setData( user );
-  }, [] )
 
   return (
     <>

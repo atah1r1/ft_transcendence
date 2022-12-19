@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "../styles/chat.module.css";
 import styles_p from "../styles/profile.module.css";
-import { CurrentConvContext, MessagesContext, SocketContext, LastBlockedContext, UserStatusContext } from "../pages/_app";
+import { CurrentConvContext, MessagesContext, SocketContext, LastBlockedContext } from "../pages/_app";
 
 export default function ConversationBody ()
 {
@@ -12,7 +12,6 @@ export default function ConversationBody ()
   const [ messages, setMessages ] = useContext( MessagesContext );
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
   const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
-  const [ memberStatus, setMemberStatus ] = useContext( UserStatusContext );
   const socket = useContext( SocketContext );
 
   useEffect( () =>
