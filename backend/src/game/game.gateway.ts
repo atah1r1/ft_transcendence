@@ -6,22 +6,34 @@ import {
   WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
+import { User } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+import { UserService } from 'src/user/user.service';
 import { GameService } from './game.service';
+import Game, { GameStatus } from './models/game.model';
 
 const EV_PLAY_AGAINST = 'play_against';
+const EV_PLAY_QUEUE = 'play_queue';
 const EV_PLAY_AGAINST_ACCEPT = 'play_against_accept';
 const EV_PLAY_AGAINST_DECLINE = 'play_against_decline';
+const EV_PLAY_AGAINST_CANCEL = 'play_against_cancel';
+const EV_START_GAME = 'start_game';
+const EV_LEAVE_GAME = 'leave_game';
+const EV_LEAVE_QUEUE = 'leave_queue';
+const EV_SPECTATE_GAME = 'spectate_game';
+const EV_GAME_MOVE = 'game_move';
 
 const EV_EMIT_PLAY_AGAINST_REQUEST = 'emit_play_against_request';
-const EV_EMIT_GAME_ID = 'emit_game_id';
-const EV_EMIT_DECLINE = 'emit_decline';
+const EV_EMIT_GAME = 'emit_game';
+const EV_EMIT_SPECTATE_GAME = 'emit_spectate_game';
+const EV_EMIT_LEAVE_QUEUE = 'emit_leave_queue';
 
 @WebSocketGateway({ namespace: 'game', cors: true, origins: '*' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private gameService: GameService,
   ) {}
 
@@ -50,6 +62,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.gameService.removeConnectedUser(client.data.id, client);
   }
 
+  /* *********** */
+  /*  VALIDATORS */
+  /* *********** */
   validatePlayAgainst(payload: any) {
     if (!('userId' in payload)) {
       throw new WsException({
@@ -65,23 +80,91 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  sendPlayAgainstRequestToClient(userId: string, opId: string) {
+  validateMakeMove(payload: any) {
+    // TODO: add validation as follows:
+    if (!('gameId' in payload)) {
+      throw new WsException({
+        error: EV_PLAY_AGAINST,
+        message: 'Invalid payload',
+      });
+    }
+    if (typeof payload.gameId !== 'string') {
+      throw new WsException({
+        error: EV_PLAY_AGAINST,
+        message: 'Invalid payload',
+      });
+    }
+  }
+
+  validateSpectateGame(payload: any) {
+    if (!('gameId' in payload)) {
+      throw new WsException({
+        error: EV_PLAY_AGAINST,
+        message: 'Invalid payload',
+      });
+    }
+    if (typeof payload.gameId !== 'string') {
+      throw new WsException({
+        error: EV_PLAY_AGAINST,
+        message: 'Invalid payload',
+      });
+    }
+  }
+
+  sendPlayAgainstRequestToClient(userId: string, opUser: User) {
     const sockets = this.gameService.getConnectedUserById(userId);
     sockets.forEach((s) => {
-      s.emit(EV_EMIT_PLAY_AGAINST_REQUEST, {
-        userId: opId,
-      });
+      s.emit(EV_EMIT_PLAY_AGAINST_REQUEST, opUser);
     });
   }
 
-  sendGameIdToClients(gameId: string) {
-    const players = this.gameService.getGameById(gameId);
+  sendGameToClients(game: Game) {
+    const players = game.players;
+    const spectators = game.spectators;
     players.forEach((p) => {
       const s = this.gameService.getPlayerById(p);
       if (s) {
-        s.emit(EV_EMIT_GAME_ID, { gameId });
+        s.emit(EV_EMIT_GAME, game);
       }
     });
+    // in case there are spectators
+    spectators.forEach((sp) => {
+      const s = this.gameService.getSpectatorById(sp);
+      if (s) {
+        s.emit(EV_EMIT_GAME, game);
+      }
+    });
+  }
+
+  sendGameToSpectator(client: Socket, game: Game) {
+    if (client) {
+      client.emit(EV_EMIT_SPECTATE_GAME, game);
+    }
+  }
+
+  sendQueueLeftToClient(client: Socket, left: boolean) {
+    client.emit(EV_EMIT_LEAVE_QUEUE, left);
+  }
+
+  /* ********** */
+  /*   EVENTS   */
+  /* ********** */
+  @SubscribeMessage(EV_PLAY_QUEUE)
+  async playInQueue(client: any, payload: any) {
+    try {
+      const game = await this.gameService.playInQueue(
+        client.data.id,
+        payload.userId,
+      );
+      if (game) {
+        this.sendGameToClients(game);
+      }
+    } catch (err) {
+      throw new WsException({
+        error: EV_PLAY_QUEUE,
+        message: err.message,
+      });
+    }
   }
 
   @SubscribeMessage(EV_PLAY_AGAINST)
@@ -93,7 +176,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.userId,
       );
       if (reqAdded) {
-        this.sendPlayAgainstRequestToClient(client.data.id, payload.userId);
+        const user = await this.userService.getUserById(
+          client.data.id,
+          client.data.id,
+        );
+        this.sendPlayAgainstRequestToClient(payload.userId, user);
       }
     } catch (err) {
       throw new WsException({
@@ -107,17 +194,149 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async playAgainstAccept(client: any, payload: any) {
     this.validatePlayAgainst(payload);
     try {
-      const gameId = await this.gameService.acceptPlayAgainst(
+      const game = this.gameService.acceptPlayAgainst(
         client.data.id,
         payload.userId,
         client,
       );
-      if (gameId) {
-        this.sendGameIdToClients(gameId);
+      if (game) {
+        this.sendGameToClients(game);
       }
     } catch (err) {
       throw new WsException({
-        error: EV_PLAY_AGAINST,
+        error: EV_PLAY_AGAINST_ACCEPT,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_PLAY_AGAINST_DECLINE)
+  async playAgainstDecline(client: any, payload: any) {
+    this.validatePlayAgainst(payload);
+    try {
+      const game = this.gameService.declinePlayAgainst(
+        client.data.id,
+        payload.userId,
+      );
+      if (game) {
+        this.sendGameToClients(game);
+      }
+    } catch (err) {
+      throw new WsException({
+        error: EV_PLAY_AGAINST_DECLINE,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_PLAY_AGAINST_CANCEL)
+  async playAgainstCancel(client: any, payload: any) {
+    this.validatePlayAgainst(payload);
+    try {
+      const game = this.gameService.cancelPlayAgainst(
+        client.data.id,
+        payload.userId,
+      );
+      if (game) {
+        this.sendGameToClients(game);
+      }
+    } catch (err) {
+      throw new WsException({
+        error: EV_PLAY_AGAINST_CANCEL,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_START_GAME)
+  async startGame(client: any, payload: any) {
+    this.validatePlayAgainst(payload);
+    try {
+      const game = this.gameService.startGame(client.data.id, payload.userId);
+      if (game) {
+        this.sendGameToClients(game);
+      }
+    } catch (err) {
+      throw new WsException({
+        error: EV_START_GAME,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_LEAVE_GAME)
+  async leaveGame(client: any, payload: any) {
+    this.validatePlayAgainst(payload);
+    try {
+      const game = this.gameService.leaveGame(client.data.id, payload.userId);
+      if (game) {
+        // notify player/spectators
+        this.sendGameToClients(game);
+        // remove players/spectators
+        if (game.status === GameStatus.FINISHED) {
+          this.gameService.removeGameMembers(game);
+        }
+      }
+    } catch (err) {
+      throw new WsException({
+        error: EV_LEAVE_GAME,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_LEAVE_QUEUE)
+  async leaveQueue(client: any, payload: any) {
+    try {
+      const left = await this.gameService.leaveQueue(client.data.id);
+      this.sendQueueLeftToClient(client, left ?? false);
+    } catch (err) {
+      throw new WsException({
+        error: EV_LEAVE_GAME,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_SPECTATE_GAME)
+  async spectateGame(client: any, payload: any) {
+    this.validateSpectateGame(payload);
+    try {
+      const game = await this.gameService.spectateGame(
+        client.data.id,
+        payload.gameId,
+        client,
+      );
+      this.sendGameToSpectator(client, game);
+    } catch (err) {
+      throw new WsException({
+        error: EV_LEAVE_GAME,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_SPECTATE_GAME)
+  async stopSpectatingGame(client: any, payload: any) {
+    this.validateSpectateGame(payload);
+    try {
+      this.gameService.stopSpectatingGame(client.data.id, payload.gameId);
+    } catch (err) {
+      throw new WsException({
+        error: EV_LEAVE_GAME,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_GAME_MOVE)
+  async makeMove(client: any, payload: any) {
+    this.validateMakeMove(payload);
+    try {
+      this.gameService.makeMove(client.data.id, payload.gameId, payload);
+    } catch (err) {
+      throw new WsException({
+        error: EV_START_GAME,
         message: err.message,
       });
     }
