@@ -9,8 +9,9 @@ const EV_EMIT_GAME_DATA = 'emit_game_data';
 @Injectable()
 export class GameService {
   constructor(private userService: UserService) {
+    // TODO: start a new thread for gamesloop
     // Start Game Loop
-    this.gamesLoop();
+    // this.gamesLoop();
   }
 
   connectedUsers = new Map<string, Socket[]>();
