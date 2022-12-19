@@ -14,6 +14,7 @@ import { DataContext } from "../_app";
 
 const Profile = () =>
 {
+  const [ loader, setLoader ] = useState( true );
   const [ data, setData ] = useContext( DataContext );
   console.log( 'data avatar: ', data.avatar );
   const [ s_witch, setSwitch ] = useState( false );
@@ -65,7 +66,6 @@ const Profile = () =>
       {
         setUsernameError( "" );
         setData( res.data );
-        console.log( 'res', res );
       } )
       .catch( ( error ) =>
       {
@@ -76,12 +76,13 @@ const Profile = () =>
           "username must be longer than or equal to 4 characters"
         )
           setUsernameError( "Username too short" );
-      } );
+      } )
     setValue( { firstName: "", lastName: "", username: "" } );
   };
 
   useEffect( () =>
   {
+    setLoader( true );
     const formData = new FormData();
     formData.append( "image", selectedFile as Blob );
     axios( {
@@ -100,7 +101,7 @@ const Profile = () =>
       .catch( ( error ) =>
       {
         console.log( "error: ", error );
-      } )
+      } ).finally( () => setLoader( false ) )
   }, [ selectedFile ] );
 
   return (
@@ -134,17 +135,25 @@ const Profile = () =>
                           setSelectedFile( e.target.files[ 0 ] )
                         }
                       ></input>
-                      <Image
-                        className={ styles.profile_avatar }
-                        src={
-                          data?.avatar
-                            ? data.avatar
-                            : "https://picsum.photos/300/300"
-                        }
-                        alt="avatar_profile"
-                        width="180px"
-                        height="180px"
-                      ></Image>
+                      {
+                        loader ? <Image
+                          src="/spinner.svg"
+                          alt="spinner"
+                          width="180px"
+                          height="180px"
+                        ></Image> :
+                          <Image
+                            className={ styles.profile_avatar }
+                            src={
+                              data?.avatar
+                                ? data.avatar
+                                : "https://picsum.photos/300/300"
+                            }
+                            alt="avatar_profile"
+                            width="180px"
+                            height="180px"
+                          ></Image>
+                      }
                     </div>
                   </form>
                   <p>{ data.username }</p>

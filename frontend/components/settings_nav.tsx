@@ -26,9 +26,15 @@ const SettingsNav = ( { selected, menu }: any ) =>
             className={ cn( styles_s_l.profile_image, styles.profile_avatar ) }
           ></Image>
         </div>
-        <p className={ styles_s_l.profile_info_login }>{ data?.username }</p>
-        <p className={ styles_s_l.profile_info_full_name }>{ `${ data?.last_name } 
-        ${ data?.first_name }` }</p>
+        {
+          data.username &&
+          <p className={ styles_s_l.profile_info_login }>{ data.username }</p>
+        }
+        {
+          data.first_name && data.last_name &&
+          <p className={ styles_s_l.profile_info_full_name }>{ `${ data.last_name } 
+          ${ data.first_name }` }</p>
+        }
       </div>
       <div className={ styles_s_l.setting_btns }>
         { sections.map( ( section, i ) =>
