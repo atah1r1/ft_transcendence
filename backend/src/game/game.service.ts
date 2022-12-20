@@ -605,39 +605,72 @@ export class GameService {
     return history;
   }
 
-  async getGameHistoryByUserId(userId: string): Promise<GameHistory[]> {
+  async getGameHistoryByUserId(
+    userId: string,
+    id: string,
+  ): Promise<GameHistory[]> {
+    const blocked = await this.userService.getBlockedUsers(userId);
+    const blockedUsersIds = blocked.map((user) => user.id);
+    if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
+
     const history = await this.prisma.gameHistory.findMany({
       where: {
-        OR: [{ winnerId: userId }, { loserId: userId }],
+        OR: [{ winnerId: id }, { loserId: id }],
       },
     });
     return history;
   }
 
-  async getWonGamesByUserId(userId: string): Promise<GameHistory[]> {
+  async getWonGamesByUserId(
+    userId: string,
+    id: string,
+  ): Promise<GameHistory[]> {
+    const blocked = await this.userService.getBlockedUsers(userId);
+    const blockedUsersIds = blocked.map((user) => user.id);
+    if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
+
     const history = await this.prisma.gameHistory.findMany({
       where: {
-        winnerId: userId,
+        winnerId: id,
       },
     });
     return history;
   }
 
-  async getLostGamesByUserId(userId: string): Promise<GameHistory[]> {
+  async getLostGamesByUserId(
+    userId: string,
+    id: string,
+  ): Promise<GameHistory[]> {
+    const blocked = await this.userService.getBlockedUsers(userId);
+    const blockedUsersIds = blocked.map((user) => user.id);
+    if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
+
     const history = await this.prisma.gameHistory.findMany({
       where: {
-        loserId: userId,
+        loserId: id,
       },
     });
     return history;
   }
 
-  async getGameHistoryByGameId(gameId: string): Promise<GameHistory> {
+  async getGameHistoryByGameId(
+    userId: string,
+    gameId: string,
+  ): Promise<GameHistory> {
     const history = await this.prisma.gameHistory.findUnique({
       where: {
         gameId,
       },
     });
+
+    const blocked = await this.userService.getBlockedUsers(userId);
+    const blockedUsersIds = blocked.map((user) => user.id);
+    if (
+      blockedUsersIds.includes(history.loserId) ||
+      blockedUsersIds.includes(history.winnerId)
+    )
+      throw new Error('User is blocked');
+
     return history;
   }
 }
