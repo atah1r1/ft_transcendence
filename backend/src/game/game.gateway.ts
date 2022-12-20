@@ -102,13 +102,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // TODO: add validation as follows:
     if (!('gameId' in payload)) {
       throw new WsException({
-        error: EV_PLAY_AGAINST,
+        error: EV_GAME_MOVE,
         message: 'Invalid payload',
       });
     }
     if (typeof payload.gameId !== 'string') {
       throw new WsException({
-        error: EV_PLAY_AGAINST,
+        error: EV_GAME_MOVE,
         message: 'Invalid payload',
       });
     }
@@ -117,13 +117,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   validateSpectateGame(payload: any) {
     if (!('gameId' in payload)) {
       throw new WsException({
-        error: EV_PLAY_AGAINST,
+        error: EV_SPECTATE_GAME,
         message: 'Invalid payload',
       });
     }
     if (typeof payload.gameId !== 'string') {
       throw new WsException({
-        error: EV_PLAY_AGAINST,
+        error: EV_SPECTATE_GAME,
         message: 'Invalid payload',
       });
     }
