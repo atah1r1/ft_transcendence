@@ -11,7 +11,7 @@ const SettingsNav = ( { selected, menu }: any ) =>
 {
 
   const [ data, setData ] = useContext( DataContext );
-  const sections = [ "home", "profile", "chat", "history", "statistics", "friends", "rooms" ];
+  const sections = [ "game", "profile", "chat", "history", "statistics", "friends", "rooms" ];
   const router = useRouter();
 
   return (

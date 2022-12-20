@@ -13,13 +13,14 @@ import ClickOutsidePoints from "../../components/clickOutsidePoints";
 import TreePointsBox from "../../components/treePoint_box";
 import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext, UserStatusContext } from "../_app";
 import MenuNav from "../../components/menuNav";
-import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp, BagAddSharp, ShieldCheckmarkSharp } from "react-ionicons";
+import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp, BagAddSharp, ShieldCheckmarkSharp, AlertCircleOutline } from "react-ionicons";
 import ConversationBody from "../../components/conversation_body";
 import axios from "axios";
 import { LastBlockedContext } from "../_app";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 import { useRouter } from "next/router";
+import Modal from "../../components/modal_dialog";
 
 const Chat = () =>
 {
@@ -79,6 +80,7 @@ const Chat = () =>
   const [ roomUser, setRoomUser ] = useState( {} );
   const [ addPassToProtectedRoom, setAddPassToProtectedRoom ] = useState( false );
   const [ passValue, setPassValue ] = useState( '' );
+  const [ leaveRoom, setLeaveRoom ] = useState( false );
 
   useEffect( () =>
   {
@@ -116,8 +118,53 @@ const Chat = () =>
   return (
     <div>
       <MenuNav menu={ menu } setMenu={ setMenu } />
-      { room && (
-        <div className={ styles_r_w.add_btn_window }>
+      { leaveRoom && <Modal content={ <>
+        <div className={ styles_r_w.part_up }>
+          <div className={ styles_r_w.text }>LEAVE A CHAT ROOM</div>
+          <div
+            className={ styles_r_w.remove }
+            onClick={ () => { setLeaveRoom( false ) } }
+          >
+            <CloseSharp
+              color={ '#ffffff' }
+              height="40px"
+              width="40px"
+            />
+          </div>
+        </div>
+        <div className={ styles_r_w.part_up }>
+          <div className={ styles_r_w.leave_room_box }>
+            <div>
+              <AlertCircleOutline
+                color={ '#ffffff' }
+                height="100px"
+                width="100px"
+              />
+            </div>
+            <div className={ styles_r_w.leave_room }>Are you sure you want to leave this room</div>
+          </div>
+        </div>
+        <div className={ styles_r_w.part_down }>
+          <div
+            className={ styles_r_w.cancel }
+            onClick={ () => { setLeaveRoom( false ) } }
+          >
+            NO
+          </div>
+          <div className={ styles_r_w.create } onClick={ () =>
+          {
+            setLeaveRoom( false );
+            socket?.emit( 'leave_room', {
+              roomId: currentConv?.roomId,
+            } );
+          } }>
+            YES
+          </div>
+        </div>
+      </> } />
+      }
+      {
+        room && <Modal content={ <>
           <div className={ styles_r_w.part_up }>
             { room && !creat_room && !protected_room && <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div> }
             { creat_room && <div className={ styles_r_w.text }>CREATE A CHAT ROOM</div> }
@@ -220,19 +267,11 @@ const Chat = () =>
                   CREATE
                 </button>
               }
-              {
-                protected_room &&
-                <button className={ styles_r_w.create }>
-                  JOIN
-                </button>
-              }
             </div>
           </form>
-        </div>
-      ) }
-      <div
-        className={ cn( styles_box.container, room && styles_r_w.room ) }
-      >
+        </> } />
+      }
+      <div className={ cn( styles_box.container, ( room || leaveRoom ) && styles_r_w.room ) }>
         <SettingsNav selected={ "chat" } menu={ menu } />
         <div className={ styles_box.profile_details }>
           <Logout />
@@ -424,10 +463,7 @@ const Chat = () =>
                                       <p>leave room</p>
                                       <div className={ styles.leave_btn_c } onClick={ () =>
                                       {
-                                        setTreePoints( !treePoints );
-                                        socket?.emit( 'leave_room', {
-                                          roomId: currentConv?.roomId,
-                                        } );
+                                        setLeaveRoom( true );
                                       } }>
                                         <LogOutSharp
                                           color={ '#ffffff' }

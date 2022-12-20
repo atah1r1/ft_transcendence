@@ -92,7 +92,7 @@ function Home ()
     const playGame = ( e: any ) =>
     {
         e.preventDefault();
-        router.push( '/home/game' );
+        router.push( '/game/play' );
         // socket.emit('join_game');
         console.log( "join game" );
     }
@@ -100,7 +100,7 @@ function Home ()
     const singlePmode = ( e: any ) =>
     {
         e.preventDefault();
-        router.push( '/home/game/vbot' );
+        router.push( '/game/play/vbot' );
     }
 
 
@@ -109,7 +109,7 @@ function Home ()
         <>
             <MenuNav menu={ menu } setMenu={ setMenu } />
             <div className={ styles_box.container }>
-                <SettingsNav selected={ "home" } menu={ menu } />
+                <SettingsNav selected={ "game" } menu={ menu } />
                 <div className={ styles_box.profile_details }>
                     <Logout />
                     <Container>

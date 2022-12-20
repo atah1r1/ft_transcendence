@@ -171,3 +171,20 @@
   letter-spacing: 1px;
   color: #222;
 }
+
+.leave_room_box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  line-height: 3rem;
+  letter-spacing: 1px;
+  font-family: "Inter";
+  width: 80%;
+  color: #fff;
+}
