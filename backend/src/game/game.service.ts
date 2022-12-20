@@ -343,53 +343,29 @@ export class GameService {
     return game;
   }
 
-  // Loops through all games and updates them
-  private async gamesLoop() {
-    while (true) {
-      this.games.forEach((game) => {
-        if (game.status !== GameStatus.STARTED) return;
-        const updatedGame = this.updateGame(game);
-        // notify clients of game update
-        this.sendGameUpdateToClients(updatedGame);
-        if (updatedGame.status === GameStatus.FINISHED) {
-          this.removeGameMembers(updatedGame);
-        }
-      });
-    }
+  private initGame(game: Game): Game {
+    // TODO: modify game/models/game.model.ts to add all needed properties for game logic
+    // return game object after setting all initial values for ball pos...etc
+    // TODO: initialize game state
+    return game;
   }
 
   // Starts initial state of the game
   // Returns game object with status STARTED
   private launchGame(game: Game): Game {
     game.status = GameStatus.STARTED;
-    // Check if any player has disconnected
-    // then set game as finished and set full score for opponent
     if (!this.checkGameDisconnection(game)) {
       return game;
     }
-    // TODO: implement game logic
-    // TODO: modify game/models/game.model.ts to add all needed properties for game logic
-
-    // To emit events, access the sockets of the players and spectators
-    // from game object
-    const p1Sock = this.getPlayerById(game.players[0]); // player 1
-    const p2Sock = this.getPlayerById(game.players[1]); // player 2
-    // do something with p1Sock and p2Sock
-
-    // All spectators
-    game.spectators.forEach((spectatorId) => {
-      const sock = this.getSpectatorById(spectatorId);
-      // do something with sock
-    });
-
-    // To update score
-    const oldScore1 = game.score.get(game.players[0]);
-    game.score.set(game.players[0], oldScore1 + 1);
-
-    const oldScore2 = game.score.get(game.players[1]);
-    game.score.set(game.players[1], oldScore2 + 1);
-
-    // return game object after setting all initial values for ball pos...etc
+    this.initGame(game);
+    setInterval(() => {
+      if (game.status !== GameStatus.STARTED) return;
+      const updatedGame = this.updateGame(game);
+      this.sendGameUpdateToClients(updatedGame);
+      if (updatedGame.status === GameStatus.FINISHED) {
+        this.removeGameMembers(updatedGame);
+      }
+    }, 1000 / 30);
     return game;
   }
 
@@ -400,15 +376,11 @@ export class GameService {
     const game = this.getGameByUserIds(userId, otherId);
 
     if (!game) throw new Error('This game does not exist.');
-
     if (game.status === GameStatus.STARTED)
       throw new Error('This game has already started.');
-
     if (game.status === GameStatus.FINISHED)
       throw new Error('This game has already finished.');
-
     game.playerStatus[userId] = PlayerStatus.READY;
-
     if (
       game.playerStatus[userId] === PlayerStatus.READY &&
       game.playerStatus[otherId] === PlayerStatus.READY
@@ -457,25 +429,6 @@ export class GameService {
     this.games.delete(game.id);
     return game;
   }
-
-  // Deletes Game / Save in db.
-  // Returns Game object with status FINISHED
-  // leaveGameOnDisconnect(userId: string): Game {
-  //   const game = this.getGameByUserId(userId);
-
-  //   if (!game) throw new Error('This game does not exist.');
-
-  //   if (game.status === GameStatus.FINISHED)
-  //     throw new Error('This game has already finished.');
-
-  //   const otherId = game.players.find((p) => p !== userId);
-
-  //   game.score.set(otherId, 10);
-  //   game.status = GameStatus.FINISHED;
-  //   // Save game to database.
-  //   this.games.delete(game.id);
-  //   return game;
-  // }
 
   // Creates new Game.
   // Accepts Play Against request
