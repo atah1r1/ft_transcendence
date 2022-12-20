@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { GameHistory } from '@prisma/client';
 import { Socket } from 'socket.io';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import Queue from 'src/utils/queue';
 import Game, { GameStatus, PlayerStatus } from './models/game.model';
@@ -8,11 +10,10 @@ const EV_EMIT_GAME_DATA = 'emit_game_data';
 
 @Injectable()
 export class GameService {
-  constructor(private userService: UserService) {
-    // TODO: start a new thread for gamesloop
-    // Start Game Loop
-    // this.gamesLoop();
-  }
+  constructor(
+    private userService: UserService,
+    private prisma: PrismaService,
+  ) {}
 
   connectedUsers = new Map<string, Socket[]>();
 
@@ -136,9 +137,10 @@ export class GameService {
     this.gameQueue.push(userId);
   }
 
+  // Creates a new game in the ACCEPTED state.
   createNewGame(userId: string, opponentId: string): Game {
     const newGame = new Game();
-    const gameId = `${userId}_${opponentId}`;
+    const gameId = `${userId}_${opponentId}_${Date.now()}`;
     newGame.id = gameId;
     newGame.players = [userId, opponentId];
     newGame.spectators = [];
@@ -154,36 +156,54 @@ export class GameService {
     return newGame;
   }
 
+  // Unsafe method.
+  // remove player from players map
   removePlayer(userId: string) {
     this.players.delete(userId);
   }
 
+  // Unsafe method.
+  // remove spectator from spectators map
   removeSpectator(userId: string) {
     this.spectators.delete(userId);
   }
 
+  // Unsafe method.
+  // remove request from requests map
   removeRequest(userId: string, opponentId: string) {
     this.requests.delete(userId);
     this.requests.delete(opponentId);
   }
 
+  removeRequestByUserId(userId: string) {
+    const opponentId = this.requests.get(userId);
+    this.requests.delete(userId);
+    if (opponentId) this.requests.delete(opponentId);
+  }
+
+  // remove players/spectators from players/spectators maps
+  // NB: doesn't remove from game object, because game object itself is removed
+  // after being saved in database as game history.
   removeGameMembers(game: Game) {
     game.players.forEach((pId) => {
       this.removePlayer(pId);
     });
-    game.spectators.forEach((pId) => {
-      this.removeSpectator(pId);
+    game.spectators.forEach((sId) => {
+      this.removeSpectator(sId);
     });
   }
 
+  // Get all player userIds
   getPlayerIds(): string[] {
     return [...this.players.keys()];
   }
 
+  // Get all spectator userIds
   getSpectatorIds(): string[] {
     return [...this.spectators.keys()];
   }
 
+  // Get list of friends (User) that are playing a game
   async getPlayingFriends(userId: string): Promise<any[]> {
     const friends = await this.userService.getFriends(userId);
     if (!friends) return [];
@@ -191,6 +211,7 @@ export class GameService {
     return players;
   }
 
+  // Get list of friends (User) that are spectating a game
   async getSpectatingFriends(userId: string): Promise<any[]> {
     const friends = await this.userService.getFriends(userId);
     if (!friends) return [];
@@ -198,32 +219,13 @@ export class GameService {
     return players;
   }
 
-  // Add Play Against request
-  async playAgainst(userId: string, otherId: string): Promise<boolean> {
-    if (userId === otherId)
-      throw new Error('You cannot play against yourself.');
-    const blocked = await this.userService.getBlockedUsers(userId);
-    const blockedUsersIds = blocked.map((user) => user.id);
-    if (blockedUsersIds.includes(otherId))
-      throw new Error('You cannot play against this user.');
-    if (this.players.has(userId))
-      throw new Error('You are already in a match.');
-    if (this.spectators.has(userId))
-      throw new Error('You are spectating a match.');
-    if (this.players.has(otherId))
-      throw new Error('This user is already in a match.');
-    if (this.spectators.has(otherId))
-      throw new Error('This user is spectating a match.');
-    if (this.requests.has(userId))
-      throw new Error('You already have a pending request.');
-    if (this.requests.has(otherId))
-      throw new Error('This user already has a pending request.');
-    if (this.gameQueue.contains(userId))
-      throw new Error('You are already in the queue.');
-    this.addRequest(userId, otherId);
-    return true;
-  }
-
+  // Join the auto-match queue
+  // If you can play with player before you (not blocked)
+  // the game will be created, next, both players need to send startGame event
+  // to start the game
+  // Otherwise you will be pushed to the queue and wait until someone joins
+  // In both cases you recieve a game object with status ACCEPTED or QUEUED
+  // respectively, so either show a waiting screen or start the game.
   async playInQueue(userId: string, socket: Socket): Promise<Game> {
     if (this.players.has(userId))
       throw new Error('You are already in a match.');
@@ -255,10 +257,14 @@ export class GameService {
     return queuedGame;
   }
 
+  // Leave the auto-match queue
+  // Should be called when the user cancels/leaves the waiting screen
+  // It will be automatically called on disconnect
   async leaveQueue(userId: string): Promise<boolean> {
     return this.gameQueue.remove(userId);
   }
 
+  // Start spectating a game
   async spectateGame(
     userId: string,
     gameId: string,
@@ -287,6 +293,7 @@ export class GameService {
     return game;
   }
 
+  // Quit spectating a game
   stopSpectatingGame(userId: string, gameId: string): Game {
     if (!this.spectators.has(userId))
       throw new Error('You are not spectating a match.');
@@ -304,14 +311,13 @@ export class GameService {
     const p2Sock = this.getPlayerById(game.players[1]); // player 2
     if (p1Sock && p2Sock) return true;
     if (!p1Sock) game.score.set(game.players[1], 10);
-    if (!p2Sock) game.score.set(game.players[0], 10);
-    game.status = GameStatus.FINISHED;
-    // TODO: save game score to database.
-    this.games.delete(game.id);
+    else if (!p2Sock) game.score.set(game.players[0], 10);
+    this.finishGame(game);
     return false;
   }
 
   // Sends game data to all players and spectators
+  // Change the data being sent to aminimal object
   private sendGameUpdateToClients(game: Game) {
     const players = game.players;
     const spectators = game.spectators;
@@ -331,19 +337,34 @@ export class GameService {
   }
 
   // Updates game state
+  // Called every frame (intervals of 1000ms / 30)
   private updateGame(game: Game): Game {
-    if (!this.checkGameDisconnection(game)) {
-      return game;
-    }
+    // check for disconnection and finish game.
+    if (!this.checkGameDisconnection(game)) return game;
+
     // TODO: update ball position for game.
+    // TODO: check for collision and goals.
     // TODO: update score for game.
-    // TODO: check for disconnection and finish game.
-    // TODO: check for win and finish game.
+
     // TODO: do other stuff
+
+    // Check for win and finish game.
+    if (
+      game.score[game.players[0]] === 10 ||
+      game.score[game.players[1]] === 10
+    ) {
+      return this.finishGame(game);
+    }
     return game;
   }
 
+  // Called when game starts.
+  // Initializes game state
   private initGame(game: Game): Game {
+    game.status = GameStatus.STARTED;
+    if (!this.checkGameDisconnection(game)) {
+      return game;
+    }
     // TODO: modify game/models/game.model.ts to add all needed properties for game logic
     // return game object after setting all initial values for ball pos...etc
     // TODO: initialize game state
@@ -353,28 +374,32 @@ export class GameService {
   // Starts initial state of the game
   // Returns game object with status STARTED
   private launchGame(game: Game): Game {
-    game.status = GameStatus.STARTED;
-    if (!this.checkGameDisconnection(game)) {
-      return game;
-    }
-    this.initGame(game);
-    setInterval(() => {
-      if (game.status !== GameStatus.STARTED) return;
+    // Initialize game state
+    game = this.initGame(game);
+    if (game.status === GameStatus.FINISHED) return game;
+
+    // Start game loop
+    const timer: NodeJS.Timer = setInterval(() => {
       const updatedGame = this.updateGame(game);
+      if (updatedGame.status === GameStatus.FINISHED) return;
       this.sendGameUpdateToClients(updatedGame);
-      if (updatedGame.status === GameStatus.FINISHED) {
-        this.removeGameMembers(updatedGame);
-      }
     }, 1000 / 30);
+
+    // Save interval timer to game object to cancel it later
+    game.timer = timer;
     return game;
   }
 
   // Called twice when players are ready
   // Sets Game as STARTED and calls launchGame
   // Returns Game object with status STARTED
+  //
+  // In frontend, each player will call this function
+  // after they open Game UI. and wait for other player to do the same.
+  // When both players are ready, the game will start
+  // and they will start receiving game data.
   startGame(userId: string, otherId: string): Game {
     const game = this.getGameByUserIds(userId, otherId);
-
     if (!game) throw new Error('This game does not exist.');
     if (game.status === GameStatus.STARTED)
       throw new Error('This game has already started.');
@@ -387,12 +412,13 @@ export class GameService {
     ) {
       return this.launchGame(game);
     }
-
     return game;
   }
 
-  // move paddle and do other stuff
+  // Move paddle and do other stuff
+  // The payload should contain the move data
   private moveGame(game: Game, payload: any): Game {
+    // TODO: make move using payload content.
     // TODO: update paddle position for game.
     // NB: no need to update ball position here or send game update to clients
     // TODO: do other stuff
@@ -400,16 +426,22 @@ export class GameService {
   }
 
   // Make move
+  // Called whenever a player makes a move
+  // The payload should contain the move data
+  // No need to send anything back to client
+  // because the game interval will do that 30 times per sec.
   makeMove(userId: string, gameId: string, payload: any): Game {
+    // Search for game using gameId for quick access
     const game = this.getGameById(gameId);
 
+    // Security checks before applying move
     if (!game) throw new Error('This game does not exist.');
     if (game.status !== GameStatus.STARTED)
       throw new Error('This game is not started.');
     if (!game.players.includes(userId))
       throw new Error('You are not playing this game.');
 
-    // TODO: make move using payload content.
+    // Apply move
     return this.moveGame(game, payload);
   }
 
@@ -417,17 +449,52 @@ export class GameService {
   // Returns Game object with status FINISHED
   leaveGame(userId: string, otherId: string): Game {
     const game = this.getGameByUserIds(userId, otherId);
-
     if (!game) throw new Error('This game does not exist.');
-
     if (game.status === GameStatus.FINISHED)
       throw new Error('This game has already finished.');
-
     game.score.set(otherId, 10);
-    game.status = GameStatus.FINISHED;
-    // Save game to database.
-    this.games.delete(game.id);
+    this.finishGame(game);
     return game;
+  }
+
+  // Called when game is finished/aborted
+  private finishGame(game: Game): Game {
+    clearInterval(game.timer);
+    game.status = GameStatus.FINISHED;
+    this.sendGameUpdateToClients(game);
+    this.removeGameMembers(game);
+    this.games.delete(game.id);
+    this.createGameHistory(game);
+    return game;
+  }
+
+  // Add Play Against request
+  // It should be called when you want to play against a user.
+  // After security checks, a request is added to the requests map.
+  // and the other user if notified to accept or decline.
+  async playAgainst(userId: string, otherId: string): Promise<boolean> {
+    if (userId === otherId)
+      throw new Error('You cannot play against yourself.');
+    const blocked = await this.userService.getBlockedUsers(userId);
+    const blockedUsersIds = blocked.map((user) => user.id);
+    if (blockedUsersIds.includes(otherId))
+      throw new Error('You cannot play against this user.');
+    if (this.players.has(userId))
+      throw new Error('You are already in a match.');
+    if (this.spectators.has(userId))
+      throw new Error('You are spectating a match.');
+    if (this.players.has(otherId))
+      throw new Error('This user is already in a match.');
+    if (this.spectators.has(otherId))
+      throw new Error('This user is spectating a match.');
+    if (this.requests.has(userId))
+      throw new Error('You already have a pending request.');
+    if (this.requests.has(otherId))
+      throw new Error('This user already has a pending request.');
+    if (this.gameQueue.contains(userId))
+      throw new Error('You are already in the queue.');
+    this.addRequest(userId, otherId);
+    return true;
   }
 
   // Creates new Game.
@@ -510,5 +577,67 @@ export class GameService {
     cancelledGame.players = [userId];
     cancelledGame.status = GameStatus.CANCELLED;
     return cancelledGame;
+  }
+
+  // Prisma Stuff
+  // Save GameHistory to DB
+  async createGameHistory(game: Game): Promise<GameHistory> {
+    if (game.players.length !== 2) return null;
+
+    const score1 = game.score[game.players[0]];
+    const score2 = game.score[game.players[1]];
+
+    const winnerId = score1 > score2 ? game.players[0] : game.players[1];
+    const loserId = score1 > score2 ? game.players[1] : game.players[0];
+
+    const winnerScore = score1 > score2 ? score1 : score2;
+    const loserScore = score1 > score2 ? score2 : score1;
+
+    const history = await this.prisma.gameHistory.create({
+      data: {
+        gameId: game.id,
+        winnerId,
+        loserId,
+        winnerScore,
+        loserScore,
+      },
+    });
+    return history;
+  }
+
+  async getGameHistoryByUserId(userId: string): Promise<GameHistory[]> {
+    const history = await this.prisma.gameHistory.findMany({
+      where: {
+        OR: [{ winnerId: userId }, { loserId: userId }],
+      },
+    });
+    return history;
+  }
+
+  async getWonGamesByUserId(userId: string): Promise<GameHistory[]> {
+    const history = await this.prisma.gameHistory.findMany({
+      where: {
+        winnerId: userId,
+      },
+    });
+    return history;
+  }
+
+  async getLostGamesByUserId(userId: string): Promise<GameHistory[]> {
+    const history = await this.prisma.gameHistory.findMany({
+      where: {
+        loserId: userId,
+      },
+    });
+    return history;
+  }
+
+  async getGameHistoryByGameId(gameId: string): Promise<GameHistory> {
+    const history = await this.prisma.gameHistory.findUnique({
+      where: {
+        gameId,
+      },
+    });
+    return history;
   }
 }

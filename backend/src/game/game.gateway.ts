@@ -11,7 +11,7 @@ import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { GameService } from './game.service';
-import Game, { GameStatus } from './models/game.model';
+import Game from './models/game.model';
 
 const EV_PLAY_AGAINST = 'play_against';
 const EV_PLAY_QUEUE = 'play_queue';
@@ -47,6 +47,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.data = decoded;
   }
 
+  // Authenticate user and add to connected users
   async handleConnection(client: Socket) {
     try {
       await this.verifyAndSave(client);
@@ -56,10 +57,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  // Remove user from connected users
   handleDisconnect(client: Socket) {
-    this.gameService.removePlayer(client.data.id);
-    this.gameService.removeSpectator(client.data.id);
+    // Remove this particular socket from the list of connected sockets
     this.gameService.removeConnectedUser(client.data.id, client);
+    const sockets = this.gameService.getConnectedUserById(client.data.id);
+
+    // If no sockets are left, remove the user from the queue and requests.
+    if (!sockets || sockets.length === 0) {
+      this.gameService.removeRequestByUserId(client.data.id);
+      this.gameService.leaveQueue(client.data.id);
+    }
+
+    // If this socket is used for playing remove the player.
+    if (this.gameService.getPlayerById(client.data.id) === client) {
+      this.gameService.removePlayer(client.data.id);
+    }
+
+    // If this socket is used for spectating remove the spectator.
+    if (this.gameService.getSpectatorById(client.data.id) === client) {
+      this.gameService.removeSpectator(client.data.id);
+    }
   }
 
   /* *********** */
@@ -268,15 +286,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async leaveGame(client: any, payload: any) {
     this.validatePlayAgainst(payload);
     try {
-      const game = this.gameService.leaveGame(client.data.id, payload.userId);
-      if (game) {
-        // notify player/spectators
-        this.sendGameToClients(game);
-        // remove players/spectators
-        if (game.status === GameStatus.FINISHED) {
-          this.gameService.removeGameMembers(game);
-        }
-      }
+      this.gameService.leaveGame(client.data.id, payload.userId);
     } catch (err) {
       throw new WsException({
         error: EV_LEAVE_GAME,

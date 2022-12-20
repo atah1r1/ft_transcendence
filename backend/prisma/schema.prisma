@@ -11,22 +11,37 @@ datasource db {
 }
 
 model User {
-  id                    String     @id @default(uuid())
-  createdAt             DateTime   @default(now())
-  updatedAt             DateTime   @updatedAt
-  username              String     @unique @db.VarChar(50)
-  intra_name            String     @unique @db.VarChar(50)
-  first_name            String?    @db.VarChar(50)
-  last_name             String?    @db.VarChar(50)
-  avatar                String?    @db.VarChar(255)
-  two_factor_auth       Boolean    @default(false)
-  two_factor_auth_key   String?    @db.VarChar(255)
-  two_factor_auth_uri   String?    @db.VarChar(255)
-  friends               User[]     @relation("Friends")
-  friendsRelations      User[]     @relation("Friends")
-  blockedUsers          User[]     @relation("BlockedUsers")
-  blockedUsersRelations User[]     @relation("BlockedUsers")
+  id                    String        @id @default(uuid())
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  username              String        @unique @db.VarChar(50)
+  intra_name            String        @unique @db.VarChar(50)
+  first_name            String?       @db.VarChar(50)
+  last_name             String?       @db.VarChar(50)
+  avatar                String?       @db.VarChar(255)
+  two_factor_auth       Boolean       @default(false)
+  two_factor_auth_key   String?       @db.VarChar(255)
+  two_factor_auth_uri   String?       @db.VarChar(255)
+  friends               User[]        @relation("Friends")
+  friendsRelations      User[]        @relation("Friends")
+  blockedUsers          User[]        @relation("BlockedUsers")
+  blockedUsersRelations User[]        @relation("BlockedUsers")
   roomMemberships       RoomUser[]
+  wonGames              GameHistory[] @relation("Winner")
+  lostGame              GameHistory[] @relation("Loser")
+}
+
+model GameHistory {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  gameId      String   @unique
+  winner      User     @relation(name: "Winner", fields: [winnerId], references: [id])
+  winnerId    String
+  loser       User     @relation(name: "Loser", fields: [loserId], references: [id])
+  loserId     String
+  winnerScore Int
+  loserScore  Int
 }
 
 model RoomUser {

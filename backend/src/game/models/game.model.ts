@@ -19,5 +19,6 @@ export default class Game {
   score: Map<string, number>;
   status: GameStatus;
   playerStatus: Map<string, PlayerStatus>;
+  timer: NodeJS.Timer;
   // TODO: add other fields for ball position, etc.
 }
