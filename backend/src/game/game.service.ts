@@ -417,7 +417,7 @@ export class GameService {
 
   // Move paddle and do other stuff
   // The payload should contain the move data
-  private moveGame(game: Game, payload: any): Game {
+  private moveGame(userId: string, game: Game, payload: any): Game {
     // TODO: make move using payload content.
     // TODO: update paddle position for game.
     // NB: no need to update ball position here or send game update to clients
@@ -442,7 +442,7 @@ export class GameService {
       throw new Error('You are not playing this game.');
 
     // Apply move
-    return this.moveGame(game, payload);
+    return this.moveGame(userId, game, payload);
   }
 
   // Deletes Game / Save in db.
