@@ -3,15 +3,17 @@ import Image from "next/image";
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "../styles/chat.module.css";
 import styles_p from "../styles/profile.module.css";
-import { CurrentConvContext, MessagesContext, SocketContext, LastBlockedContext } from "../pages/_app";
+import { CurrentConvContext, MessagesContext, SocketContext, LastBlockedContext, UserStatusContext } from "../pages/_app";
 
 export default function ConversationBody ()
 {
   const bottomRef = useRef<null | HTMLDivElement>( null );
   const [ messageInput, setMessageInput ] = useState( "" );
+  const [ userStatus, setUserStatus ] = useState( "NORMAL" );
   const [ messages, setMessages ] = useContext( MessagesContext );
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
   const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
+  const [ memberStatus, setMemberStatus ] = useContext( UserStatusContext );
   const socket = useContext( SocketContext );
 
   useEffect( () =>
@@ -65,6 +67,20 @@ export default function ConversationBody ()
     bottomRef.current?.scrollIntoView( { behavior: 'smooth' } )
   }, [ messages.get( currentConv?.roomId ), messageInput === '' ] );
 
+  useEffect( () =>
+  {
+    if ( !currentConv?.roomId ) return;
+    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/members`, {
+      withCredentials: true,
+    } ).then( ( res ) =>
+    {
+      setUserStatus( res.data.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) )?.status );
+    } ).catch( ( err ) =>
+    {
+      console.log( 'error: ', err );
+    } );
+  }, [ currentConv, memberStatus ] );
+
   return (
     <div className={ styles.conversation_body }>
       <div className={ styles.message_part_content }>
@@ -109,12 +125,24 @@ export default function ConversationBody ()
               className={ styles.message_form }
               onSubmit={ handleSubmitMessages }
             >
-              <input
-                type="search"
-                placeholder="Type a message here ."
-                onChange={ ( e ) => setMessageInput( e.target.value ) }
-                value={ messageInput }
-              ></input>
+              {
+                userStatus === 'NORMAL' ?
+                  <input
+                    type="search"
+                    placeholder="Type a message here ..."
+                    onChange={ ( e ) => setMessageInput( e.target.value ) }
+                    value={ messageInput }
+                  ></input> :
+                  <div className={ styles.input_disabled }>
+                    <input
+                      type="search"
+                      placeholder="You are disabled"
+                      onChange={ ( e ) => setMessageInput( e.target.value ) }
+                      value={ messageInput }
+                      disabled
+                    ></input>
+                  </div>
+              }
             </form>
 
           </div>

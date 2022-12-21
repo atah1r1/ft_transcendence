@@ -93,7 +93,8 @@
   transform: translateX(-2px);
 }
 
-.room_privacy_box, .room_input_box {
+.room_privacy_box,
+.room_input_box {
   display: flex;
   align-items: center;
   gap: 1.6rem;
@@ -397,6 +398,11 @@
   height: 65rem;
   position: relative;
 }
+
+.input_disabled input::placeholder {
+  color: red;
+}
+
 /* media q--------------------- */
 
 @media (max-width: 1280px) {
