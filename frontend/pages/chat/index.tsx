@@ -141,7 +141,7 @@ const Chat = () =>
                 width="100px"
               />
             </div>
-            <div className={ styles_r_w.leave_room }>Are you sure you want to leave this room</div>
+            <div className={ styles_r_w.leave_room }>Are you sure you want to leave this room?</div>
           </div>
         </div>
         <div className={ styles_r_w.part_down }>

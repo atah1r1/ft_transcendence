@@ -1,13 +1,14 @@
 import styles from "../styles/conversation_box.module.css";
 import styles_p from "../styles/profile.module.css";
 import cn from "classnames";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { ChatContext, CurrentConvContext } from "../pages/_app";
 
 const ConversationBox = ( { searchInput, ref }: any ) =>
 {
+  const bottomRef = useRef<null | HTMLDivElement>( null );
   // format date
   const formatDateAndTime = ( date: string ) =>
   {
@@ -36,7 +37,7 @@ const ConversationBox = ( { searchInput, ref }: any ) =>
 
   useEffect( () =>
   {
-    ref?.current?.scrollIntoView( { behavior: 'smooth', top: 0 } )
+    // bottomRef.current?.scrollIntoView( { behavior: 'smooth' } )
   }, [ chats ] )
 
   return chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput ) )
@@ -81,6 +82,7 @@ const ConversationBox = ( { searchInput, ref }: any ) =>
               }
             </div>
           </div>
+          <div ref={ bottomRef } />
         </div>
       );
     } )
