@@ -14,6 +14,7 @@ import {
   HttpStatus,
   Param,
   Query,
+  Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
@@ -84,7 +85,7 @@ export class UserController {
         data: { avatar: secure_url },
       });
       return { avatar: user.avatar };
-    } catch(e) {
+    } catch (e) {
       throw new BadRequestException('Error uploading image' + e.message);
     }
   }

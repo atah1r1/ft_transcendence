@@ -8,7 +8,7 @@ config;
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
   async activate2fa(user: any) {
     const otpauthUrl = authenticator.keyuri(
       user.id,
@@ -21,7 +21,10 @@ export class UserService {
       data: { two_factor_auth: true, two_factor_auth_uri: otpauthUrl },
     });
     // console.log(otpauthUrl);
-    return { two_factor_auth_uri: otpauthUrl, two_factor_auth: updated.two_factor_auth };
+    return {
+      two_factor_auth_uri: otpauthUrl,
+      two_factor_auth: updated.two_factor_auth,
+    };
   }
 
   async deactivate2fa(user: any) {
@@ -38,6 +41,14 @@ export class UserService {
       secret: user.two_factor_auth_key,
     });
     if (isValid) {
+      await this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          code_verified: true,
+        },
+      });
       return true;
     }
     return false;
