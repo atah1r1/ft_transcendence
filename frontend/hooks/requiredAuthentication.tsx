@@ -1,25 +1,18 @@
 import cookie from 'cookie';
 
-export default function requireAuthentication ( gssp: any )
-{
-    return async ( ctx: any ) =>
-    {
+export default function requireAuthentication(gssp: any) {
+    return async (ctx: any) => {
         const { req } = ctx;
-        if ( req.headers.cookie )
-        {
-            const { jwt } = cookie.parse( req.headers.cookie );
-            console.log( jwt );
-            if ( jwt === undefined )
-            {
-                return {
-                    redirect: {
-                        permanent: false,
-                        destination: '/',
-                    },
-                };
+        const { jwt } = cookie.parse(req.headers.cookie || '');
+
+        const res = await fetch(`http://localhost:9000/api/user/me`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': `jwt=${jwt};`
             }
-        } else
-        {
+        })
+        const data = await res.json()
+        if (data.statusCode === 401) {
             return {
                 redirect: {
                     permanent: false,
@@ -27,7 +20,6 @@ export default function requireAuthentication ( gssp: any )
                 },
             };
         }
-
-        return await gssp( ctx );
+        return await gssp(ctx);
     };
 }

@@ -19,7 +19,7 @@ const socket = io( "http://localhost:9000/chat", {
 } );
 
 export const SocketContext = React.createContext<Socket>( socket );
-export const DataContext = React.createContext<any[]>( [ null, () => { } ] );
+export const DataContext = React.createContext<any[]>( [ {}, () => { } ] );
 export const MessagesContext = React.createContext<any[]>( [
   new Map(),
   () => { },
@@ -39,7 +39,10 @@ export const UploadAvatarContext = React.createContext<any[]>( [ null, () => { }
 function MyApp ( { Component, pageProps }: AppProps )
 {
   const router = useRouter();
-  const [ data, setData ] = useState( [] );
+  const [ data, setData ] = useState<any>( {
+    two_factor_auth: false,
+    two_factor_auth_uri: ''
+  } );
   const [ chats, setChats ] = useState( [] );
   const [ messages, setMessages ] = useState( new Map<string, any[]>() );
   const [ onlineFriends, setOnlineFriends ] = useState( [] );
