@@ -65,7 +65,7 @@ const FriendProfile = () =>
     <>
       <MenuNav menu={ menu } setMenu={ setMenu } />
       <div className={ styles_box.container }>
-        <SettingsNav selected={ "friends" } menu={ menu } />
+        <SettingsNav selected={ "" } menu={ menu } />
         <div className={ styles_box.profile_details }>
           <div>
             <Logout />

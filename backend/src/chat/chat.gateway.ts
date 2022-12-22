@@ -472,7 +472,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!chat) {
         throw new Error('Failed to protect room');
       }
-      await this.sendChatsToClient(client.data.id);
+      await this.sendChatsToClient(client);
       await this.sendRoomProtectedToClient(client.data.id, chat);
     } catch (e) {
       throw new WsException({
@@ -894,10 +894,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
     if (payload.password === '') {
-       throw new WsException({
-         error: EV_PROTECT_ROOM,
-         message: "password can't be empty",
-       });
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: "password can't be empty",
+      });
     }
   }
 }

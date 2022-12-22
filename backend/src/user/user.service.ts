@@ -8,7 +8,7 @@ config;
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
   async activate2fa(user: any) {
     const otpauthUrl = authenticator.keyuri(
       user.id,
@@ -16,20 +16,20 @@ export class UserService {
       user.two_factor_auth_key,
     );
     // console.log(otpauthUrl);
-    await this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: { two_factor_auth: true, two_factor_auth_uri: otpauthUrl },
     });
     // console.log(otpauthUrl);
-    return { two_factor_auth_uri: otpauthUrl };
+    return { two_factor_auth_uri: otpauthUrl, two_factor_auth: updated.two_factor_auth };
   }
 
   async deactivate2fa(user: any) {
-    await this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: { two_factor_auth: false, two_factor_auth_uri: null },
     });
-    return { message: '2FA deactivated' };
+    return { two_factor_auth: updated.two_factor_auth };
   }
 
   async verify2fa(user: any, code: string) {
@@ -43,7 +43,10 @@ export class UserService {
     return false;
   }
 
-  async checkIfUsernameExists(currentUserName: string, username: string): Promise<boolean> {
+  async checkIfUsernameExists(
+    currentUserName: string,
+    username: string,
+  ): Promise<boolean> {
     if (currentUserName === username) return false;
     const user = await this.prisma.user.findUnique({
       where: { username },
@@ -64,7 +67,10 @@ export class UserService {
     if (last_name) data.last_name = last_name;
     if (username) data.username = username;
 
-    if (username && await this.checkIfUsernameExists(currentUser.username, username)) {
+    if (
+      username &&
+      (await this.checkIfUsernameExists(currentUser.username, username))
+    ) {
       throw new HttpException('Username already exists', HttpStatus.NOT_FOUND);
     }
     return await this.prisma.user.update({

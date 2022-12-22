@@ -5,6 +5,6 @@ import { UserService } from './user.service';
 
 @Module({
   imports: [CloudinaryModule],
-  providers: [UserService, PrismaService]
+  providers: [UserService, PrismaService],
 })
-export class UserModule { }
+export class UserModule {}

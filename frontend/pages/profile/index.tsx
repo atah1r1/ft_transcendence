@@ -10,47 +10,31 @@ import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import { CameraOutline } from "react-ionicons";
-import Loader from "../../components/Loading";
-import { DataContext, UploadAvatarContext } from "../_app";
+import { DataContext } from "../_app";
 import QRCode from "react-qr-code";
 
 const Profile = () => {
-  const [ uploadAvatar, setUploadAvatar ] = useContext( UploadAvatarContext );
-  const [ data, setData ] = useContext( DataContext );
-  console.log( 'data avatar: ', data.avatar );
-  // const [ data, setData ] = useState( {
-  //   avatar: "",
-  //   createdAt: "",
-  //   first_name: "",
-  //   id: "",
-  //   last_name: "",
-  //   two_factor_auth: false,
-  //   updateAt: "",
-  //   username: "",
-  // } );
-  const [ loader, setLoader ] = useState( true );
-  const [ me, setMe ] = useState( true );
-  const [ s_witch, setSwitch ] = useState( false );
-  const [ value, setValue ] = useState( {
+  const [loader, setLoader] = useState(true);
+  const [data, setData] = useContext(DataContext);
+  console.log('data: ', data);
+  const [s_witch, setSwitch] = useState(data.two_factor_auth);
+  const [value, setValue] = useState({
     firstName: "",
     lastName: "",
     username: "",
-  } );
-  const [ usernameError, setUsernameError ] = useState( "" );
-  const [ menu, setMenu ] = useState( false );
-  const [ selectedFile, setSelectedFile ] = useState<Blob>();
+  });
+  const [usernameError, setUsernameError] = useState("");
+  const [menu, setMenu] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<Blob>();
 
-  const handleFirstName = ( e: any ) =>
-  {
-    setValue( { ...value, firstName: e.target.value } );
+  const handleFirstName = (e: any) => {
+    setValue({ ...value, firstName: e.target.value });
   };
-  const handleLastName = ( e: any ) =>
-  {
-    setValue( { ...value, lastName: e.target.value } );
+  const handleLastName = (e: any) => {
+    setValue({ ...value, lastName: e.target.value });
   };
-  const handleUsername = ( e: any ) =>
-  {
-    setValue( { ...value, username: e.target.value } );
+  const handleUsername = (e: any) => {
+    setValue({ ...value, username: e.target.value });
   };
 
   const userToPatch: {
@@ -67,80 +51,53 @@ const Profile = () => {
   !value.lastName && delete userToPatch.last_name;
   !value.username && delete userToPatch.username;
 
-  const handleClick = async () =>
-  {
-    await axios( {
+  const handleClick = async () => {
+    await axios({
       method: "patch",
-      url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/profile`,
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/profile`,
       withCredentials: true,
       data: userToPatch,
-    } )
-      .then( ( res ) =>
-      {
-        setUsernameError( "" );
-        setUploadAvatar( res );
-      } )
-      .catch( ( error ) =>
-      {
-        if ( error.response.data.message === "Username already exists" )
-          setUsernameError( "Username already exists" );
+    })
+      .then((res) => {
+        setUsernameError("");
+        setData(res.data);
+      })
+      .catch((error) => {
+        if (error.response.data.message === "Username already exists")
+          setUsernameError("Username already exists");
         if (
-          error.response.data.message[ 0 ] ===
+          error.response.data.message[0] ===
           "username must be longer than or equal to 4 characters"
         )
-          setUsernameError( "Username too short" );
-      } );
-    setValue( { firstName: "", lastName: "", username: "" } );
+          setUsernameError("Username too short");
+      })
+    setValue({ firstName: "", lastName: "", username: "" });
   };
 
-  useEffect( () =>
-  {
-    axios
-      .get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
-        withCredentials: true,
-      } )
-      .then( ( response ) =>
-      {
-        setData( response.data );
-        localStorage.setItem( "user", JSON.stringify( response.data ) );
-        localStorage.setItem( "userId", response.data?.id );
-      } )
-      .catch( ( err ) =>
-      {
-        console.log( "error: ", err );
-      } )
-      .finally( () => setMe( false ) );
-  }, [ uploadAvatar ] );
-
-  useEffect( () =>
-  {
-    setLoader( true );
+  useEffect(() => {
+    setLoader(true);
     const formData = new FormData();
-    formData.append( "image", selectedFile as Blob );
-    axios( {
+    formData.append("image", selectedFile as Blob);
+    axios({
       method: "post",
-      url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/upload`,
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/upload`,
       withCredentials: true,
       data: formData,
-    } )
-      .then( ( response ) =>
-      {
-        setData( ( prev: any ) =>
-        {
+    })
+      .then((response) => {
+        setData((prev: any) => {
           return { ...prev, avatar: response.data.avatar };
-        } );
-        setUploadAvatar( response );
-      } )
-      .catch( ( error ) =>
-      {
-        console.log( "error: ", error );
-      } )
-      .finally( () => setLoader( false ) );
-  }, [ selectedFile ] );
+        });
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+      }).finally(() => setLoader(false))
+  }, [selectedFile]);
+
 
   // 2fa authentication code
 
-  const [TwoFaUri, setTwoFaUri] = useState('');
+  const [TwoFaUri, setTwoFaUri] = useState(data.two_factor_auth_uri);
 
   const handleClickSwitch = () => {
     axios({
@@ -150,22 +107,25 @@ const Profile = () => {
     }).then((response) => {
       console.log(response.data);
       setTwoFaUri(response.data.two_factor_auth_uri);
+      setSwitch(response.data.two_factor_auth);
+      setData({...data, two_factor_auth: response.data.two_factor_auth, two_factor_auth_uri: response.data.two_factor_auth_uri});
     }).catch((error) => {
       console.log('error: ', error);
     })
   }
+  
+  useEffect(() => {
+    setSwitch(data.two_factor_auth);
+    setTwoFaUri(data.two_factor_auth_uri);
+  }, [data])
 
   return (
     <>
       <MenuNav menu={menu} setMenu={setMenu} />
       <div className={styles_box.container}>
-        {
-          !me &&
-          <SettingsNav selected={"profile"} menu={menu} />
-        }
+        {<SettingsNav selected={"profile"} menu={menu} />}
         <div className={styles_box.profile_details}>
-          {
-            !me &&
+          {(
             <div>
               <Logout />
               <div className={styles.details_up}>
@@ -176,7 +136,7 @@ const Profile = () => {
                 <div className={styles.details_avatar}>
                   <div className={styles.upload_avatar}>
                     <CameraOutline
-                      color={'#ffffff'}
+                      color={"#ffffff"}
                       height="36px"
                       width="36px"
                     />
@@ -184,16 +144,27 @@ const Profile = () => {
                   <form>
                     <div className={styles.profile_box}>
                       <div className={styles.profile_slide}>change picture</div>
-                      <input type="file"
-                        onChange={(e: any) => setSelectedFile(e.target.files[0])}></input>
+                      <input
+                        type="file"
+                        onChange={(e: any) =>
+                          setSelectedFile(e.target.files[0])
+                        }
+                      ></input>
                       {
-                        loader ?
-                          <Loader />
-                          :
+                        loader ? <Image
+                          src="/spinner.svg"
+                          alt="spinner"
+                          width="180px"
+                          height="180px"
+                        ></Image> :
                           <Image
                             className={styles.profile_avatar}
-                            src={data?.avatar ? data.avatar : "https://picsum.photos/300/300"}
-                            alt="avatar"
+                            src={
+                              data?.avatar
+                                ? data.avatar
+                                : "https://picsum.photos/300/300"
+                            }
+                            alt="avatar_profile"
                             width="180px"
                             height="180px"
                           ></Image>
@@ -241,20 +212,34 @@ const Profile = () => {
                 <form className={styles.details_form}>
                   <div>
                     <label>FIRST NAME</label>
-                    <input type="text" placeholder={data.first_name} maxLength={12} value={value.firstName}
-                      onChange={handleFirstName}></input>
+                    <input
+                      type="text"
+                      placeholder={data.first_name}
+                      maxLength={12}
+                      value={value.firstName}
+                      onChange={handleFirstName}
+                    ></input>
                   </div>
                   <div>
                     <label>LAST NAME</label>
-                    <input type="text" placeholder={data.last_name} maxLength={12} value={value.lastName}
-                      onChange={handleLastName}></input>
+                    <input
+                      type="text"
+                      placeholder={data.last_name}
+                      maxLength={12}
+                      value={value.lastName}
+                      onChange={handleLastName}
+                    ></input>
                   </div>
                   <div>
                     <label>USERNAME</label>
-                    <input type="text" placeholder={data.username} maxLength={12} value={value.username}
-                      onChange={handleUsername}></input>
-                    {
-                      usernameError &&
+                    <input
+                      type="text"
+                      placeholder={data.username}
+                      maxLength={12}
+                      value={value.username}
+                      onChange={handleUsername}
+                    ></input>
+                    {usernameError && (
                       <div className={styles.error_box}>
                         <Image
                           src="/input_exist.svg"
@@ -264,7 +249,7 @@ const Profile = () => {
                         ></Image>
                         <p className={styles.error_msg}>{usernameError}</p>
                       </div>
-                    }
+                    )}
                   </div>
                 </form>
               </div>
@@ -278,7 +263,11 @@ const Profile = () => {
                   in.
                 </p>
                 <label className={styles.switch}>
-                  <input type="checkbox" onClick={() => { setSwitch(!s_witch); handleClickSwitch() }}></input>
+                  <input
+                    type="checkbox"
+                    defaultChecked={s_witch}
+                    onClick={() => { handleClickSwitch() }}
+                  ></input>
                   <span className={cn(styles.slider, styles.round)}></span>
                 </label>
                 {s_witch &&
@@ -286,20 +275,29 @@ const Profile = () => {
                     <QRCode
                       size={512}
                       style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                      value={TwoFaUri === undefined ? '' : TwoFaUri}
+                      value={TwoFaUri === undefined || TwoFaUri === null ? '' : TwoFaUri}
                       viewBox={`0 0 256 256`}
                     />
                   </div>
                 }
               </div>
               <div className={styles.save_box} onClick={handleClick}>
-                <div className={cn(styles_s_l.setting_btn, styles.save_btn,
-                  `${!value.firstName && !value.lastName && !value.username && styles.save_unclick}`)}>
+                <div
+                  className={cn(
+                    styles_s_l.setting_btn,
+                    styles.save_btn,
+                    `${!value.firstName &&
+                    !value.lastName &&
+                    !value.username &&
+                    styles.save_unclick
+                    }`
+                  )}
+                >
                   SAVE
                 </div>
               </div>
             </div>
-          }
+          )}
         </div>
       </div>
     </>
@@ -310,7 +308,6 @@ export default Profile;
 
 export const getServerSideProps = requireAuthentication(async () => {
   return {
-    props: {
-    }, // will be passed to the page component as props
-  }
-})
+    props: {}, // will be passed to the page component as props
+  };
+});

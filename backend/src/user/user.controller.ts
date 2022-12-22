@@ -4,7 +4,6 @@ import {
   Post,
   Req,
   UseGuards,
-  Res,
   Body,
   UseInterceptors,
   ClassSerializerInterceptor,
@@ -24,7 +23,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { User } from '@prisma/client';
-import { use } from 'passport';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
