@@ -13,7 +13,7 @@ import ClickOutsidePoints from "../../components/clickOutsidePoints";
 import TreePointsBox from "../../components/treePoint_box";
 import { CurrentConvContext, NewMemberAddedContext, OnlineFriendsContext, SocketContext, UserStatusContext } from "../_app";
 import MenuNav from "../../components/menuNav";
-import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp, BagAddSharp, ShieldCheckmarkSharp, AlertCircleOutline } from "react-ionicons";
+import { AddOutline, CloseSharp, ArrowBackOutline, PersonSharp, LogOutSharp, BagAddSharp, ShieldCheckmarkSharp, AlertCircleOutline, PersonAddOutline, PersonRemoveOutline, ReturnUpBackOutline } from "react-ionicons";
 import ConversationBody from "../../components/conversation_body";
 import axios from "axios";
 import { LastBlockedContext } from "../_app";
@@ -373,11 +373,12 @@ const Chat = () =>
                             setGroupBox( false );
                             setAddFriends( false );
                           } }>
-                            <ArrowBackOutline
+                            <ReturnUpBackOutline
                               color={ '#ffffff' }
-                              height="28px"
-                              width="28px"
+                              height="30px"
+                              width="30px"
                             />
+                            <p>go back</p>
                           </div>
                         }
                         <TreePointsBox members={ currentConv.members } group={ { setGroupBox: setGroupBox, group_box: group_box } }
@@ -441,36 +442,33 @@ const Chat = () =>
                                   {
                                     member.role === 'OWNER' &&
                                     localStorage.getItem( 'userId' ) === member.userId &&
-                                    <div className={ styles.add_leave_btn } >
+                                    <div className={ styles.add_leave_btn }
+                                      onClick={ () =>
+                                      {
+                                        setAddFriends( true );
+                                      } }>
                                       <p>add members</p>
-                                      <div className={ styles.add_btn_c }>
-                                        <AddOutline
-                                          onClick={ () =>
-                                          {
-                                            setAddFriends( true );
-                                          } }
-                                          color={ '#ffffff' }
-                                          height="52px"
-                                          width="52px"
-                                        />
-                                      </div>
+                                      <PersonAddOutline
+                                        color={ '#ffffff' }
+                                        height="30px"
+                                        width="30px"
+                                      />
                                     </div>
                                   }
                                   {
                                     ( member.role === 'MEMBER' || member.role === 'ADMIN' ) &&
                                     localStorage.getItem( 'userId' ) === member.userId &&
-                                    <div className={ styles.add_leave_btn }>
-                                      <p>leave room</p>
-                                      <div className={ styles.leave_btn_c } onClick={ () =>
+                                    <div className={ styles.add_leave_btn }
+                                      onClick={ () =>
                                       {
                                         setLeaveRoom( true );
                                       } }>
-                                        <LogOutSharp
-                                          color={ '#ffffff' }
-                                          height="46px"
-                                          width="46px"
-                                        />
-                                      </div>
+                                      <p>leave room</p>
+                                      <PersonRemoveOutline
+                                        color={ '#ffffff' }
+                                        height="30px"
+                                        width="30px"
+                                      />
                                     </div>
                                   }
                                   {
@@ -485,7 +483,7 @@ const Chat = () =>
                                     member.role === 'MEMBER' && arr[ i - 1 ]?.role !== 'MEMBER' &&
                                     <p className={ styles_tree_p.treepoints_owner }>Members</p>
                                   }
-                                  <div className={ styles_tree_p.treepoints_box_row }>
+                                  <div className={ styles_tree_p.treepoints_box_row_users }>
                                     <div
                                       className={
                                         styles_tree_p.treePoints_box_avatar
@@ -537,7 +535,14 @@ const Chat = () =>
                                 <div
                                   key={ i }
                                 >
-                                  <div className={ styles_tree_p.treepoints_box_row }>
+                                  <div className={ styles_tree_p.treepoints_box_row }
+                                    onClick={ () =>
+                                    {
+                                      socket?.emit( 'add_member', {
+                                        userToAddId: friend?.id,
+                                        roomId: currentConv?.roomId,
+                                      } );
+                                    } }>
                                     <div
                                       className={
                                         styles_tree_p.treePoints_box_avatar
@@ -553,20 +558,11 @@ const Chat = () =>
                                       />
                                     </div>
                                     <p>{ friend?.username }</p>
-                                    <div onClick={ () =>
-                                    {
-                                      socket?.emit( 'add_member', {
-                                        userToAddId: friend?.id,
-                                        roomId: currentConv?.roomId,
-                                      } );
-                                    } }
-                                      className={ styles_tree_p.treepoints_settings }>
-                                      <AddOutline
-                                        color={ '#ffffff' }
-                                        height="30px"
-                                        width="30px"
-                                      />
-                                    </div>
+                                    <AddOutline
+                                      color={ '#ffffff' }
+                                      height="30px"
+                                      width="30px"
+                                    />
                                   </div>
                                 </div>
                               );
@@ -574,16 +570,17 @@ const Chat = () =>
                           ) }
                           {
                             addFriends &&
-                            <div className={ styles.back_arrow_f } onClick={ () =>
+                            <div className={ styles.add_leave_btn } onClick={ () =>
                             {
                               setGroupBox( false );
                               setAddFriends( false );
                             } }>
-                              <ArrowBackOutline
+                              <ReturnUpBackOutline
                                 color={ '#ffffff' }
-                                height="28px"
-                                width="28px"
+                                height="30px"
+                                width="30px"
                               />
+                              <p>go back</p>
                             </div>
                           }
                         </div>

@@ -15,7 +15,7 @@
   background-color: #c9c9c9;
 }
 .conversation:active {
-  transform: translateY(1.5px);
+  transform: translateY(1.6px);
 }
 
 .conversation_group_img {
@@ -74,7 +74,7 @@
 }
 
 .conversation_name:active {
-  transform: translateY(1.5px);
+  transform: translateY(1.6px);
 }
 
 .conversation_text {
