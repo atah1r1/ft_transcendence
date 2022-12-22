@@ -25,7 +25,6 @@ import Modal from "../../components/modal_dialog";
 const Chat = () =>
 {
 
-  const ref = useRef<null | HTMLDivElement>( null );
   const router = useRouter();
 
   const socket = useContext( SocketContext );
@@ -304,7 +303,7 @@ const Chat = () =>
                 </form>
               </div>
               <div className={ styles.l_part_two }>
-                <ConversationBox searchInput={ searchInput } ref={ ref } />
+                <ConversationBox searchInput={ searchInput } />
               </div>
               <div className={ styles.l_part_tree }>
                 {
