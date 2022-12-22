@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 
@@ -14,14 +14,16 @@ export class AuthController {
     async fortyTwoAuthRedirect(@Req() req: any, @Res({ passthrough: true }) res: any) {
         console.log(req.user["_json"].image?.link);
         const { username, name, _json } = req.user;
-        const image  = _json?.image?.link; 
+        const image = _json?.image?.link;
         const jwt = await this.AuthService.Login(username, name, image);
         res.cookie('jwt', jwt);
         return res.redirect('http://localhost:3000/profile');
     }
 
     @Get('logout')
-    async logout(@Res({ passthrough: true }) res: any) {
+    @UseGuards(AuthGuard('jwt'))
+    async logout(@Req() req: any, @Res({ passthrough: true }) res: any) {
+        await this.AuthService.logoutService(req.user);
         res.clearCookie('jwt');
         return res.redirect('http://localhost:3000/');
     }

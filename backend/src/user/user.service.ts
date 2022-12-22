@@ -38,6 +38,14 @@ export class UserService {
       secret: user.two_factor_auth_key,
     });
     if (isValid) {
+      await this.prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          code_verified: true
+        }
+      })
       return true;
     }
     return false;

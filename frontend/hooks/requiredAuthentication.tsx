@@ -12,7 +12,17 @@ export default function requireAuthentication(gssp: any) {
             }
         })
         const data = await res.json()
-        if (data.statusCode === 401) {
+
+        if (data.statusCode === 477)
+        {
+            return {
+                redirect: {
+                    permanent: false,
+                    destination: '/auth',
+                },
+            };
+        }
+        if (data.statusCode === 401 || data.statusCode === 500) {
             return {
                 redirect: {
                     permanent: false,

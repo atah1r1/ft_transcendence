@@ -14,6 +14,7 @@ import {
   HttpStatus,
   Param,
   Query,
+  Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
