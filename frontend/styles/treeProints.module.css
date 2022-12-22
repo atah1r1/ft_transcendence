@@ -73,6 +73,10 @@
   border-radius: 1rem;
 }
 
+.treepoints_box_row_users {
+  margin-bottom: 1.2rem;
+}
+
 .treepoints_box_row:active {
   transform: translateY(1.6px);
 }
@@ -87,7 +91,7 @@
   font-size: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 2.6rem;
+  margin-bottom: 1.2rem;
   letter-spacing: 1.2px;
   padding: 0.6rem 0;
 }
@@ -120,7 +124,8 @@
 /* media q--------------------- */
 
 @media (max-width: 1280px) {
-  .treepoints_box {
+  .treepoints_box,
+  .treepoints_box_details {
     height: 93%;
   }
 }

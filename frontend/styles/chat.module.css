@@ -77,27 +77,8 @@
   border-radius: 1rem;
   z-index: 1;
   cursor: pointer;
-  /* transition: all 0.3s; */
-  font-size: 1.8rem;
+  font-size: 2rem;
 }
-
-/* .add_leave_btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 1.8rem;
-  background-color: #16213e;
-  width: 100%;
-  height: 7rem;
-  border-radius: 1rem;
-  z-index: 1;
-  cursor: pointer;
-  transition: all 0.3s;
-} */
 
 .back_arrow:active {
   transform: translateY(1.6px);
@@ -165,7 +146,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  font-size: 1.8rem;
+  font-size: 2rem;
   background-color: #16213e;
   width: 100%;
   height: 7rem;
