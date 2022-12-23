@@ -341,7 +341,6 @@ const Profile = () =>
                   <input
                     type="checkbox"
                     defaultChecked={ s_witch }
-                    checked={ s_witch }
                     onClick={ () =>
                     {
                       if ( !s_witch )
