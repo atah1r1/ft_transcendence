@@ -42,7 +42,7 @@
 }
 
 .loginBtn:active {
-  transform: translateY(1.5px);
+  transform: translateY(1.6px);
 }
 
 .loginBtn::after {

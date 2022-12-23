@@ -6,7 +6,7 @@ import Image from "next/image";
 import axios from "axios";
 import { ChatContext, CurrentConvContext } from "../pages/_app";
 
-const ConversationBox = ( { searchInput, ref }: any ) =>
+const ConversationBox = ( { searchInput }: any ) =>
 {
   const bottomRef = useRef<null | HTMLDivElement>( null );
   // format date

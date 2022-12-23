@@ -85,7 +85,7 @@ export class UserController {
         data: { avatar: secure_url },
       });
       return { avatar: user.avatar };
-    } catch(e) {
+    } catch (e) {
       throw new BadRequestException('Error uploading image' + e.message);
     }
   }

@@ -56,7 +56,7 @@
 
 .setting_btn:active,
 .current_btn:active {
-  transform: translateY(1.5px);
+  transform: translateY(1.6px);
 }
 
 .setting_btn:not(:last-child) {

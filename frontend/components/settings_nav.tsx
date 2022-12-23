@@ -19,7 +19,11 @@ const SettingsNav = ( { selected, menu }: any ) =>
       <div className={ styles_s_l.profile_info }>
         <div className={ styles_s_l.profile_image_wrap }>
           <Image
-            src={ data?.avatar }
+            src={
+              data?.avatar
+                ? data.avatar
+                : "https://picsum.photos/300/300"
+            }
             alt="avatar"
             width="100px"
             height="100px"

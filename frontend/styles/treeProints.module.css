@@ -16,8 +16,8 @@
   width: 26rem;
   height: 100%;
   background-color: #16213e;
-  padding: 1.6rem;
-  padding-top: 6rem;
+  padding: 1.2rem;
+  padding-top: 8rem;
   font-family: "Pixeboy";
   font-size: 1.6rem;
   border-radius: 1rem;
@@ -36,22 +36,53 @@
   display: none;
 }
 
-.treepoints_box_row {
+.treepoints_box_details {
+  width: 26rem;
+  height: 100%;
+  background-color: #16213e;
+  padding: 1.2rem;
+  padding-top: 6.8rem;
+  font-family: "Pixeboy";
+  font-size: 1.6rem;
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+.treepoints_box_conv {
+  width: 26rem;
+  height: 100%;
+  background-color: #16213e;
+  padding: 1.2rem;
+  padding-top: 2rem;
+  font-family: "Pixeboy";
+  font-size: 1.6rem;
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+.treepoints_box_row,
+.treepoints_box_row_users {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 2.2rem;
+  padding: 1rem 0.8rem;
   font-size: 2rem;
-}
-
-.treepoints_box_row:not(:last-child) {
-  margin-bottom: 1.4rem;
-}
-
-.treepoints_settings {
   cursor: pointer;
   transition: all 0.3s;
+  border-radius: 1rem;
+}
+
+.treepoints_box_row_users {
+  margin-bottom: 1.2rem;
+}
+
+.treepoints_box_row:active {
+  transform: translateY(1.6px);
+}
+
+.treepoints_box_row:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .treepoints_owner {
@@ -60,13 +91,9 @@
   font-size: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 2.6rem;
+  margin-bottom: 1.2rem;
   letter-spacing: 1.2px;
   padding: 0.6rem 0;
-}
-
-.treepoints_settings:active {
-  transform: translateY(2.4px);
 }
 
 .treePoints_box_avatar {
@@ -85,10 +112,20 @@
   right: -20%;
 }
 
+.treepoints_settings {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.treepoints_settings:active {
+  transform: translateY(1.6px);
+}
+
 /* media q--------------------- */
 
 @media (max-width: 1280px) {
-  .treepoints_box {
+  .treepoints_box,
+  .treepoints_box_details {
     height: 93%;
   }
 }

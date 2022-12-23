@@ -12,44 +12,51 @@ import Loader from "../../components/Loading";
 const AuthPage = () => {
   const [value, setValue] = useState('');
 
-  const handleChange = (e: any) => {
-    const result = e.target.value.replace(/\D/g, '');
+  const handleChange = ( e: any ) =>
+  {
+    const result = e.target.value.replace( /\D/g, '' );
 
     setValue(result);
   };
 
   // code added for verification of 2fa authentication
 
-  const [loading, setLoading] = useState(true);
+  const [ loading, setLoading ] = useState( true );
   const router = useRouter();
 
 
   // gha terqi3a :)
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000)
-    router.push('/profile');
-  }, [])
+  useEffect( () =>
+  {
+    setTimeout( () =>
+    {
+      setLoading( false );
+    }, 1000 )
+    router.push( '/profile' );
+  }, [] )
 
-  if (loading) {
+  if ( loading )
+  {
     return <Loader />
   }
 
-  const HandleSubmit = () => {
-    axios({
+  const HandleSubmit = () =>
+  {
+    axios( {
       method: 'post',
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/user/2fa/verify`,
+      url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/2fa/verify`,
       data: {
         code: value
       },
       withCredentials: true
-    }).then((resp) => {
-      console.log(resp.data);
-      window.location.replace('/profile');
-    }).catch((err) => {
-      console.log(err);
-    })
+    } ).then( ( resp ) =>
+    {
+      console.log( resp.data );
+      window.location.replace( '/profile' );
+    } ).catch( ( err ) =>
+    {
+      console.log( err );
+    } )
   }
 
   return (
@@ -79,8 +86,8 @@ const AuthPage = () => {
             </div>
           </form>
         </div>
-        <div className={styles.verify_box}>
-          <div className={cn(styles_s_l.setting_btn, styles.verify_btn, `${value.length !== 6 && styles.verify_unclick}`)} onClick={HandleSubmit}>
+        <div className={ styles.verify_box }>
+          <div className={ cn( styles_s_l.setting_btn, styles.verify_btn, `${ value.length !== 6 && styles.verify_unclick }` ) } onClick={ HandleSubmit }>
             Verify
           </div>
         </div>
@@ -91,7 +98,8 @@ const AuthPage = () => {
 
 export default AuthPage;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async () =>
+{
   return {
     props: {}, // will be passed to the page component as props
   };
