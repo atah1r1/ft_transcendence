@@ -187,3 +187,7 @@
   width: 80%;
   color: #fff;
 }
+
+.leave_room_box span{
+  font-weight: bold;
+}

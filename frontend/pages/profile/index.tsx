@@ -2,6 +2,7 @@ import cn from "classnames";
 import styles from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import styles_s_l from "../../styles/style_settings_nav.module.css";
+import styles_r_w from "../../styles/chatroom_window.module.css";
 import SettingsNav from "../../components/settings_nav";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
@@ -9,15 +10,20 @@ import Image from "next/image";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
-import { CameraOutline } from "react-ionicons";
+import { AlertCircleOutline, CameraOutline, CloseSharp } from "react-ionicons";
 import { DataContext } from "../_app";
 import QRCode from "react-qr-code";
+import Modal from "../../components/modal_dialog";
+import { useRouter } from "next/router";
 
 const Profile = () =>
 {
+  const router = useRouter();
   const [ loader, setLoader ] = useState( true );
   const [ data, setData ] = useContext( DataContext );
   const [ s_witch, setSwitch ] = useState( data.two_factor_auth );
+  const [ checkBox, setCheckBox ] = useState( false );
+  const [ test, setTest ] = useState( data.two_factor_auth );
   const [ value, setValue ] = useState( {
     firstName: "",
     lastName: "",
@@ -121,12 +127,14 @@ const Profile = () =>
       withCredentials: true
     } ).then( ( response ) =>
     {
+      console.log( 'data', response );
       setTwoFaUri( response.data.two_factor_auth_uri );
       setSwitch( response.data.two_factor_auth );
       setData( { ...data, two_factor_auth: response.data.two_factor_auth, two_factor_auth_uri: response.data.two_factor_auth_uri } );
     } ).catch( ( error ) =>
     {
       console.log( 'error: ', error );
+      router.push( "/auth" );
     } )
   }
 
@@ -137,9 +145,59 @@ const Profile = () =>
   }, [ data ] )
 
   return (
-    <>
+    <div>
       <MenuNav menu={ menu } setMenu={ setMenu } />
-      <div className={ styles_box.container }>
+      {
+        checkBox && <Modal content={ <>
+          <div className={ styles_r_w.part_up }>
+            <div className={ styles_r_w.text }>TWO-FACTOR AUTHENTICATION</div>
+            <div
+              className={ styles_r_w.remove }
+              onClick={ () =>
+              {
+                setCheckBox( false );
+              } }
+            >
+              <CloseSharp
+                color={ '#ffffff' }
+                height="40px"
+                width="40px"
+              />
+            </div>
+          </div>
+          <div className={ styles_r_w.part_up }>
+            <div className={ styles_r_w.leave_room_box }>
+              <div>
+                <AlertCircleOutline
+                  color={ '#ffffff' }
+                  height="100px"
+                  width="100px"
+                />
+              </div>
+              <div>If you clicked <span>ACTIVATE</span> , you must scan QR code</div>
+            </div>
+          </div>
+          <div className={ styles_r_w.part_down }>
+            <div
+              className={ styles_r_w.cancel }
+              onClick={ () =>
+              {
+                setCheckBox( false );
+              } }
+            >
+              CANCEL
+            </div>
+            <div className={ styles_r_w.create } onClick={ () =>
+            {
+              setCheckBox( false );
+              handleClickSwitch();
+            } }>
+              ACTIVATE
+            </div>
+          </div>
+        </> } />
+      }
+      <div className={ cn( styles_box.container, checkBox && styles_r_w.room ) }>
         { <SettingsNav selected={ "profile" } menu={ menu } /> }
         <div className={ styles_box.profile_details }>
           { (
@@ -283,7 +341,17 @@ const Profile = () =>
                   <input
                     type="checkbox"
                     defaultChecked={ s_witch }
-                    onClick={ () => { handleClickSwitch() } }
+                    checked={ s_witch }
+                    onClick={ () =>
+                    {
+                      if ( !s_witch )
+                        setCheckBox( true );
+                      else
+                      {
+                        setSwitch( !s_witch );
+                        handleClickSwitch();
+                      }
+                    } }
                   ></input>
                   <span className={ cn( styles.slider, styles.round ) }></span>
                 </label>
@@ -317,7 +385,7 @@ const Profile = () =>
           ) }
         </div>
       </div>
-    </>
+    </div >
   );
 };
 
