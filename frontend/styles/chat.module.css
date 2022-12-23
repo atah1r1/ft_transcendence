@@ -408,7 +408,11 @@
 }
 
 .input_disabled input::placeholder {
-  color: red;
+  color: #dc465e;
+}
+
+.input_disabled input {
+  border: 2px solid #dc465e;
 }
 
 /* media q--------------------- */

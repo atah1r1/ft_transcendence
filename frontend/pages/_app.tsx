@@ -51,7 +51,6 @@ function MyApp ( { Component, pageProps }: AppProps )
   const [ newRoom, setNewRoom ] = useState<any>( null );
   const [ newMemberAdded, setNewMemberAdded ] = useState<any>( null );
   const [ status, setStatus ] = useState<any>( null );
-  // const [ uploadAvatar, setUploadAvatar ] = useState<any>( null );
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -262,7 +261,7 @@ function MyApp ( { Component, pageProps }: AppProps )
       } )
       .catch( ( err ) =>
       {
-        console.log( "error: ", err );
+        console.log( "error1: ", err );
       } );
   }, [] );
 

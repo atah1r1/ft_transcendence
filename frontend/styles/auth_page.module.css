@@ -1,14 +1,14 @@
 .box {
   height: 100vh;
   color: #fff;
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 16rem;
 }
 
-.container{
+.container {
   position: relative;
   min-width: 70rem;
   min-height: 40rem;
@@ -18,20 +18,20 @@
   padding: 4.2rem 2.6rem;
 }
 
-.auth_text_box{
-  font-family: 'Inter';
+.auth_text_box {
+  font-family: "Inter";
   width: 45rem;
   margin-bottom: 8rem;
 }
-.auth_title{
+.auth_title {
   font-size: 2.6rem;
   margin-bottom: 1.6rem;
 }
-.auth_text{
+.auth_text {
   font-size: 2rem;
 }
 
-.auth_image{
+.auth_image {
   position: absolute;
   top: 0;
   right: -4.2rem;
@@ -40,7 +40,7 @@
 .code_box form {
   display: flex;
   justify-content: space-between;
-  font-family: 'Inter';
+  font-family: "Inter";
 }
 
 .code_box input:focus {
@@ -48,7 +48,7 @@
 }
 
 .code_box input {
-  font-family: 'Inter';
+  font-family: "Inter";
   width: 24rem;
   height: 5.2rem;
   border-radius: 1rem;
@@ -60,6 +60,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   letter-spacing: 1px;
   color: #222;
+  margin-bottom: 0.6rem;
 }
 
 .code_box label {
@@ -69,57 +70,57 @@
   margin-bottom: 0.8rem;
 }
 
-.verify_box{
+.verify_box {
   position: absolute;
   bottom: 2.4rem;
   right: 8rem;
 }
 
-.box .verify_unclick{
+.box .verify_unclick {
   pointer-events: none;
   background-color: #dd6176 !important;
 }
 
-.box .verify_btn{
+.box .verify_btn {
   font-size: 1.6rem;
   font-weight: 600;
   padding: 1.2rem 3.6rem;
-  background: #DC465E;
+  background: #dc465e;
   border-radius: 10px;
-  font-family: 'Inter';
+  font-family: "Inter";
 }
 
-.box .verify_btn:hover{
+.box .verify_btn:hover {
   background-color: #da3e58;
 }
 
 /* media --------------------------------- */
 
 @media (max-width: 900px) {
-  .container{
+  .container {
     min-width: 60rem;
   }
 
-  .auth_text_box{
+  .auth_text_box {
     width: 35rem;
   }
 
-  .auth_image{
+  .auth_image {
     width: 28.8rem;
     height: 25.6rem;
   }
 
-  .verify_box{
+  .verify_box {
     right: 5rem;
   }
 }
 
 @media (max-width: 680px) {
-  .auth_image{
+  .auth_image {
     display: none;
   }
 
-  .container{
+  .container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -127,8 +128,12 @@
     text-align: center;
   }
 
-  .verify_box{
+  .verify_box {
     right: 50%;
     transform: translate(50%);
+  }
+
+  .auth_text_box {
+    margin-bottom: 4rem;
   }
 }

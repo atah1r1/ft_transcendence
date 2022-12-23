@@ -56,7 +56,7 @@ const ConversationBox = ( { searchInput }: any ) =>
           >
             <div className={ styles.conversation_img }>
               <Image
-                src={ conv.image === null ? "https://ui-avatars.com/api/?name=John+Doe" : conv.image }
+                src={ conv.image === null ? "https://avatars.dicebear.com/api/bottts/test.svg" : conv.image }
                 alt="conversation_image"
                 width={ "42px" }
                 height={ "42px" }

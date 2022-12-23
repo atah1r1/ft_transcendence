@@ -57,7 +57,7 @@ const Chat = () =>
       name: chatroomInputs.groupName,
       privacy: chatroomInputs.groupType,
       password: chatroomInputs.password,
-      image: `https://ui-avatars.com/api/?name=${ chatroomInputs.groupName }`,
+      image: `https://avatars.dicebear.com/api/bottts/${ chatroomInputs.groupName }.svg`,
     } );
     setChatroomInputs( {
       groupName: "",
@@ -350,7 +350,11 @@ const Chat = () =>
                     </p>
                     <div
                       className={ styles_tree_p.conversation_head_treepoints }
-                      onClick={ () => setTreePoints( !treePoints ) }
+                      onClick={ () =>
+                      {
+                        setTreePoints( !treePoints );
+                        setAddPassToProtectedRoom( false );
+                      } }
                     >
                       ...
                     </div>

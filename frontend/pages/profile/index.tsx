@@ -15,15 +15,26 @@ import { DataContext } from "../_app";
 import QRCode from "react-qr-code";
 import Modal from "../../components/modal_dialog";
 import { useRouter } from "next/router";
+import { toast, ToastOptions } from "react-toastify";
 
 const Profile = () =>
 {
+  const toastOptions: ToastOptions<{}> = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+  };
+
   const router = useRouter();
   const [ loader, setLoader ] = useState( true );
   const [ data, setData ] = useContext( DataContext );
   const [ s_witch, setSwitch ] = useState( data.two_factor_auth );
   const [ checkBox, setCheckBox ] = useState( false );
-  const [ test, setTest ] = useState( data.two_factor_auth );
   const [ value, setValue ] = useState( {
     firstName: "",
     lastName: "",
@@ -109,7 +120,7 @@ const Profile = () =>
         } )
         .catch( ( error ) =>
         {
-          console.log( "error: ", error );
+          toast.info( `${ error.response.data.message }`, toastOptions );
         } ).finally( () => setLoader( false ) )
     }
   }, [ selectedFile ] );
@@ -127,7 +138,6 @@ const Profile = () =>
       withCredentials: true
     } ).then( ( response ) =>
     {
-      console.log( 'data', response );
       setTwoFaUri( response.data.two_factor_auth_uri );
       setSwitch( response.data.two_factor_auth );
       setData( { ...data, two_factor_auth: response.data.two_factor_auth, two_factor_auth_uri: response.data.two_factor_auth_uri } );
@@ -340,7 +350,7 @@ const Profile = () =>
                 <label className={ styles.switch }>
                   <input
                     type="checkbox"
-                    defaultChecked={ s_witch }
+                    onChange={ () => { } }
                     checked={ s_witch }
                     onClick={ () =>
                     {

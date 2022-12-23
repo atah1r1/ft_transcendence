@@ -136,7 +136,7 @@ export default function ConversationBody ()
                   <div className={ styles.input_disabled }>
                     <input
                       type="search"
-                      placeholder="You are disabled"
+                      placeholder="You are muted"
                       onChange={ ( e ) => setMessageInput( e.target.value ) }
                       value={ messageInput }
                       disabled

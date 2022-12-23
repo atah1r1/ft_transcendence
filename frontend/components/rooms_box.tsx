@@ -16,7 +16,7 @@ const Rooms_box = ( { rooms }: any ) =>
   {
     return ( room.privacy !== 'PRIVATE' && <div className={ styles.friends_box } key={ i }>
       <div className={ styles.friends_avatar }>
-        <Image src={ room?.avatar ?? "https://picsum.photos/300/300" } alt="avatar" width="68" height="68" />
+        <Image src={ room?.image ?? "https://avatars.dicebear.com/api/bottts/yhadari.svg" } alt="avatar" width="68" height="68" />
       </div>
       <div className={ styles.friends_userName }>
         <p>{ room.name }</p>
