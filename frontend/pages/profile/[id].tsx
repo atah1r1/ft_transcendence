@@ -34,7 +34,7 @@ const FriendProfile = () =>
 
   useEffect( () =>
   {
-    axios.get( `http://localhost:9000/api/user/${ id }`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/${ id }`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {

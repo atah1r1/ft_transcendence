@@ -184,7 +184,7 @@ const Profile = () =>
                   width="100px"
                 />
               </div>
-              <div>If you clicked <span>ACTIVATE</span> , you must scan QR code</div>
+              <div>If you clicked <span>ACTIVATE</span> you must scan QR code</div>
             </div>
           </div>
           <div className={ styles_r_w.part_down }>

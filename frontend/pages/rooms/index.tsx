@@ -18,7 +18,7 @@ const History = () =>
 
   useEffect( () =>
   {
-    axios.get( 'http://localhost:9000/api/chat/rooms', {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/rooms`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {

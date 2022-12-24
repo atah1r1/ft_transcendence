@@ -84,7 +84,7 @@ const Chat = () =>
   useEffect( () =>
   {
     if ( !currentConv?.roomId ) return;
-    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/members`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/room/${ currentConv.roomId }/members`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
@@ -98,7 +98,7 @@ const Chat = () =>
   useEffect( () =>
   {
     if ( !currentConv?.roomId || currentConv?.isDm ) return;
-    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/friendstoadd`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/room/${ currentConv.roomId }/friendstoadd`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {

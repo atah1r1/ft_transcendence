@@ -19,7 +19,7 @@ export default function ConversationBody ()
   useEffect( () =>
   {
     if ( !currentConv.roomId ) return;
-    axios.get( `http://localhost:9000/api/chat/messages/${ currentConv.roomId }`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/messages/${ currentConv.roomId }`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
@@ -70,7 +70,7 @@ export default function ConversationBody ()
   useEffect( () =>
   {
     if ( !currentConv?.roomId ) return;
-    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/members`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/room/${ currentConv.roomId }/members`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {

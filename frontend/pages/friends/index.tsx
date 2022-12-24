@@ -19,7 +19,7 @@ const History = () =>
 
   useEffect( () =>
   {
-    axios.get( "http://localhost:9000/api/user/all", {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/all`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {

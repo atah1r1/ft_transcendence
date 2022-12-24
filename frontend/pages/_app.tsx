@@ -8,7 +8,7 @@ import { ToastContainer, ToastOptions, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
-const socket = io( "http://localhost:9000/chat", {
+const socket = io( `http://localhost:9000/chat`, {
   auth: ( cb ) =>
   {
     cb( {
