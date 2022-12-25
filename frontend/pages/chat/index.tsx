@@ -354,6 +354,7 @@ const Chat = () =>
                       {
                         setTreePoints( !treePoints );
                         setAddPassToProtectedRoom( false );
+                        setAddFriends( false );
                       } }
                     >
                       ...
