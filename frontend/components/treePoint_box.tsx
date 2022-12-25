@@ -30,7 +30,13 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
           width="30px"
         />
       </div>
-      <div className={ styles.treepoints_box_row }>
+      <div className={ styles.treepoints_box_row }
+        onClick={ () =>
+        {
+          console.log( 'clicked!!' );
+          socket?.emit( 'play_against', { userId: roomUser.userId } );
+          group.setGroupBox( false );
+        } }>
         <p>invite player</p>
         <Image
           src="/invete_player.svg"
@@ -55,7 +61,13 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
             width="30px"
           />
         </div>
-        <div className={ styles.treepoints_box_row }>
+        <div className={ styles.treepoints_box_row }
+          onClick={ () =>
+          {
+            console.log( 'clicked!!' );
+            socket?.emit( 'play_against', { userId: roomUser.userId } );
+            group.setGroupBox( false );
+          } }>
           <p>invite player</p>
           <Image
             src="/invete_player.svg"

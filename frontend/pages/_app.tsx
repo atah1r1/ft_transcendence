@@ -34,7 +34,6 @@ export const NewMemberAddedContext = React.createContext<any[]>( [
   () => { },
 ] );
 export const UserStatusContext = React.createContext<any[]>( [ null, () => { } ] );
-export const UploadAvatarContext = React.createContext<any[]>( [ null, () => { } ] );
 
 function MyApp ( { Component, pageProps }: AppProps )
 {
@@ -66,6 +65,7 @@ function MyApp ( { Component, pageProps }: AppProps )
   useEffect( () =>
   {
     console.log( "USE EFFECT APP. ", socket.id );
+
     socket.on( "connect", () =>
     {
       console.log( "CONNECT: ", socket.id );
@@ -245,6 +245,13 @@ function MyApp ( { Component, pageProps }: AppProps )
         }
       }
     } );
+
+    socket.on( "emit_play_against_request", ( data: any ) =>
+    {
+      console.log( "play_against: ", socket.id );
+      console.log( "data: ", data );
+    } );
+
   }, [] );
 
   useEffect( () =>
@@ -266,7 +273,6 @@ function MyApp ( { Component, pageProps }: AppProps )
   }, [] );
 
   return (
-    // <UploadAvatarContext.Provider value={ [ uploadAvatar, setUploadAvatar ] } >
     <UserStatusContext.Provider value={ [ status, setStatus ] }>
       <NewMemberAddedContext.Provider
         value={ [ newMemberAdded, setNewMemberAdded ] }
@@ -295,7 +301,6 @@ function MyApp ( { Component, pageProps }: AppProps )
         </NewRoomContext.Provider>
       </NewMemberAddedContext.Provider>
     </UserStatusContext.Provider>
-    // </UploadAvatarContext.Provider>
   );
 }
 

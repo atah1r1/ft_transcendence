@@ -130,6 +130,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   sendPlayAgainstRequestToClient(userId: string, opUser: User) {
+    console.log('here!!!!');
     const sockets = this.gameService.getConnectedUserById(userId);
     sockets.forEach((s) => {
       s.emit(EV_EMIT_PLAY_AGAINST_REQUEST, opUser);
