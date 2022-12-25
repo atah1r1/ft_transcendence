@@ -181,12 +181,11 @@
     margin: auto;
   }
   .ach_medal::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   /* Handle */
   .ach_medal::-webkit-scrollbar-thumb {
-    background: #aaa;
-    border-radius: 10px;
+    background-color: #d9d9d9;
   }
 }
 

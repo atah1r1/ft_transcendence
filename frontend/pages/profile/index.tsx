@@ -231,6 +231,7 @@ const Profile = () =>
                       <div className={ styles.profile_slide }>change picture</div>
                       <input
                         type="file"
+                        accept=".png, .jpg, .jpeg"
                         onChange={ ( e: any ) =>
                           setSelectedFile( e.target.files[ 0 ] )
                         }

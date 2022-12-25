@@ -6,12 +6,11 @@
 }
 
 .friends::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .friends::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 1rem;
+  background-color: #d9d9d9;
 }
 
 .friends_box {
@@ -25,13 +24,13 @@
 
 .search {
   margin: 0 auto;
-  width: 28rem;
-  margin-bottom: 2rem;
+  width: 32rem;
+  margin-bottom: 2.6rem;
 }
 
 .search input {
   width: inherit;
-  height: 3.8rem;
+  height: 4rem;
   border-radius: 1.4rem;
   border: none;
   outline: none;
