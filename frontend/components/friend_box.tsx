@@ -25,7 +25,7 @@ const Friends_box = ( { friends, inputForm }: any ) =>
   return friends.length ?
     (
       find.length ?
-        friends.map( ( ele: any, i: any ) =>
+        find.map( ( ele: any, i: any ) =>
         {
           return (
             <div className={ styles.friends_box } key={ i }>
@@ -41,7 +41,7 @@ const Friends_box = ( { friends, inputForm }: any ) =>
               <div className={ styles.friends_options }>
                 <div onClick={ () =>
                 {
-                  router.push( `/profile/${ friends[ i ].id }` )
+                  router.push( `/profile/${ find[ i ].id }` )
                 } }>
                   <PersonCircleOutline
                     color={ '#ffffff' }
@@ -50,7 +50,7 @@ const Friends_box = ( { friends, inputForm }: any ) =>
                   />
                 </div>
                 {
-                  friends[ i ].isFriend === false &&
+                  find[ i ].isFriend === false &&
                   <div onClick={ () =>
                   {
                     socket?.emit( "create_dm", { otherUserId: ele.id } );
@@ -63,7 +63,7 @@ const Friends_box = ( { friends, inputForm }: any ) =>
                   </div>
                 }
                 {
-                  friends[ i ].isFriend === true &&
+                  find[ i ].isFriend === true &&
                   <div onClick={ () =>
                   {
                     socket?.emit( "create_dm", { otherUserId: ele.id } );

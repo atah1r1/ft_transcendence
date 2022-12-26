@@ -17,7 +17,7 @@ const HistoryBox = ( { history }: any ) =>
     }, 100 )
   } )
 
-  return history.lenfth ?
+  return history.length ?
     history.map( ( ele: any, i: any ) =>
     {
       return (

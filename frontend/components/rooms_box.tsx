@@ -26,7 +26,7 @@ const Rooms_box = ( { rooms, inputForm }: any ) =>
   return rooms.length ?
     (
       find.length ?
-        rooms.map( ( room: any, i: number ) =>
+        find.map( ( room: any, i: number ) =>
         {
           return ( room.privacy !== 'PRIVATE' && <div className={ styles.friends_box } key={ i }>
             <div className={ styles.friends_avatar }>
