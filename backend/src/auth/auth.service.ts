@@ -8,8 +8,19 @@ config();
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService) {}
+  constructor(private prisma: PrismaService, private jwt: JwtService) { }
   async Login(username: string, name: object, photos: string): Promise<any> {
+    const userTwofaActivated = await this.prisma.user.findUnique({
+      where: { intra_name: username },
+    });
+    if (userTwofaActivated.two_factor_auth) {
+      await this.prisma.user.update({
+        where: { intra_name: username },
+        data: {
+          code_verified: false,
+        }
+      });
+    }
     const user = await this.prisma.user.findUnique({
       where: { intra_name: username },
     });
