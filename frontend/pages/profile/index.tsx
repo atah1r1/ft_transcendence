@@ -219,16 +219,16 @@ const Profile = () =>
                   <span>2</span>
                 </div>
                 <div className={ styles.details_avatar }>
-                  <div className={ styles.upload_avatar }>
-                    <CameraOutline
-                      color={ "#ffffff" }
-                      height="36px"
-                      width="36px"
-                    />
-                  </div>
                   <form>
                     <div className={ styles.profile_box }>
                       <div className={ styles.profile_slide }>change picture</div>
+                      <div className={ styles.upload_avatar }>
+                        <CameraOutline
+                          color={ "#ffffff" }
+                          height="36px"
+                          width="36px"
+                        />
+                      </div>
                       <input
                         type="file"
                         accept=".png, .jpg, .jpeg"
