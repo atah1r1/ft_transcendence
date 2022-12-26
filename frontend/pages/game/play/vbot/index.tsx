@@ -25,7 +25,7 @@ const ScoreContainer = styled.div`
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
     @font-face {
         font-family: 'street';
-        src: url("Act_Of_Rejection.ttf") format("truetype");
+        src: url("/Act_Of_Rejection.ttf") format("truetype");
     }
 `;
 

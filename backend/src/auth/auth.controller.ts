@@ -32,9 +32,9 @@ export class AuthController {
   }
 
   @Get('logout')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   async logout(@Req() req: any, @Res({ passthrough: true }) res: any) {
-    await this.AuthService.logoutService(req.user);
+    // await this.AuthService.logoutService(req.user);
     res.clearCookie('jwt');
     return res.redirect('http://localhost:3000/');
   }

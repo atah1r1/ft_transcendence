@@ -62,16 +62,16 @@ const AuthPage = () =>
   }
 
   return (
-    <div className={ styles.box }>
-      <p className={ styles_login.welcom }>WELCOME TO</p>
-      <p className={ styles_login.pongify }>PONGIFY</p>
-      <div className={ styles.container }>
-        <div className={ styles.auth_text_box }>
-          <p className={ styles.auth_title }>Please enter 2fa code</p>
-          <p className={ styles.auth_text }>Two-factor authentication (2FA) is enabled
+    <div className={styles.box}>
+      <p className={styles_login.welcom}>WELCOME TO</p>
+      <p className={styles_login.pongify}>PONGIFY</p>
+      <div className={styles.container}>
+        <div className={styles.auth_text_box}>
+          <p className={styles.auth_title}>Please enter 2fa code</p>
+          <p className={styles.auth_text}>Two-factor authentication (2FA) is enabled
             for account please enter a code to login</p>
         </div>
-        <div className={ styles.auth_image }>
+        <div className={styles.auth_image}>
           <Image
             src="/auth_image.png"
             alt="auth_image"
