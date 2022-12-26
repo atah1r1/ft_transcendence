@@ -40,7 +40,7 @@ const ConversationBox = ( { searchInput }: any ) =>
     // bottomRef.current?.scrollIntoView( { behavior: 'smooth' } )
   }, [ chats ] )
 
-  return chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput ) )
+  return chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput.toLowerCase() ) )
     .map( ( conv: any, i: number ) =>
     {
       return (

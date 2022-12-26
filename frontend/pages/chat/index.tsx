@@ -206,7 +206,7 @@ const Chat = () =>
                   onChange={ ( e ) =>
                     setChatroomInputs( {
                       ...chatroomInputs,
-                      groupName: e.target.value,
+                      groupName: e.target.value.trim(),
                     } )
                   }
                 ></input>
@@ -244,7 +244,7 @@ const Chat = () =>
                   onChange={ ( e ) =>
                     setChatroomInputs( {
                       ...chatroomInputs,
-                      password: e.target.value,
+                      password: e.target.value.trim(),
                     } )
                   }
                 ></input>
@@ -297,7 +297,7 @@ const Chat = () =>
                     maxLength={ 16 }
                     type="search"
                     placeholder="Search..."
-                    onChange={ ( e ) => setSearchInput( e.target.value ) }
+                    onChange={ ( e ) => setSearchInput( e.target.value.trim() ) }
                     value={ searchInput }
                   ></input>
                 </form>

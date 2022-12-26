@@ -49,14 +49,15 @@ const History = () =>
               placeholder="Search..."
               onChange={ ( e ) =>
               {
-                setInputForm( e.target.value );
+                setInputForm( e.target.value.trim() );
               } }
               value={ inputForm }
+              maxLength={ 16 }
             ></input>
           </form>
           <div className={ styles.friends }>
             <Friends_box
-              friends={ friends.filter( ( friend: any ) => friend.username.toLowerCase().includes( inputForm ) ) }
+              friends={ friends.filter( ( friend: any ) => friend.username.toLowerCase().includes( inputForm.toLowerCase() ) ) }
             ></Friends_box>
           </div>
         </div>

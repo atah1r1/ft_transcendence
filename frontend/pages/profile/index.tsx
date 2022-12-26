@@ -46,15 +46,15 @@ const Profile = () =>
 
   const handleFirstName = ( e: any ) =>
   {
-    setValue( { ...value, firstName: e.target.value } );
+    setValue( { ...value, firstName: e.target.value.trim() } );
   };
   const handleLastName = ( e: any ) =>
   {
-    setValue( { ...value, lastName: e.target.value } );
+    setValue( { ...value, lastName: e.target.value.trim() } );
   };
   const handleUsername = ( e: any ) =>
   {
-    setValue( { ...value, username: e.target.value } );
+    setValue( { ...value, username: e.target.value.trim() } );
   };
 
   const userToPatch: {
