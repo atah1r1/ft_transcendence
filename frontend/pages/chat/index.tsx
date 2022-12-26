@@ -57,7 +57,7 @@ const Chat = () =>
       name: chatroomInputs.groupName,
       privacy: chatroomInputs.groupType,
       password: chatroomInputs.password,
-      image: `https://ui-avatars.com/api/?name=${ chatroomInputs.groupName }`,
+      image: `https://avatars.dicebear.com/api/bottts/${ chatroomInputs.groupName }.svg`,
     } );
     setChatroomInputs( {
       groupName: "",
@@ -84,7 +84,7 @@ const Chat = () =>
   useEffect( () =>
   {
     if ( !currentConv?.roomId ) return;
-    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/members`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/room/${ currentConv.roomId }/members`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
@@ -98,7 +98,7 @@ const Chat = () =>
   useEffect( () =>
   {
     if ( !currentConv?.roomId || currentConv?.isDm ) return;
-    axios.get( `http://localhost:9000/api/chat/room/${ currentConv.roomId }/friendstoadd`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/room/${ currentConv.roomId }/friendstoadd`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
@@ -206,7 +206,7 @@ const Chat = () =>
                   onChange={ ( e ) =>
                     setChatroomInputs( {
                       ...chatroomInputs,
-                      groupName: e.target.value,
+                      groupName: e.target.value.trim(),
                     } )
                   }
                 ></input>
@@ -244,7 +244,7 @@ const Chat = () =>
                   onChange={ ( e ) =>
                     setChatroomInputs( {
                       ...chatroomInputs,
-                      password: e.target.value,
+                      password: e.target.value.trim(),
                     } )
                   }
                 ></input>
@@ -297,7 +297,7 @@ const Chat = () =>
                     maxLength={ 16 }
                     type="search"
                     placeholder="Search..."
-                    onChange={ ( e ) => setSearchInput( e.target.value ) }
+                    onChange={ ( e ) => setSearchInput( e.target.value.trim() ) }
                     value={ searchInput }
                   ></input>
                 </form>
@@ -350,7 +350,12 @@ const Chat = () =>
                     </p>
                     <div
                       className={ styles_tree_p.conversation_head_treepoints }
-                      onClick={ () => setTreePoints( !treePoints ) }
+                      onClick={ () =>
+                      {
+                        setTreePoints( !treePoints );
+                        setAddPassToProtectedRoom( false );
+                        setAddFriends( false );
+                      } }
                     >
                       ...
                     </div>

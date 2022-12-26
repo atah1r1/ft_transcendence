@@ -1,5 +1,6 @@
 import styles_login from "../../styles/login_page.module.css";
 import styles from "../../styles/auth_page.module.css";
+import styles_p from "../../styles/profile.module.css";
 import Image from "next/image";
 import cn from "classnames";
 import styles_s_l from "../../styles/style_settings_nav.module.css";
@@ -9,21 +10,21 @@ import { useRouter } from "next/router";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 import Loader from "../../components/Loading";
 
-const AuthPage = () => {
-  const [value, setValue] = useState('');
+const AuthPage = () =>
+{
+  const [ value, setValue ] = useState( '' );
+  const [ invalidCode, setInvalidCode ] = useState( false );
 
   const handleChange = ( e: any ) =>
   {
     const result = e.target.value.replace( /\D/g, '' );
-
-    setValue(result);
+    setValue( result );
   };
 
   // code added for verification of 2fa authentication
 
   const [ loading, setLoading ] = useState( true );
   const router = useRouter();
-
 
   // gha terqi3a :)
   useEffect( () =>
@@ -40,8 +41,10 @@ const AuthPage = () => {
     return <Loader />
   }
 
-  const HandleSubmit = () =>
+  const HandleSubmit = ( e: any ) =>
   {
+    e.preventDefault();
+    setInvalidCode( false );
     axios( {
       method: 'post',
       url: `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/2fa/verify`,
@@ -51,11 +54,10 @@ const AuthPage = () => {
       withCredentials: true
     } ).then( ( resp ) =>
     {
-      console.log( resp.data );
       window.location.replace( '/profile' );
     } ).catch( ( err ) =>
     {
-      console.log( err );
+      err.response.status === 400 && setInvalidCode( true );
     } )
   }
 
@@ -77,12 +79,23 @@ const AuthPage = () => {
             height="322px"
           ></Image>
         </div>
-        <div className={styles.code_box}>
-          <form className={styles.details_form}>
+        <div className={ styles.code_box }>
+          <form className={ styles.details_form } onSubmit={ HandleSubmit }>
             <div>
               <label>Code</label>
-              <input type="text" placeholder="******" maxLength={6} value={value}
-                onChange={handleChange} ></input>
+              <input type="text" placeholder="******" maxLength={ 6 } value={ value }
+                onChange={ handleChange } ></input>
+              { invalidCode && (
+                <div className={ styles_p.error_box }>
+                  <Image
+                    src="/input_exist.svg"
+                    alt="medal_img"
+                    width="20px"
+                    height="20px"
+                  ></Image>
+                  <p className={ styles_p.error_msg }>Invalide code</p>
+                </div>
+              ) }
             </div>
           </form>
         </div>

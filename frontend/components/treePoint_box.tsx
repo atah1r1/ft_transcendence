@@ -30,7 +30,13 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
           width="30px"
         />
       </div>
-      <div className={ styles.treepoints_box_row }>
+      <div className={ styles.treepoints_box_row }
+        onClick={ () =>
+        {
+          console.log( 'clicked!!' );
+          socket?.emit( 'play_against', { userId: roomUser.userId } );
+          group.setGroupBox( false );
+        } }>
         <p>invite player</p>
         <Image
           src="/invete_player.svg"
@@ -55,7 +61,13 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
             width="30px"
           />
         </div>
-        <div className={ styles.treepoints_box_row }>
+        <div className={ styles.treepoints_box_row }
+          onClick={ () =>
+          {
+            console.log( 'clicked!!' );
+            socket?.emit( 'play_against', { userId: roomUser.userId } );
+            group.setGroupBox( false );
+          } }>
           <p>invite player</p>
           <Image
             src="/invete_player.svg"
@@ -79,9 +91,9 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
                 } )
               group.setGroupBox( false );
             } }>
-            { roomUser.status === 'MUTED' ? <p>unmute user</p> : <p>mute user</p> }
+            { roomUser.status === 'MUTED' ? <p style={ { color: "#dc465e" } }>unmute user</p> : <p>mute user</p> }
             <VolumeMuteSharp
-              color={ '#ffffff' }
+              color={ roomUser.status === 'MUTED' ? '#dc465e' : '#ffffff' }
               height="30px"
               width="30px"
             />
@@ -101,9 +113,9 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
               } )
               group.setGroupBox( false );
             } }>
-            { roomUser.status === 'BANNED' ? <p>unban user</p> : <p>ban user</p> }
+            { roomUser.status === 'BANNED' ? <p style={ { color: "#dc465e" } }>unban user</p> : <p>ban user</p> }
             <BanSharp
-              color={ '#ffffff' }
+              color={ roomUser.status === 'BANNED' ? '#dc465e' : '#ffffff' }
               height="30px"
               width="30px"
             />

@@ -22,6 +22,7 @@
 }
 
 .profile_box {
+  position: relative;
   margin: 0 auto;
   width: 18rem;
   height: 18rem;
@@ -63,8 +64,8 @@
   width: 3.8rem;
   height: 3.8rem;
   position: absolute;
-  bottom: 24%;
-  left: 60%;
+  bottom: 1rem;
+  right: 1rem;
   z-index: 1;
   opacity: 0.8;
   background-color: #333;

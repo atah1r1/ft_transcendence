@@ -18,7 +18,7 @@ const History = () =>
 
   useEffect( () =>
   {
-    axios.get( 'http://localhost:9000/api/chat/rooms', {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/rooms`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
@@ -48,13 +48,16 @@ const History = () =>
               placeholder="Search..."
               onChange={ ( e ) =>
               {
-                setInputForm( e.target.value );
+                setInputForm( e.target.value.trim() );
               } }
               value={ inputForm }
+              maxLength={ 16 }
             ></input>
           </form>
           <div className={ styles.friends }>
-            <Rooms_box rooms={ rooms.filter( ( room: any ) => room.name.toLowerCase().includes( inputForm ) ) }>
+            <Rooms_box
+              rooms={ rooms }
+              inputForm={ inputForm }>
             </Rooms_box>
           </div>
         </div>

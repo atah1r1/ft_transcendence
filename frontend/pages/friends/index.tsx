@@ -19,7 +19,7 @@ const History = () =>
 
   useEffect( () =>
   {
-    axios.get( "http://localhost:9000/api/user/all", {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/all`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
@@ -49,14 +49,16 @@ const History = () =>
               placeholder="Search..."
               onChange={ ( e ) =>
               {
-                setInputForm( e.target.value );
+                setInputForm( e.target.value.trim() );
               } }
               value={ inputForm }
+              maxLength={ 16 }
             ></input>
           </form>
           <div className={ styles.friends }>
             <Friends_box
-              friends={ friends.filter( ( friend: any ) => friend.username.toLowerCase().includes( inputForm ) ) }
+              friends={ friends }
+              inputForm={ inputForm }
             ></Friends_box>
           </div>
         </div>

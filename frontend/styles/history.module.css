@@ -6,12 +6,11 @@
 }
 
 .history::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .history::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 1rem;
+  background-color: #d9d9d9;
 }
 
 .history_box {
@@ -85,7 +84,7 @@
 @media (max-width: 1280px) {
   .history_box {
     /* padding: 1.2rem 0; */
-     font-size: 1.5rem;
+    font-size: 1.5rem;
   }
 
   .history_achievements {

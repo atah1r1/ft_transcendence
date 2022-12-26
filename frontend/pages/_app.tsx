@@ -8,7 +8,7 @@ import { ToastContainer, ToastOptions, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
-const socket = io( "http://localhost:9000/chat", {
+const socket = io( `http://localhost:9000/chat`, {
   auth: ( cb ) =>
   {
     cb( {
@@ -34,7 +34,6 @@ export const NewMemberAddedContext = React.createContext<any[]>( [
   () => { },
 ] );
 export const UserStatusContext = React.createContext<any[]>( [ null, () => { } ] );
-export const UploadAvatarContext = React.createContext<any[]>( [ null, () => { } ] );
 
 function MyApp ( { Component, pageProps }: AppProps )
 {
@@ -51,7 +50,6 @@ function MyApp ( { Component, pageProps }: AppProps )
   const [ newRoom, setNewRoom ] = useState<any>( null );
   const [ newMemberAdded, setNewMemberAdded ] = useState<any>( null );
   const [ status, setStatus ] = useState<any>( null );
-  // const [ uploadAvatar, setUploadAvatar ] = useState<any>( null );
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -67,6 +65,7 @@ function MyApp ( { Component, pageProps }: AppProps )
   useEffect( () =>
   {
     console.log( "USE EFFECT APP. ", socket.id );
+
     socket.on( "connect", () =>
     {
       console.log( "CONNECT: ", socket.id );
@@ -246,6 +245,13 @@ function MyApp ( { Component, pageProps }: AppProps )
         }
       }
     } );
+
+    socket.on( "emit_play_against_request", ( data: any ) =>
+    {
+      console.log( "play_against: ", socket.id );
+      console.log( "data: ", data );
+    } );
+
   }, [] );
 
   useEffect( () =>
@@ -262,12 +268,11 @@ function MyApp ( { Component, pageProps }: AppProps )
       } )
       .catch( ( err ) =>
       {
-        console.log( "error: ", err );
+        console.log( "error1: ", err );
       } );
   }, [] );
 
   return (
-    // <UploadAvatarContext.Provider value={ [ uploadAvatar, setUploadAvatar ] } >
     <UserStatusContext.Provider value={ [ status, setStatus ] }>
       <NewMemberAddedContext.Provider
         value={ [ newMemberAdded, setNewMemberAdded ] }
@@ -296,7 +301,6 @@ function MyApp ( { Component, pageProps }: AppProps )
         </NewRoomContext.Provider>
       </NewMemberAddedContext.Provider>
     </UserStatusContext.Provider>
-    // </UploadAvatarContext.Provider>
   );
 }
 

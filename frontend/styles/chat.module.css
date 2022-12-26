@@ -40,21 +40,25 @@
   flex-direction: column;
   gap: 1.4rem;
   height: 70%;
-  overflow-y: scroll;
+  overflow-y: hidden;
   padding-bottom: 1.6rem;
-  padding-right: 1rem;
+  padding-right: 1.6rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   width: 28rem;
+}
+
+.l_part_two:hover {
+  overflow-y: scroll;
+  padding-right: 1rem;
 }
 
 .l_part_two::-webkit-scrollbar {
   width: 6px;
 }
 
-/* Handle */
 .l_part_two::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
 }
 
 .l_part_tree {
@@ -165,13 +169,12 @@
 }
 
 .l_part_tree::-webkit-scrollbar {
-  height: 6px;
+  height: 8px;
 }
 
 /* Handle */
 .l_part_tree::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 10px;
+  background-color: #d9d9d9;
 }
 
 .chat_plus {
@@ -263,8 +266,7 @@
   display: flex;
   flex-direction: column;
   border-radius: 1.2rem;
-  background-color: rgba(255, 255, 255, 0.7);
-  /* height: 93%; */
+  background-color: rgba(255, 255, 255, 0.6);
   align-items: flex-end;
   column-gap: 1.2rem;
   padding: 0 0.6rem;
@@ -272,14 +274,13 @@
 }
 
 .conversation_body::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
-/* Handle */
 .conversation_body::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 10px;
+  background-color: #d9d9d9;
 }
+
 .message_box {
   width: 90%;
 }
@@ -288,7 +289,7 @@
   width: 100%;
   height: 4.6rem;
   border-radius: 1.2rem;
-  background-color: #eee;
+  background-color: rgba(255, 255, 255, 0.6);
   border: none;
   padding: 1.6rem;
   outline: none;
@@ -307,7 +308,7 @@
   height: 4.6rem;
   background-color: #da3e58;
   border-radius: 50%;
-  background-color: #eee;
+  background-color: rgba(255, 255, 255, 0.6);
   transition: all 0.3s;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
@@ -337,8 +338,12 @@
   padding: 1.2rem;
   font-size: 1.2rem;
   font-weight: bold;
-  overflow-y: scroll;
   gap: 0.6rem;
+  overflow-y: hidden;
+}
+
+.message_part_content:hover {
+  overflow-y: scroll;
 }
 
 .message_part_content::-webkit-scrollbar {
@@ -347,8 +352,8 @@
 
 /* Handle */
 .message_part_content::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
 }
 
 .message_left {
@@ -408,7 +413,11 @@
 }
 
 .input_disabled input::placeholder {
-  color: red;
+  color: #dc465e;
+}
+
+.input_disabled input {
+  border: 2px solid #dc465e;
 }
 
 /* media q--------------------- */
@@ -464,13 +473,12 @@
     padding: 0 1rem;
   }
   .l_part_tree::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
 
   /* Handle */
   .l_part_tree::-webkit-scrollbar-thumb {
-    background: #aaa;
-    border-radius: 10px;
+    background-color: #d9d9d9;
   }
 
   .conversation_head {
