@@ -88,6 +88,13 @@
   transform: translateY(1.6px);
 }
 
+.noresult {
+  height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.1;
+}
 /* media q--------------------- */
 
 @media (max-width: 1280px) {

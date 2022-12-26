@@ -55,7 +55,9 @@ const History = () =>
             ></input>
           </form>
           <div className={ styles.friends }>
-            <Rooms_box rooms={ rooms.filter( ( room: any ) => room.name.toLowerCase().includes( inputForm.toLowerCase() ) ) }>
+            <Rooms_box
+              rooms={ rooms }
+              inputForm={ inputForm }>
             </Rooms_box>
           </div>
         </div>

@@ -57,7 +57,8 @@ const History = () =>
           </form>
           <div className={ styles.friends }>
             <Friends_box
-              friends={ friends.filter( ( friend: any ) => friend.username.toLowerCase().includes( inputForm.toLowerCase() ) ) }
+              friends={ friends }
+              inputForm={ inputForm }
             ></Friends_box>
           </div>
         </div>

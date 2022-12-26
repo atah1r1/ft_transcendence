@@ -1,5 +1,6 @@
 import styles from "../styles/conversation_box.module.css";
 import styles_p from "../styles/profile.module.css";
+import styles_f from "../styles/friends.module.css";
 import cn from "classnames";
 import { useContext, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -40,52 +41,71 @@ const ConversationBox = ( { searchInput }: any ) =>
     // bottomRef.current?.scrollIntoView( { behavior: 'smooth' } )
   }, [ chats ] )
 
-  return chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput.toLowerCase() ) )
-    .map( ( conv: any, i: number ) =>
-    {
-      return (
-        <div key={ i }>
-          <div
-            onClick={ () =>
-            {
-              setCurrentConv( conv );
-            } }
-            className={ cn(
-              styles.conversation, ` ${ conv.roomId === currentConv.roomId && styles.current_conv }`
-            ) }
-          >
-            <div className={ styles.conversation_img }>
-              <Image
-                src={ conv.image === null ? "https://avatars.dicebear.com/api/bottts/test.svg" : conv.image }
-                alt="conversation_image"
-                width={ "42px" }
-                height={ "42px" }
-                className={ styles_p.profile_avatar }
-              ></Image>
+  const find = chats ? chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput.toLowerCase() ) ) : [];
+
+  return chats.length ?
+    (
+      find.length ?
+        find.map( ( conv: any, i: number, arr: any ) =>
+        {
+          return (
+            <div key={ i }>
+              <div
+                onClick={ () =>
+                {
+                  setCurrentConv( conv );
+                } }
+                className={ cn(
+                  styles.conversation, ` ${ conv.roomId === currentConv.roomId && styles.current_conv }`
+                ) }
+              >
+                <div className={ styles.conversation_img }>
+                  <Image
+                    src={ conv.image === null ? "https://avatars.dicebear.com/api/bottts/test.svg" : conv.image }
+                    alt="conversation_image"
+                    width={ "42px" }
+                    height={ "42px" }
+                    className={ styles_p.profile_avatar }
+                  ></Image>
+                </div>
+                <div>
+                  <p className={ styles.conversation_name }>
+                    { conv.name }
+                  </p>
+                  <p className={ styles.conversation_text }>{ conv.lastMessage?.message }</p>
+                </div>
+                <div>
+                  <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
+                  { conv.wasRead !== true && (
+                    <p
+                      className={ cn(
+                        styles.conversation_number
+                      ) }
+                    >
+                      { conv.wasRead ? "" : "" }
+                    </p> )
+                  }
+                </div>
+              </div>
+              <div ref={ bottomRef } />
             </div>
-            <div>
-              <p className={ styles.conversation_name }>
-                { conv.name }
-              </p>
-              <p className={ styles.conversation_text }>{ conv.lastMessage?.message }</p>
-            </div>
-            <div>
-              <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
-              { conv.wasRead !== true && (
-                <p
-                  className={ cn(
-                    styles.conversation_number
-                  ) }
-                >
-                  { conv.wasRead ? "" : "" }
-                </p> )
-              }
-            </div>
-          </div>
-          <div ref={ bottomRef } />
-        </div>
-      );
-    } )
+          );
+        } ) : <div className={ styles_f.noresult }>
+          <Image
+            src={ "/noresult1.png" }
+            alt="no_result_img"
+            width="80"
+            height="80"
+          ></Image>
+        </div> ) :
+    <div className={ styles_f.noresult }>
+      <Image
+        src={ "/noresult.png" }
+        alt="no_result_img"
+        width="80"
+        height="80"
+      ></Image>
+    </div>
 };
 
 export default ConversationBox;
