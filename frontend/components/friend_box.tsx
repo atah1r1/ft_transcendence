@@ -1,7 +1,7 @@
 import styles from "../styles/friends.module.css";
 import styles_p from "../styles/profile.module.css";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { SocketContext } from "../pages/_app";
 import { AddCircleOutline, ChatbubbleOutline, PersonCircleOutline, RemoveCircleOutline } from 'react-ionicons'
 import { useRouter } from "next/router";
@@ -10,20 +10,13 @@ const Friends_box = ( { friends, inputForm }: any ) =>
 {
   const router = useRouter();
   const socket = useContext( SocketContext );
-  const [ empty, setEmpty ] = useState( false );
 
-  useEffect( () =>
-  {
-    setTimeout( () =>
-    {
-      !friends.length && setEmpty( true );
-    }, 100 )
-  } )
-
+  console.log( 'fri: ', friends );
   const find = friends ? friends.filter( ( friend: any ) => friend.username.toLowerCase().includes( inputForm.toLowerCase() ) ) : [];
 
-  return friends.length ?
-    (
+  if ( friends.length > 0 )
+  {
+    return (
       find.length ?
         find.map( ( ele: any, i: any ) =>
         {
@@ -95,15 +88,21 @@ const Friends_box = ( { friends, inputForm }: any ) =>
             width="220"
             height="220"
           ></Image>
-        </div> ) :
-    empty && <div className={ styles.noresult }>
-      <Image
-        src={ "/noresult.png" }
-        alt="no_result_img"
-        width="220"
-        height="220"
-      ></Image>
-    </div>
+        </div> )
+  }
+  if ( friends.length === 0 )
+  {
+    return (
+      <div className={ styles.noresult }>
+        <Image
+          src={ "/noresult.png" }
+          alt="no_result_img"
+          width="220"
+          height="220"
+        ></Image>
+      </div>
+    )
+  }
 };
 
 export default Friends_box;

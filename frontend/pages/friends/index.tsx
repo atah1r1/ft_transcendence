@@ -57,7 +57,7 @@ const History = () =>
           </form>
           <div className={ styles.friends }>
             <Friends_box
-              friends={ friends }
+              friends={ friends.length > 0 ? friends : [] }
               inputForm={ inputForm }
             ></Friends_box>
           </div>

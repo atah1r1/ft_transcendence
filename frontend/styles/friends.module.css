@@ -2,6 +2,8 @@
   width: 100%;
   height: 90%;
   overflow-y: scroll;
+  scrollbar-color: #d9d9d9 #d9d9d9;
+  scrollbar-width: thin;
   padding-right: 1rem;
 }
 

@@ -45,6 +45,8 @@
   padding-right: 1.6rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   width: 28rem;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
 }
 
 .l_part_two:hover {
@@ -67,6 +69,8 @@
   align-items: center;
   gap: 1rem;
   overflow-x: scroll;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
 }
 
 .back_arrow {
@@ -271,6 +275,8 @@
   column-gap: 1.2rem;
   padding: 0 0.6rem;
   overflow-y: scroll;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
 }
 
 .conversation_body::-webkit-scrollbar {
@@ -340,6 +346,8 @@
   font-weight: bold;
   gap: 0.6rem;
   overflow-y: hidden;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
 }
 
 .message_part_content:hover {
@@ -476,7 +484,6 @@
     width: 8px;
   }
 
-  /* Handle */
   .l_part_tree::-webkit-scrollbar-thumb {
     background-color: #d9d9d9;
   }
