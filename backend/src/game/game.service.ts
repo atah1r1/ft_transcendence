@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 import Queue from 'src/utils/queue';
 import Game, { GameStatus, PlayerStatus } from './models/game.model';
 
+let intervalid;
 const EV_EMIT_GAME_DATA = 'emit_game_data';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class GameService {
   constructor(
     private userService: UserService,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   connectedUsers = new Map<string, Socket[]>();
 
@@ -304,6 +305,19 @@ export class GameService {
     return game;
   }
 
+  //Ball Collision function
+  collision(objGame: any) {
+    if (
+      objGame.x + objGame.width > objGame.ball.x &&
+      objGame.x < objGame.ball.x + objGame.ball.rad &&
+      objGame.y + objGame.height > objGame.ball.y &&
+      objGame.y < objGame.ball.dy + objGame.ball.rad) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
   // Checks if any player has disconnected
   // Sets other player as winner and sets game as finished
   private checkGameDisconnection(game: Game): boolean {
@@ -338,6 +352,7 @@ export class GameService {
 
   // Updates game state
   // Called every frame (intervals of 1000ms / 30)
+
   private updateGame(game: Game): Game {
     // check for disconnection and finish game.
     if (!this.checkGameDisconnection(game)) return game;
@@ -346,6 +361,57 @@ export class GameService {
     // TODO: check for collision and goals.
     // TODO: update score for game.
 
+    //ball handle  
+    if (game.ball.y < 0 || game.ball.y + game.ball.rad > 720) {
+      game.ball.dy = -game.ball.dy;
+    }
+    if (game.ball.x < 0) {
+
+      //update points +1
+      game.score[game.players[1]] = game.score[game.players[1]] + 1;
+      //Send the new point
+      this.server.to(game.id).emit('player2_scored', game.score[game.players[1]]);
+
+      game.ball.x = 640;
+      game.ball.y = 350;
+      game.ball.dx = -7;
+      game.ball.dy = -7;
+      //update score here
+    }
+    else if (game.ball.x + game.ball.rad > 1280) {
+      //update points +1
+      game.score[game.players[0]] = game.score[game.players[0]] + 1;
+      // Send the new score
+      this.server.to(game.id).emit('player1_scored', game.score[game.players[0]]);
+
+
+      game.ball.x = 640;
+      game.ball.y = 350;
+      game.ball.dx = 7;
+      game.ball.dy = 7;
+      //update score here
+    }
+
+    if ((this.collision(game) && game.ball.dx < 0)
+      && player1.side == 'left') {
+      game.ball.dx = -game.ball.dx;
+      this.server.to(game.id).emit('play_sound');
+    }
+
+    if ((this.collision(game) && game.ball.dx > 0
+      && player2.side == 'right')
+    ) {
+      game.ball.dx = -game.ball.dx;
+      this.server.to(game.id).emit('play_sound');
+
+    }
+
+
+    game.ball.x += game.ball.dx;
+    game.ball.y += game.ball.dy;
+    // console.log(game.ball);
+
+
     // TODO: do other stuff
 
     // Check for win and finish game.
@@ -353,6 +419,9 @@ export class GameService {
       game.score[game.players[0]] === 10 ||
       game.score[game.players[1]] === 10
     ) {
+      //send player points here
+      //Reset Player score to 0
+      //game.score[game.players[0]] = 0;
       return this.finishGame(game);
     }
     return game;
