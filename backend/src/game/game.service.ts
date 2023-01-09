@@ -306,12 +306,12 @@ export class GameService {
   }
 
   //Ball Collision function
-  collision(objGame: any) {
+  collision(objGame: any, objPlayer: any) {
     if (
-      objGame.x + objGame.width > objGame.ball.x &&
-      objGame.x < objGame.ball.x + objGame.ball.rad &&
-      objGame.y + objGame.height > objGame.ball.y &&
-      objGame.y < objGame.ball.dy + objGame.ball.rad) {
+      objPlayer.x + objPlayer.width > objGame.ball.x &&
+      objPlayer.x < objGame.ball.x + objGame.ball.rad &&
+      objPlayer.y + objPlayer.height > objGame.ball.y &&
+      objPlayer.y < objGame.ball.dy + objGame.ball.rad) {
       return true;
     }
     else {
@@ -370,7 +370,7 @@ export class GameService {
       //update points +1
       game.score[game.players[1]] = game.score[game.players[1]] + 1;
       //Send the new point
-      this.server.to(game.id).emit('player2_scored', game.score[game.players[1]]);
+      
 
       game.ball.x = 640;
       game.ball.y = 350;
@@ -382,7 +382,7 @@ export class GameService {
       //update points +1
       game.score[game.players[0]] = game.score[game.players[0]] + 1;
       // Send the new score
-      this.server.to(game.id).emit('player1_scored', game.score[game.players[0]]);
+      
 
 
       game.ball.x = 640;
@@ -392,18 +392,12 @@ export class GameService {
       //update score here
     }
 
-    if ((this.collision(game) && game.ball.dx < 0)
-      && player1.side == 'left') {
+    if ((this.collision(game, game.paddle.get(game.playerStatus[0])) && game.ball.dx < 0)) {
       game.ball.dx = -game.ball.dx;
-      this.server.to(game.id).emit('play_sound');
     }
 
-    if ((this.collision(game) && game.ball.dx > 0
-      && player2.side == 'right')
-    ) {
+    if ((this.collision(game, game.paddle.get(game.playerStatus[1])) && game.ball.dx > 0)) {
       game.ball.dx = -game.ball.dx;
-      this.server.to(game.id).emit('play_sound');
-
     }
 
 
@@ -510,7 +504,7 @@ export class GameService {
 
     if (payload === "UP" && game.paddle.get(userId).y > 0)
     game.paddle.get(userId).y -= 40;
-    
+
     return game;
   }
 
