@@ -437,6 +437,20 @@ export class GameService {
     // TODO: modify game/models/game.model.ts to add all needed properties for game logic
     // return game object after setting all initial values for ball pos...etc
     // TODO: initialize game state
+    game.ball.x = 640;
+    game.ball.y = 350;
+    game.ball.dx = 7;
+    game.ball.dy = 7;
+    game.ball.rad = 10;
+
+    game.players.forEach(player => {
+      game.paddle.get(player).x = 4;
+      game.paddle.get(player).y = 0;
+      game.paddle.get(player).width = 8;
+      game.paddle.get(player).height = 100;
+      game.paddle.get(player). colour = "#02CEFC";
+    })
+
     return game;
   }
 
@@ -452,7 +466,7 @@ export class GameService {
       const updatedGame = this.updateGame(game);
       if (updatedGame.status === GameStatus.FINISHED) return;
       this.sendGameUpdateToClients(updatedGame);
-    }, 1000 / 30);
+    }, 1000 / 60);
 
     // Save interval timer to game object to cancel it later
     game.timer = timer;
@@ -491,6 +505,7 @@ export class GameService {
     // TODO: update paddle position for game.
     // NB: no need to update ball position here or send game update to clients
     // TODO: do other stuff
+    
     return game;
   }
 

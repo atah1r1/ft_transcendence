@@ -20,6 +20,13 @@ export class Ball {
   rad: number;
 }
 
+export class Paddle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  colour: string;
+}
 
 
 export default class Game {
@@ -31,6 +38,7 @@ export default class Game {
   playerStatus: Map<string, PlayerStatus>;
   timer: NodeJS.Timer;
   ball: Ball;
+  paddle: Map<string, Paddle>;
 
   // TODO: add other fields for ball position, etc.
 }
