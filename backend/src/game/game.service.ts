@@ -505,6 +505,11 @@ export class GameService {
     // TODO: update paddle position for game.
     // NB: no need to update ball position here or send game update to clients
     // TODO: do other stuff
+    if (payload === "DOWN" && game.paddle.get(userId).y < 620)
+    game.paddle.get(userId).y += 40;
+
+    if (payload === "UP" && game.paddle.get(userId).y > 0)
+    game.paddle.get(userId).y -= 40;
     
     return game;
   }
