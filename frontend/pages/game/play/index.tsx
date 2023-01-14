@@ -6,12 +6,13 @@ import styled from "styled-components";
 import { io, Socket } from "socket.io-client";
 import styles_box from "../../../styles/style_box.module.css";
 import requireAuthentication from "../../../hooks/requiredAuthentication";
-export const socket = io( '0.0.0.0:3001', {
-    query: {
-        userLogin: 'mougnou',
-    }
-} ); //update this to mac pubic ip
-
+// export const socket = io( '0.0.0.0:3001', {
+//     query: {
+//         userLogin: 'mougnou',
+//     }
+// } ); //update this to mac pubic ip
+// FIX SOCKET HERE
+export const socket = io( '0.0.0.0:3001');
 const Container = styled.div`
     background-image:
     linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
@@ -59,13 +60,9 @@ function Game ()
     useEffect( () =>
     {
 
-        socket.off( 'START_GAME' ).on( 'START_GAME', () =>
+        socket.off( 'emit_game_data' ).on( 'emit_game_data', data =>
         {
-            // socket.on('START_GAME', () => {
-            newPlayer = true;
-            setGameOn( true );
-            console.log( 'game started' );
-            console.log( gameOn );
+           leftPaddle = data.
 
         } );
 

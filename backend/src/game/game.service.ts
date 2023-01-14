@@ -6,7 +6,6 @@ import { UserService } from 'src/user/user.service';
 import Queue from 'src/utils/queue';
 import Game, { GameStatus, PlayerStatus } from './models/game.model';
 
-let intervalid;
 const EV_EMIT_GAME_DATA = 'emit_game_data';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class GameService {
   constructor(
     private userService: UserService,
     private prisma: PrismaService,
-  ) { }
+  ) {}
 
   connectedUsers = new Map<string, Socket[]>();
 
@@ -125,10 +124,6 @@ export class GameService {
 
   // Unsafe method.
   addRequest(userId: string, opponentId: string) {
-    // if (this.requests.has(userId))
-    //   throw new Error('You already have a pending request.');
-    // if (this.requests.has(opponentId))
-    //   throw new Error('This user already has a pending request.');
     this.requests.set(userId, opponentId);
     this.requests.set(opponentId, userId);
   }
@@ -311,10 +306,10 @@ export class GameService {
       objPlayer.x + objPlayer.width > objGame.ball.x &&
       objPlayer.x < objGame.ball.x + objGame.ball.rad &&
       objPlayer.y + objPlayer.height > objGame.ball.y &&
-      objPlayer.y < objGame.ball.dy + objGame.ball.rad) {
+      objPlayer.y < objGame.ball.dy + objGame.ball.rad
+    ) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -361,29 +356,24 @@ export class GameService {
     // TODO: check for collision and goals.
     // TODO: update score for game.
 
-    //ball handle  
+    //ball handle
     if (game.ball.y < 0 || game.ball.y + game.ball.rad > 720) {
       game.ball.dy = -game.ball.dy;
     }
     if (game.ball.x < 0) {
-
       //update points +1
       game.score[game.players[1]] = game.score[game.players[1]] + 1;
       //Send the new point
-      
 
       game.ball.x = 640;
       game.ball.y = 350;
       game.ball.dx = -7;
       game.ball.dy = -7;
       //update score here
-    }
-    else if (game.ball.x + game.ball.rad > 1280) {
+    } else if (game.ball.x + game.ball.rad > 1280) {
       //update points +1
       game.score[game.players[0]] = game.score[game.players[0]] + 1;
       // Send the new score
-      
-
 
       game.ball.x = 640;
       game.ball.y = 350;
@@ -392,19 +382,23 @@ export class GameService {
       //update score here
     }
 
-    if ((this.collision(game, game.paddle.get(game.playerStatus[0])) && game.ball.dx < 0)) {
+    if (
+      this.collision(game, game.paddle.get(game.playerStatus[0])) &&
+      game.ball.dx < 0
+    ) {
       game.ball.dx = -game.ball.dx;
     }
 
-    if ((this.collision(game, game.paddle.get(game.playerStatus[1])) && game.ball.dx > 0)) {
+    if (
+      this.collision(game, game.paddle.get(game.playerStatus[1])) &&
+      game.ball.dx > 0
+    ) {
       game.ball.dx = -game.ball.dx;
     }
-
 
     game.ball.x += game.ball.dx;
     game.ball.y += game.ball.dy;
     // console.log(game.ball);
-
 
     // TODO: do other stuff
 
@@ -437,13 +431,21 @@ export class GameService {
     game.ball.dy = 7;
     game.ball.rad = 10;
 
-    game.players.forEach(player => {
-      game.paddle.get(player).x = 4;
-      game.paddle.get(player).y = 0;
-      game.paddle.get(player).width = 8;
-      game.paddle.get(player).height = 100;
-      game.paddle.get(player). colour = "#02CEFC";
-    })
+    for (let i = 0; i < 2; i++) {
+      if (i == 0) {
+        game.paddle.get(game.players[i]).x = 4;
+        game.paddle.get(game.players[i]).y = 0;
+        game.paddle.get(game.players[i]).width = 8;
+        game.paddle.get(game.players[i]).height = 100;
+        game.paddle.get(game.players[i]).colour = '#02CEFC';
+      } else {
+        game.paddle.get(game.players[i]).x = 1268;
+        game.paddle.get(game.players[i]).y = 0;
+        game.paddle.get(game.players[i]).width = 8;
+        game.paddle.get(game.players[i]).height = 100;
+        game.paddle.get(game.players[i]).colour = '#ED006C';
+      }
+    }
 
     return game;
   }
@@ -482,6 +484,7 @@ export class GameService {
       throw new Error('This game has already started.');
     if (game.status === GameStatus.FINISHED)
       throw new Error('This game has already finished.');
+
     game.playerStatus[userId] = PlayerStatus.READY;
     if (
       game.playerStatus[userId] === PlayerStatus.READY &&
@@ -499,11 +502,11 @@ export class GameService {
     // TODO: update paddle position for game.
     // NB: no need to update ball position here or send game update to clients
     // TODO: do other stuff
-    if (payload === "DOWN" && game.paddle.get(userId).y < 620)
-    game.paddle.get(userId).y += 40;
+    if (payload.move === 'DOWN' && game.paddle.get(userId).y < 620)
+      game.paddle.get(userId).y += 40;
 
-    if (payload === "UP" && game.paddle.get(userId).y > 0)
-    game.paddle.get(userId).y -= 40;
+    if (payload.move === 'UP' && game.paddle.get(userId).y > 0)
+      game.paddle.get(userId).y -= 40;
 
     return game;
   }
@@ -576,6 +579,8 @@ export class GameService {
       throw new Error('This user already has a pending request.');
     if (this.gameQueue.contains(userId))
       throw new Error('You are already in the queue.');
+    if (this.gameQueue.contains(otherId))
+      throw new Error('This user already in the queue.');
     this.addRequest(userId, otherId);
     return true;
   }

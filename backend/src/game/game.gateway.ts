@@ -22,6 +22,7 @@ const EV_START_GAME = 'start_game';
 const EV_LEAVE_GAME = 'leave_game';
 const EV_LEAVE_QUEUE = 'leave_queue';
 const EV_SPECTATE_GAME = 'spectate_game';
+const EV_STOP_SPECTATE_GAME = 'stop_spectate_game';
 const EV_GAME_MOVE = 'game_move';
 
 const EV_EMIT_PLAY_AGAINST_REQUEST = 'emit_play_against_request';
@@ -100,13 +101,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   validateMakeMove(payload: any) {
     // TODO: add validation as follows:
-    if (!('gameId' in payload)) {
+    if (!('gameId' in payload) || !('move' in payload)) {
       throw new WsException({
         error: EV_GAME_MOVE,
         message: 'Invalid payload',
       });
     }
-    if (typeof payload.gameId !== 'string') {
+    if (
+      typeof payload.gameId !== 'string' ||
+      typeof payload.move !== 'string'
+    ) {
       throw new WsException({
         error: EV_GAME_MOVE,
         message: 'Invalid payload',
@@ -219,6 +223,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client,
       );
       if (game) {
+        // TODO: add a different event for each time you call this function
         this.sendGameToClients(game);
       }
     } catch (err) {
@@ -327,7 +332,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage(EV_SPECTATE_GAME)
+  @SubscribeMessage(EV_STOP_SPECTATE_GAME)
   async stopSpectatingGame(client: any, payload: any) {
     this.validateSpectateGame(payload);
     try {

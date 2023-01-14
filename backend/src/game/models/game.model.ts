@@ -13,9 +13,9 @@ export enum PlayerStatus {
 }
 
 export class Ball {
-  x: number; 
-  y: number; 
-  dx: number; 
+  x: number;
+  y: number;
+  dx: number;
   dy: number;
   rad: number;
 }
@@ -27,7 +27,6 @@ export class Paddle {
   height: number;
   colour: string;
 }
-
 
 export default class Game {
   id: string;
