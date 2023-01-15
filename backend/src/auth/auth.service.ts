@@ -8,7 +8,8 @@ config();
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService) { }
+  constructor(private prisma: PrismaService, private jwt: JwtService) {}
+
   async Login(username: string, name: object, photos: string): Promise<any> {
     const userTwofaActivated = await this.prisma.user.findUnique({
       where: { intra_name: username },
@@ -18,7 +19,7 @@ export class AuthService {
         where: { intra_name: username },
         data: {
           code_verified: false,
-        }
+        },
       });
     }
     const user = await this.prisma.user.findUnique({
@@ -40,7 +41,23 @@ export class AuthService {
     return this.SignToken(user_created.id);
   }
 
-  async SignToken(id: String): Promise<string> {
+  async LoginTemp(): Promise<any> {
+    const userNumber = await this.prisma.user.count();
+
+    const user = await this.prisma.user.create({
+      data: {
+        intra_name: 'USER' + userNumber,
+        username: 'USER' + userNumber,
+        first_name: 'USER ' + userNumber,
+        last_name: 'USER ' + userNumber,
+        avatar: null,
+        two_factor_auth_key: authenticator.generateSecret(),
+      },
+    });
+    return this.SignToken(user.id);
+  }
+
+  async SignToken(id: string): Promise<string> {
     const payload = { id: id };
     return this.jwt.signAsync(payload, {
       expiresIn: '3d',

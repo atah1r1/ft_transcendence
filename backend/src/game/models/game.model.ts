@@ -39,5 +39,38 @@ export default class Game {
   ball: Ball;
   paddle: Map<string, Paddle>;
 
-  // TODO: add other fields for ball position, etc.
+  convertToJSON() {
+    let score = {};
+    if (this.score) {
+      score = {
+        [this.players[0]]: this.score.get(this.players[0]),
+        [this.players[1]]: this.score.get(this.players[1]),
+      };
+    }
+    let playerStatus = {};
+    if (this.playerStatus) {
+      playerStatus = {
+        [this.players[0]]: this.playerStatus.get(this.players[0]),
+        [this.players[1]]: this.playerStatus.get(this.players[1]),
+      };
+    }
+    let paddle = {};
+    if (this.paddle) {
+      paddle = {
+        [this.players[0]]: this.paddle.get(this.players[0]),
+        [this.players[1]]: this.paddle.get(this.players[1]),
+      };
+    }
+
+    return {
+      id: this.id,
+      players: this.players,
+      spectators: this.spectators,
+      status: this.status,
+      ball: this.ball,
+      score: score,
+      playerStatus: playerStatus,
+      paddle: paddle,
+    };
+  }
 }

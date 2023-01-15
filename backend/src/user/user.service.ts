@@ -62,7 +62,7 @@ export class UserService {
     const user = await this.prisma.user.findUnique({
       where: { username },
     });
-    console.log(user);
+    //console.log(user);
     if (user) {
       return true;
     }
@@ -72,7 +72,7 @@ export class UserService {
   async updateProfile(user: any, body: any) {
     const currentUser = await this.getUserById(user.id, user.id);
     const { first_name, last_name, username } = body;
-    console.log('body body', body);
+    //console.log('body body', body);
     const data: any = {};
     if (first_name) data.first_name = first_name;
     if (last_name) data.last_name = last_name;

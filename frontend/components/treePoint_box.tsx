@@ -6,13 +6,14 @@ import { BanSharp, PersonAddSharp } from 'react-ionicons'
 import { PersonSharp } from 'react-ionicons'
 import { VolumeMuteSharp } from 'react-ionicons'
 import { useContext } from "react";
-import { SocketContext } from "../pages/_app";
+import { GameSocketContext, SocketContext } from "../pages/_app";
 
 const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) =>
 {
   const userId = localStorage.getItem( 'userId' );
   const friendId = members.find( ( member: any ) => member.id != userId )?.id;
   const socket = useContext( SocketContext );
+  const gameSocket = useContext( GameSocketContext );
   const router = useRouter();
 
   return !group.group_box ?
@@ -33,8 +34,7 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
       <div className={ styles.treepoints_box_row }
         onClick={ () =>
         {
-          console.log( 'clicked!!' );
-          socket?.emit( 'play_against', { userId: roomUser.userId } );
+          gameSocket.emit( 'play_against', { userId: friendId } );
           group.setGroupBox( false );
         } }>
         <p>invite player</p>
@@ -64,8 +64,7 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
         <div className={ styles.treepoints_box_row }
           onClick={ () =>
           {
-            console.log( 'clicked!!' );
-            socket?.emit( 'play_against', { userId: roomUser.userId } );
+            gameSocket.emit( 'play_against', { userId: roomUser.userId } );
             group.setGroupBox( false );
           } }>
           <p>invite player</p>

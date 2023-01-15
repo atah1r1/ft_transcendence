@@ -23,12 +23,20 @@ export class AuthController {
     @Req() req: any,
     @Res({ passthrough: true }) res: any,
   ) {
-    console.log(req.user['_json'].image?.link);
+    //console.log(req.user['_json'].image?.link);
     const { username, name, _json } = req.user;
     const image = _json?.image?.link;
     const jwt = await this.AuthService.Login(username, name, image);
     res.cookie('jwt', jwt);
     return res.redirect('http://localhost:3000/profile');
+  }
+
+  @Get('temp')
+  async temp(@Res({ passthrough: true }) res: any) {
+    const jwt = await this.AuthService.LoginTemp();
+    res.cookie('jwt', jwt);
+    // return res.redirect('http://localhost:3000/profile');
+    return { jwt };
   }
 
   @Get('logout')

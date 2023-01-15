@@ -11,7 +11,7 @@ import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { GameService } from './game.service';
-import Game from './models/game.model';
+import Game, { GameStatus } from './models/game.model';
 
 const EV_PLAY_AGAINST = 'play_against';
 const EV_PLAY_QUEUE = 'play_queue';
@@ -25,8 +25,11 @@ const EV_SPECTATE_GAME = 'spectate_game';
 const EV_STOP_SPECTATE_GAME = 'stop_spectate_game';
 const EV_GAME_MOVE = 'game_move';
 
+const EV_EMIT_PLAY_AGAINST_CANCEL = 'emit_play_against_cancel';
+const EV_EMIT_PLAY_AGAINST_DECLINE = 'emit_play_against_decline';
+const EV_EMIT_PLAY_AGAINST_ACCEPT = 'emit_play_against_accept';
+const EV_EMIT_PLAY_QUEUE = 'emit_play_queue';
 const EV_EMIT_PLAY_AGAINST_REQUEST = 'emit_play_against_request';
-const EV_EMIT_GAME = 'emit_game';
 const EV_EMIT_SPECTATE_GAME = 'emit_spectate_game';
 const EV_EMIT_LEAVE_QUEUE = 'emit_leave_queue';
 
@@ -53,7 +56,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       await this.verifyAndSave(client);
       this.gameService.addConnectedUser(client.data.id, client);
+      console.log('USER CONNECTED: ', client.data.id);
     } catch (err) {
+      console.log('USER DISCONNECTED ERROR: ', client.data.id);
       client.disconnect();
     }
   }
@@ -88,13 +93,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!('userId' in payload)) {
       throw new WsException({
         error: EV_PLAY_AGAINST,
-        message: 'Invalid payload',
+        message: 'Invalid payload 1',
       });
     }
     if (typeof payload.userId !== 'string') {
       throw new WsException({
         error: EV_PLAY_AGAINST,
-        message: 'Invalid payload',
+        message: 'Invalid payload 2',
       });
     }
   }
@@ -134,34 +139,46 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   sendPlayAgainstRequestToClient(userId: string, opUser: User) {
-    console.log('here!!!!');
     const sockets = this.gameService.getConnectedUserById(userId);
     sockets.forEach((s) => {
+      console.log('EMITTING PLAY AGAINST REQUEST TO USER');
       s.emit(EV_EMIT_PLAY_AGAINST_REQUEST, opUser);
     });
   }
 
-  sendGameToClients(game: Game) {
+  sendGameToClients(game: Game, eventName: string) {
     const players = game.players;
     const spectators = game.spectators;
     players.forEach((p) => {
       const s = this.gameService.getPlayerById(p);
       if (s) {
-        s.emit(EV_EMIT_GAME, game);
+        s.emit(eventName, game.convertToJSON());
       }
     });
     // in case there are spectators
     spectators.forEach((sp) => {
       const s = this.gameService.getSpectatorById(sp);
       if (s) {
-        s.emit(EV_EMIT_GAME, game);
+        s.emit(eventName, game.convertToJSON());
       }
+    });
+  }
+
+  sendGameToConnectedClients(game: Game, eventName: string) {
+    const players = game.players;
+    players.forEach((p) => {
+      const sockets = this.gameService.getConnectedUserById(p);
+      sockets.forEach((s) => {
+        if (s) {
+          s.emit(eventName, game.convertToJSON());
+        }
+      });
     });
   }
 
   sendGameToSpectator(client: Socket, game: Game) {
     if (client) {
-      client.emit(EV_EMIT_SPECTATE_GAME, game);
+      client.emit(EV_EMIT_SPECTATE_GAME, game.convertToJSON());
     }
   }
 
@@ -179,8 +196,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.data.id,
         payload.userId,
       );
-      if (game) {
-        this.sendGameToClients(game);
+      if (game.status === GameStatus.ACCEPTED) {
+        this.sendGameToClients(game, EV_EMIT_PLAY_QUEUE);
+      } else {
+        this.sendGameToConnectedClients(game, EV_EMIT_PLAY_QUEUE);
       }
     } catch (err) {
       throw new WsException({
@@ -192,6 +211,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(EV_PLAY_AGAINST)
   async playAgainst(client: any, payload: any) {
+    console.log('PLAY AGAINST REQUEST: ', payload);
     this.validatePlayAgainst(payload);
     try {
       const reqAdded = await this.gameService.playAgainst(
@@ -199,6 +219,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.userId,
       );
       if (reqAdded) {
+        console.log('PLAY AGAINST REQUEST ADDED');
         const user = await this.userService.getUserById(
           client.data.id,
           client.data.id,
@@ -215,6 +236,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(EV_PLAY_AGAINST_ACCEPT)
   async playAgainstAccept(client: any, payload: any) {
+    console.log('PLAY AGAINST ACCEPT: ', payload);
     this.validatePlayAgainst(payload);
     try {
       const game = this.gameService.acceptPlayAgainst(
@@ -223,8 +245,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client,
       );
       if (game) {
-        // TODO: add a different event for each time you call this function
-        this.sendGameToClients(game);
+        if (game.status === GameStatus.ACCEPTED) {
+          console.log('PLAY AGAINST GAME ACCEPTED');
+          this.sendGameToClients(game, EV_EMIT_PLAY_AGAINST_ACCEPT);
+        } else {
+          console.log('PLAY AGAINST GAME DECLINED');
+          this.sendGameToConnectedClients(game, EV_EMIT_PLAY_AGAINST_ACCEPT);
+        }
       }
     } catch (err) {
       throw new WsException({
@@ -243,7 +270,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.userId,
       );
       if (game) {
-        this.sendGameToClients(game);
+        this.sendGameToConnectedClients(game, EV_EMIT_PLAY_AGAINST_DECLINE);
       }
     } catch (err) {
       throw new WsException({
@@ -262,7 +289,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.userId,
       );
       if (game) {
-        this.sendGameToClients(game);
+        this.sendGameToConnectedClients(game, EV_EMIT_PLAY_AGAINST_CANCEL);
       }
     } catch (err) {
       throw new WsException({
@@ -276,10 +303,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async startGame(client: any, payload: any) {
     this.validatePlayAgainst(payload);
     try {
-      const game = this.gameService.startGame(client.data.id, payload.userId);
-      if (game) {
-        this.sendGameToClients(game);
-      }
+      this.gameService.startGame(client.data.id, payload.userId);
     } catch (err) {
       throw new WsException({
         error: EV_START_GAME,

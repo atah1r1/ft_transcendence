@@ -4,7 +4,13 @@ import { Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import Queue from 'src/utils/queue';
-import Game, { GameStatus, PlayerStatus } from './models/game.model';
+import { json } from 'stream/consumers';
+import Game, {
+  Ball,
+  GameStatus,
+  Paddle,
+  PlayerStatus,
+} from './models/game.model';
 
 const EV_EMIT_GAME_DATA = 'emit_game_data';
 
@@ -301,17 +307,31 @@ export class GameService {
   }
 
   //Ball Collision function
-  collision(objGame: any, objPlayer: any) {
+  private collision(objGame: any, paddle: any) {
     if (
-      objPlayer.x + objPlayer.width > objGame.ball.x &&
-      objPlayer.x < objGame.ball.x + objGame.ball.rad &&
-      objPlayer.y + objPlayer.height > objGame.ball.y &&
-      objPlayer.y < objGame.ball.dy + objGame.ball.rad
+      (objGame.ball.x - objGame.ball.rad >= paddle.x - paddle.width / 2 &&
+        objGame.ball.x - objGame.ball.rad <= paddle.x + paddle.width / 2 &&
+        objGame.ball.y >= paddle.y &&
+        objGame.ball.y <= paddle.y + paddle.height) ||
+      (objGame.ball.x + objGame.ball.rad >= paddle.x - paddle.width / 2 &&
+        objGame.ball.x + objGame.ball.rad <= paddle.x + paddle.width / 2 &&
+        objGame.ball.y >= paddle.y &&
+        objGame.ball.y <= paddle.y + paddle.height)
     ) {
       return true;
-    } else {
-      return false;
     }
+    return false;
+
+    // if (
+    //   paddle.x + paddle.width > objGame.ball.x &&
+    //   paddle.x < objGame.ball.x + objGame.ball.rad &&
+    //   paddle.y + paddle.height > objGame.ball.y &&
+    //   paddle.y < objGame.ball.dy + objGame.ball.rad
+    // ) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   }
   // Checks if any player has disconnected
   // Sets other player as winner and sets game as finished
@@ -333,14 +353,14 @@ export class GameService {
     players.forEach((p) => {
       const s = this.getPlayerById(p);
       if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game);
+        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
       }
     });
     // in case there are spectators
     spectators.forEach((sp) => {
       const s = this.getSpectatorById(sp);
       if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game);
+        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
       }
     });
   }
@@ -360,37 +380,38 @@ export class GameService {
     if (game.ball.y < 0 || game.ball.y + game.ball.rad > 720) {
       game.ball.dy = -game.ball.dy;
     }
+
     if (game.ball.x < 0) {
       //update points +1
-      game.score[game.players[1]] = game.score[game.players[1]] + 1;
+      game.score.set(game.players[1], game.score.get(game.players[1]) + 1);
       //Send the new point
 
       game.ball.x = 640;
       game.ball.y = 350;
-      game.ball.dx = -7;
-      game.ball.dy = -7;
+      game.ball.dx = -6;
+      game.ball.dy = -6;
       //update score here
     } else if (game.ball.x + game.ball.rad > 1280) {
       //update points +1
-      game.score[game.players[0]] = game.score[game.players[0]] + 1;
+      game.score.set(game.players[0], game.score.get(game.players[0]) + 1);
       // Send the new score
 
       game.ball.x = 640;
       game.ball.y = 350;
-      game.ball.dx = 7;
-      game.ball.dy = 7;
+      game.ball.dx = 6;
+      game.ball.dy = 6;
       //update score here
     }
 
     if (
-      this.collision(game, game.paddle.get(game.playerStatus[0])) &&
+      this.collision(game, game.paddle.get(game.players[0])) &&
       game.ball.dx < 0
     ) {
       game.ball.dx = -game.ball.dx;
     }
 
     if (
-      this.collision(game, game.paddle.get(game.playerStatus[1])) &&
+      this.collision(game, game.paddle.get(game.players[1])) &&
       game.ball.dx > 0
     ) {
       game.ball.dx = -game.ball.dx;
@@ -404,8 +425,8 @@ export class GameService {
 
     // Check for win and finish game.
     if (
-      game.score[game.players[0]] === 10 ||
-      game.score[game.players[1]] === 10
+      game.score.get(game.players[0]) === 10 ||
+      game.score.get(game.players[1]) === 10
     ) {
       //send player points here
       //Reset Player score to 0
@@ -425,21 +446,25 @@ export class GameService {
     // TODO: modify game/models/game.model.ts to add all needed properties for game logic
     // return game object after setting all initial values for ball pos...etc
     // TODO: initialize game state
+    game.ball = new Ball();
     game.ball.x = 640;
     game.ball.y = 350;
-    game.ball.dx = 7;
-    game.ball.dy = 7;
+    game.ball.dx = 6;
+    game.ball.dy = 6;
     game.ball.rad = 10;
 
+    game.paddle = new Map();
+    game.paddle.set(game.players[0], new Paddle());
+    game.paddle.set(game.players[1], new Paddle());
     for (let i = 0; i < 2; i++) {
       if (i == 0) {
-        game.paddle.get(game.players[i]).x = 4;
+        game.paddle.get(game.players[i]).x = 10;
         game.paddle.get(game.players[i]).y = 0;
         game.paddle.get(game.players[i]).width = 8;
         game.paddle.get(game.players[i]).height = 100;
         game.paddle.get(game.players[i]).colour = '#02CEFC';
       } else {
-        game.paddle.get(game.players[i]).x = 1268;
+        game.paddle.get(game.players[i]).x = 1262;
         game.paddle.get(game.players[i]).y = 0;
         game.paddle.get(game.players[i]).width = 8;
         game.paddle.get(game.players[i]).height = 100;
@@ -462,7 +487,7 @@ export class GameService {
       const updatedGame = this.updateGame(game);
       if (updatedGame.status === GameStatus.FINISHED) return;
       this.sendGameUpdateToClients(updatedGame);
-    }, 1000 / 60);
+    }, 1000 / 30);
 
     // Save interval timer to game object to cancel it later
     game.timer = timer;
@@ -472,7 +497,6 @@ export class GameService {
   // Called twice when players are ready
   // Sets Game as STARTED and calls launchGame
   // Returns Game object with status STARTED
-  //
   // In frontend, each player will call this function
   // after they open Game UI. and wait for other player to do the same.
   // When both players are ready, the game will start
@@ -662,7 +686,7 @@ export class GameService {
       throw new Error('You do not have a pending request.');
     this.removeRequest(userId, otherId);
     const cancelledGame = new Game();
-    cancelledGame.players = [userId];
+    cancelledGame.players = [userId, otherId];
     cancelledGame.status = GameStatus.CANCELLED;
     return cancelledGame;
   }
@@ -672,22 +696,22 @@ export class GameService {
   async createGameHistory(game: Game): Promise<GameHistory> {
     if (game.players.length !== 2) return null;
 
-    const score1 = game.score[game.players[0]];
-    const score2 = game.score[game.players[1]];
+    const score1: number = game.score.get(game.players[0]);
+    const score2: number = game.score.get(game.players[1]);
 
     const winnerId = score1 > score2 ? game.players[0] : game.players[1];
     const loserId = score1 > score2 ? game.players[1] : game.players[0];
 
-    const winnerScore = score1 > score2 ? score1 : score2;
-    const loserScore = score1 > score2 ? score2 : score1;
+    const winnerScore: number = score1 > score2 ? score1 : score2;
+    const loserScore: number = score1 > score2 ? score2 : score1;
 
     const history = await this.prisma.gameHistory.create({
       data: {
         gameId: game.id,
         winnerId,
         loserId,
-        winnerScore,
-        loserScore,
+        winnerScore: winnerScore ?? 0,
+        loserScore: loserScore ?? 0,
       },
     });
     return history;

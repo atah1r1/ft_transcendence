@@ -11,14 +11,7 @@ import { GameService } from './game.service';
 
 @Module({
   controllers: [GameController],
-  providers: [
-    GameGateway,
-    GameService,
-    AuthService,
-    UserService,
-    PrismaService,
-    JwtService,
-  ],
+  providers: [GameService, AuthService, UserService, PrismaService, JwtService],
   imports: [AuthModule, UserModule],
 })
 export class GameModule {}

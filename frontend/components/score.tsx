@@ -71,7 +71,7 @@ export let is_score: boolean = false;
 export let p1_points: number = 0;
 export let p2_points: number = 0;
 
-export function JoinRoom ( props: any )
+export function JoinRoom ( props: {score1: number, score2: number } )
 {
     const [ p1Score, setP1Score ] = React.useState( 0 );
     const [ p2Score, setP2Score ] = React.useState( 0 );
@@ -108,12 +108,12 @@ export function JoinRoom ( props: any )
             <ScoreContainer>
                 <ScoreContainerP1>
                     <p> SENKO </p>
-                    <h2> { p1Score }</h2>
+                    <h2> { props.score1 }</h2>
                 </ScoreContainerP1>
 
                 <ScoreContainerP2>
                     <p> PUNK </p>
-                    <h2> { p2Score } </h2>
+                    <h2> { props.score2 } </h2>
                 </ScoreContainerP2>
             </ScoreContainer>
         </>
