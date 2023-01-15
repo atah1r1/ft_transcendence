@@ -19,7 +19,6 @@ const ScoreContainer = styled.div`
 
     }
 `;
-
 const ScoreContainerP1 = styled.div`
     outline: none;
     background-color: #02CEFC;
@@ -71,7 +70,7 @@ export let is_score: boolean = false;
 export let p1_points: number = 0;
 export let p2_points: number = 0;
 
-export function JoinRoom ( props: {score1: number, score2: number } )
+export function Score ( props: {score1: number, score2: number } )
 {
     const [ p1Score, setP1Score ] = React.useState( 0 );
     const [ p2Score, setP2Score ] = React.useState( 0 );
@@ -118,4 +117,4 @@ export function JoinRoom ( props: {score1: number, score2: number } )
             </ScoreContainer>
         </>
     );
-} export default JoinRoom;
+} export default Score;

@@ -8,6 +8,8 @@ import styles_box from "../../../styles/style_box.module.css";
 import requireAuthentication from "../../../hooks/requiredAuthentication";
 import { GameDataContext, GameSocketContext, GameStatus } from "../../_app";
 import { useRouter } from "next/router";
+import Modal from "../../../components/modal_dialog";
+import styles_r_w from "../../../styles/chatroom_window.module.css";
 
 const Container = styled.div`
   background-image: linear-gradient(
@@ -48,18 +50,72 @@ function Game() {
   const [game, setGame] = useContext(GameDataContext);
   const [menu, setMenu] = useState(false);
   const [waitingPopup, setWaitingPopup] = useState(false);
+  let rightPaddle = {};
+  let leftPaddle = {};
+  let ball = {};
+  let status: GameStatus = GameStatus.ACCEPTED;
 
   let canvasRef = useRef<HTMLCanvasElement>(null);
-  // let rightPaddle: any = {};
-  // let leftPaddle: any = {};
-  let animation_id: any;
 
-  let getOpponentId = (gameData: any): string => {
+  const getOpponentId = (gameData: any): string => {
     const userId = localStorage.getItem("userId");
     const opId = gameData.players.find(
       (playerId: string) => playerId !== userId
     );
     return opId;
+  };
+
+  const getMyId = (gameData: any): string => {
+    const userId = localStorage.getItem("userId");
+    const myId = gameData.players.find(
+      (playerId: string) => playerId === userId
+    );
+    return myId;
+  };
+
+  const getGameStatus = () => {
+    console.log("STATUS: ", status);
+    return status;
+  };
+
+  const renderCanvas = () => {
+    const canvasBG = canvasRef.current;
+    const ctxBG = canvasBG?.getContext("2d");
+    const bg = new Image();
+    bg.src = "/splash.png";
+    bg.onload = function () {
+      ctxBG?.drawImage(bg, 0, 0, canvasBG!.width, canvasBG!.height);
+    };
+  };
+
+  const renderPaddle = (leftPaddle: any, rightPaddle: any) => {
+    const paddleC = canvasRef.current;
+    const ctx = paddleC?.getContext("2d");
+    paddle(ctx, paddleC, leftPaddle);
+    paddle(ctx, paddleC, rightPaddle);
+  };
+
+  const renderBall = (ballData: any) => {
+    const ballC = canvasRef.current;
+    const ctx = ballC?.getContext("2d");
+    ctx?.beginPath();
+    ctx?.arc(ballData.x, ballData.y, ballData.rad, 0, Math.PI * 2, false);
+    if (ctx) {
+      ctx!.fillStyle = "#ffffff";
+      ctx!.strokeStyle = "#000000";
+    }
+
+    ctx?.fill();
+    ctx?.stroke();
+    ctx?.closePath();
+  };
+
+  const render = () => {
+    renderCanvas();
+    renderPaddle(leftPaddle, rightPaddle);
+    renderBall(ball);
+    canvasRef.current?.focus();
+    requestAnimationFrame(render);
   };
 
   // Listening on socket events
@@ -76,68 +132,32 @@ function Game() {
     }
 
     socket.off("emit_game_data").on("emit_game_data", (data: any) => {
-      setGame(data);
+      setGame((prev: any) => {
+        return { ...prev, score: data.score, status: data.status };
+      });
       if (!data || data.status !== GameStatus.STARTED) {
         // show game finished popup with result
-        // redirect to home
-        router.back();
+        // router.back();
         return;
       }
       if (waitingPopup) setWaitingPopup(false);
-
       // data has started, update game object
-      // leftPaddle = data.paddle[data.players[0]];
-      // rightPaddle = data.paddle[data.players[1]];
-
-      // update ball position
-      render(
-        data.ball,
-        data.paddle[data.players[0]],
-        data.paddle[data.players[1]]
-      );
+      leftPaddle = data.paddle[data.players[0]];
+      rightPaddle = data.paddle[data.players[1]];
+      ball = data.ball;
+      status = data.status;
     });
 
-    const renderCanvas = () => {
-      const canvasBG = canvasRef.current;
-      const ctxBG = canvasBG?.getContext("2d");
-      const bg = new Image();
-      bg.src = "/splash.png";
-      bg.onload = function () {
-        ctxBG?.drawImage(bg, 0, 0, canvasBG!.width, canvasBG!.height);
-      };
-    };
-
-    const renderPaddle = (leftPaddle: any, rightPaddle: any) => {
-      const paddleC = canvasRef.current;
-      const ctx = paddleC?.getContext("2d");
-      paddle(ctx, paddleC, leftPaddle);
-      paddle(ctx, paddleC, rightPaddle);
-    };
-
-    const renderBall = (ballData: any) => {
-      const ballC = canvasRef.current;
-      const ctx = ballC?.getContext("2d");
-      ctx?.beginPath();
-      ctx?.arc(ballData.x, ballData.y, ballData.rad, 0, Math.PI * 2, false);
-      ctx!.fillStyle = "#ffffff";
-      ctx!.strokeStyle = "#000000";
-      ctx?.fill();
-      ctx?.stroke();
-      ctx?.closePath();
-    };
-
-    const render = (ballData: any, leftPaddle: any, rightPaddle: any) => {
-      renderCanvas();
-      renderPaddle(leftPaddle, rightPaddle);
-      renderBall(ballData);
-      canvasRef.current?.focus();
-      //animation_id = requestAnimationFrame(render);
-    };
-    //requestAnimationFrame(render);
-    canvasRef.current?.focus();
+    socket.off("emit_game_finish").on("emit_game_finish", (data: any) => {
+      console.log("GAME FINISHED", data.status);
+      setGame((prev: any) => {
+        return { ...prev, score: data.score, status: data.status };
+      });
+      status = data.status;
+    });
 
     return () => {
-      if (!game || game.status === GameStatus.FINISHED) {
+      if (getGameStatus() === GameStatus.FINISHED) {
         setGame(null);
         return;
       }
@@ -146,12 +166,16 @@ function Game() {
       else socket.emit("stop_spectate_game", { gameId: game.id });
       setGame(null);
     };
-  }, [socket]);
+  }, []);
 
-  // Rendering and emmiting events
-  // useEffect(() => {
-  // }, []);
+  // Rendering
+  useEffect(() => {
+    console.log("GRAPHICS EFFECT CALLED");
+    canvasRef.current?.focus();
+    render();
+  }, []);
 
+  // Emitting events
   const keyboardevent = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (e.key === "ArrowUp") {
       socket.emit("game_move", { gameId: game.id, move: "UP" });
@@ -162,6 +186,66 @@ function Game() {
 
   return (
     <>
+      {game && game?.status === GameStatus.FINISHED && (
+        <Modal
+          content={
+            <>
+              <div className={styles_r_w.part_up}>
+                <div className={styles_r_w.text}>Game Result</div>
+              </div>
+              <div className={styles_r_w.leave_room_box}>
+                <div className={styles_r_w.leave_room}>
+                  {game.score[getOpponentId(game)] > game.score[getMyId(game)]
+                    ? `You Lost The Game: ${
+                        game.score[getOpponentId(game)]
+                      } - ${game.score[getMyId(game)]}`
+                    : `You Won The Game: ${game.score[getMyId(game)]} - ${
+                        game.score[getOpponentId(game)]
+                      }`}
+                </div>
+              </div>
+              <div className={styles_r_w.part_down}>
+                <button
+                  className={styles_r_w.create}
+                  type="submit"
+                  onClick={() => {
+                    router.back();
+                  }}
+                >
+                  HOME
+                </button>
+              </div>
+            </>
+          }
+        />
+      )}
+      {!game && (
+        <Modal
+          content={
+            <>
+              <div className={styles_r_w.part_up}>
+                <div className={styles_r_w.text}>Game Result</div>
+              </div>
+              <div className={styles_r_w.leave_room_box}>
+                <div className={styles_r_w.leave_room}>
+                  The Game no longer exists! because you lost.
+                </div>
+              </div>
+              <div className={styles_r_w.part_down}>
+                <button
+                  className={styles_r_w.create}
+                  type="submit"
+                  onClick={() => {
+                    router.back();
+                  }}
+                >
+                  HOME
+                </button>
+              </div>
+            </>
+          }
+        />
+      )}
       {/* <MenuNav menu={ menu } setMenu={ setMenu } /> */}
       <div className={styles_box.container}>
         {/* <SettingsNav selected={ "home" } menu={ menu } /> */}

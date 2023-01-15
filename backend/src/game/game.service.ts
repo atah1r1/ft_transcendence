@@ -13,6 +13,7 @@ import Game, {
 } from './models/game.model';
 
 const EV_EMIT_GAME_DATA = 'emit_game_data';
+const EV_EMIT_GAME_FINISH = 'emit_game_finish';
 
 @Injectable()
 export class GameService {
@@ -155,6 +156,9 @@ export class GameService {
     newPlayerStatus.set(userId, PlayerStatus.PENDING);
     newPlayerStatus.set(opponentId, PlayerStatus.PENDING);
     newGame.playerStatus = newPlayerStatus;
+
+    newGame.ball = new Ball();
+    newGame.paddle = new Map<string, Paddle>();
     return newGame;
   }
 
@@ -365,6 +369,24 @@ export class GameService {
     });
   }
 
+  private sendGameFinishToClients(game: Game) {
+    const players = game.players;
+    const spectators = game.spectators;
+    players.forEach((p) => {
+      const s = this.getPlayerById(p);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      }
+    });
+    // in case there are spectators
+    spectators.forEach((sp) => {
+      const s = this.getSpectatorById(sp);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      }
+    });
+  }
+
   // Updates game state
   // Called every frame (intervals of 1000ms / 30)
 
@@ -446,7 +468,6 @@ export class GameService {
     // TODO: modify game/models/game.model.ts to add all needed properties for game logic
     // return game object after setting all initial values for ball pos...etc
     // TODO: initialize game state
-    game.ball = new Ball();
     game.ball.x = 640;
     game.ball.y = 350;
     game.ball.dx = 6;
@@ -487,7 +508,7 @@ export class GameService {
       const updatedGame = this.updateGame(game);
       if (updatedGame.status === GameStatus.FINISHED) return;
       this.sendGameUpdateToClients(updatedGame);
-    }, 1000 / 30);
+    }, 1000 / 60);
 
     // Save interval timer to game object to cancel it later
     game.timer = timer;
@@ -571,7 +592,7 @@ export class GameService {
   private finishGame(game: Game): Game {
     clearInterval(game.timer);
     game.status = GameStatus.FINISHED;
-    this.sendGameUpdateToClients(game);
+    this.sendGameFinishToClients(game);
     this.removeGameMembers(game);
     this.games.delete(game.id);
     this.createGameHistory(game);

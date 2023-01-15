@@ -196,47 +196,6 @@ const Chat = () => {
           }
         />
       )}
-      {gameRequestUser && (
-        <Modal
-          content={
-            <>
-              <div className={styles_r_w.part_up}>
-                <div className={styles_r_w.text}>game invitaion</div>
-              </div>
-              <div className={styles_r_w.leave_room_box}>
-                <div className={styles_r_w.leave_room}>
-                  {gameRequestUser.username} has invited to play a pong game.
-                </div>
-              </div>
-              <div className={styles_r_w.part_down}>
-                <div
-                  className={styles_r_w.cancel}
-                  onClick={() => {
-                    gameSocket.emit("play_against_decline", {
-                      userId: gameRequestUser.id,
-                    });
-                    setGameRequestUser(null);
-                  }}
-                >
-                  DENY
-                </div>
-                <button
-                  className={styles_r_w.create}
-                  type="submit"
-                  onClick={() => {
-                    gameSocket.emit("play_against_accept", {
-                      userId: gameRequestUser.id,
-                    });
-                    setGameRequestUser(null);
-                  }}
-                >
-                  ACCEPT
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
       {/* {gamePlay && (
         <Modal
           content={

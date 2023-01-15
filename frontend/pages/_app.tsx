@@ -7,6 +7,8 @@ import { useRouter } from "next/router";
 import { ToastContainer, ToastOptions, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import Modal from "../components/modal_dialog";
+import styles_r_w from "../styles/chatroom_window.module.css";
 
 export enum GameStatus {
   ACCEPTED,
@@ -339,7 +341,64 @@ function MyApp({ Component, pageProps }: AppProps) {
                         <GameSocketContext.Provider value={gameSocket}>
                           <SocketContext.Provider value={socket}>
                             <DataContext.Provider value={[data, setData]}>
-                              <Component {...pageProps} />
+                              <div>
+                                {gameRequestUser && (
+                                  <Modal
+                                    content={
+                                      <>
+                                        <div className={styles_r_w.part_up}>
+                                          <div className={styles_r_w.text}>
+                                            game invitaion
+                                          </div>
+                                        </div>
+                                        <div
+                                          className={styles_r_w.leave_room_box}
+                                        >
+                                          <div
+                                            className={styles_r_w.leave_room}
+                                          >
+                                            {gameRequestUser.username} has
+                                            invited to play a pong game.
+                                          </div>
+                                        </div>
+                                        <div className={styles_r_w.part_down}>
+                                          <div
+                                            className={styles_r_w.cancel}
+                                            onClick={() => {
+                                              gameSocket.emit(
+                                                "play_against_decline",
+                                                {
+                                                  userId: gameRequestUser.id,
+                                                }
+                                              );
+                                              setGameRequestUser(null);
+                                            }}
+                                          >
+                                            DENY
+                                          </div>
+                                          <button
+                                            className={styles_r_w.create}
+                                            type="submit"
+                                            onClick={() => {
+                                              gameSocket.emit(
+                                                "play_against_accept",
+                                                {
+                                                  userId: gameRequestUser.id,
+                                                }
+                                              );
+                                              setGameRequestUser(null);
+                                            }}
+                                          >
+                                            ACCEPT
+                                          </button>
+                                        </div>
+                                      </>
+                                    }
+                                  />
+                                )}
+                                <Component {...pageProps} />
+                              </div>
+
                               <ToastContainer style={{ fontSize: "1.2rem" }} />
                             </DataContext.Provider>
                           </SocketContext.Provider>
