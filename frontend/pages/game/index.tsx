@@ -6,18 +6,21 @@ import MenuNav from "../../components/menuNav";
 import SettingsNav from "../../components/settings_nav";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
+import styles from "../../styles/GameStyle.module.css";
 
 const Container = styled.div`
     background-image: url("/bg.jpeg");
     background-size: cover;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
     height: 100%;
     margin: 0;
-    padding: 0;
+
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+
+    padding: 50px;
     border-radius: 2.2rem;
     @font-face {
         font-family: 'street';
@@ -84,36 +87,32 @@ const JoinRoomButton = styled.button`
 
 `;
 
-function Home ()
-{
-    const [ menu, setMenu ] = useState( false );
+function Home() {
+    const [menu, setMenu] = useState(false);
     const router = useRouter();
 
-    const playGame = ( e: any ) =>
-    {
+    const playGame = (e: any) => {
         e.preventDefault();
-        router.push( '/game/play' );
+        router.push('/game/play');
         // socket.emit('join_game');
-        console.log( "join game" );
+        console.log("join game");
     }
 
-    const singlePmode = ( e: any ) =>
-    {
+    const singlePmode = (e: any) => {
         e.preventDefault();
-        router.push( '/game/play/vbot' );
+        router.push('/game/play/vbot');
     }
 
 
 
     return (
         <>
-            <MenuNav menu={ menu } setMenu={ setMenu } />
-            <div className={ styles_box.container }>
-                <SettingsNav selected={ "game" } menu={ menu } />
-                <div className={ styles_box.profile_details }>
+            <MenuNav menu={menu} setMenu={setMenu} />
+            <div className={styles_box.container}>
+                <SettingsNav selected={"game"} menu={menu} />
+                <div className={styles_box.profile_details}>
                     <Logout />
-                    <Container>
-                        <form>
+                    {/* <form>
                             <JoinRoomButton
                                 type="submit"
                                 onClick={ playGame }
@@ -126,8 +125,28 @@ function Home ()
                             >PLAY
                                 <p>PvAI</p>
                             </JoinRoomButton>
-                        </form>
-                    </Container>
+                        </form> */}
+                    <div className={styles.container}>
+                        {new Array(10).fill(0).map((match) => {
+                            return (
+                                <div className={styles.cardContainer}>
+                                    <div className={styles.players}>
+                                        <div className={styles.player}>
+                                            <img src="https://api.dicebear.com/5.x/bottts/svg?seed=Felix" width="40"></img>
+                                            <h1>Player 1</h1>
+                                            <div className={styles.score}>10</div>
+                                        </div>
+                                        <div className={styles.vs}>VS</div>
+                                        <div className={styles.player}>
+                                            <img src="https://api.dicebear.com/5.x/bottts/svg?seed=Hakam" width="40"></img>
+                                            <h1>Player 2</h1>
+                                            <div className={styles.score}>0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
             </div>
         </>
@@ -136,10 +155,9 @@ function Home ()
 
 export default Home;
 
-export const getServerSideProps = requireAuthentication( async () =>
-{
+export const getServerSideProps = requireAuthentication(async () => {
     return {
         props: {
         }, // will be passed to the page component as props
     }
-} )
+})
