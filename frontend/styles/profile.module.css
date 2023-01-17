@@ -22,6 +22,7 @@
 }
 
 .profile_box {
+  position: relative;
   margin: 0 auto;
   width: 18rem;
   height: 18rem;
@@ -32,6 +33,10 @@
 
 .profile_box:hover .profile_slide {
   opacity: 1;
+}
+
+.profile_avatar {
+  object-fit: cover;
 }
 
 .details_avatar input,
@@ -56,13 +61,15 @@
 }
 
 .upload_avatar {
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 3.8rem;
+  height: 3.8rem;
   position: absolute;
-  bottom: 24%;
-  left: 62%;
+  bottom: 1rem;
+  right: 1rem;
   z-index: 1;
   opacity: 0.8;
+  background-color: #333;
+  border-radius: 50%;
 }
 
 .details_avatar img {
@@ -152,6 +159,16 @@
   letter-spacing: 1px;
 }
 
+.error_box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.error_msg {
+  color: #ef9a9a;
+  font-size: 1.4rem;
+}
 /* Swich Botton ---------------*/
 
 .switch {

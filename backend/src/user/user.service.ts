@@ -16,20 +16,23 @@ export class UserService {
       user.two_factor_auth_key,
     );
     // console.log(otpauthUrl);
-    await this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: { two_factor_auth: true, two_factor_auth_uri: otpauthUrl },
     });
     // console.log(otpauthUrl);
-    return { two_factor_auth_uri: otpauthUrl };
+    return {
+      two_factor_auth_uri: otpauthUrl,
+      two_factor_auth: updated.two_factor_auth,
+    };
   }
 
   async deactivate2fa(user: any) {
-    await this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: { two_factor_auth: false, two_factor_auth_uri: null },
     });
-    return { message: '2FA deactivated' };
+    return { two_factor_auth: updated.two_factor_auth };
   }
 
   async verify2fa(user: any, code: string) {
@@ -38,14 +41,28 @@ export class UserService {
       secret: user.two_factor_auth_key,
     });
     if (isValid) {
+      await this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          code_verified: true,
+        },
+      });
       return true;
     }
     return false;
   }
 
-  async checkIfUsernameExists(username: string) {
-    const user = await this.prisma.user.findUnique({ where: { username } });
-    console.log(user);
+  async checkIfUsernameExists(
+    currentUserName: string,
+    username: string,
+  ): Promise<boolean> {
+    if (currentUserName === username) return false;
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+    });
+    //console.log(user);
     if (user) {
       return true;
     }
@@ -53,10 +70,19 @@ export class UserService {
   }
 
   async updateProfile(user: any, body: any) {
+    const currentUser = await this.getUserById(user.id, user.id);
     const { first_name, last_name, username } = body;
-    const data = { first_name, last_name, username };
-    if (await this.checkIfUsernameExists(username)) {
-      return { message: 'Username already exists' };
+    //console.log('body body', body);
+    const data: any = {};
+    if (first_name) data.first_name = first_name;
+    if (last_name) data.last_name = last_name;
+    if (username) data.username = username;
+
+    if (
+      username &&
+      (await this.checkIfUsernameExists(currentUser.username, username))
+    ) {
+      throw new HttpException('Username already exists', HttpStatus.NOT_FOUND);
     }
     return await this.prisma.user.update({
       where: { id: user.id },
@@ -69,15 +95,16 @@ export class UserService {
       (user) => user.id,
     );
 
+    if (blockedUsersIds.includes(id)) {
+      throw new Error('User is blocked');
+    }
+
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (user) {
       delete user.two_factor_auth_key;
       return user;
     }
 
-    if (blockedUsersIds.includes(id)) {
-      throw new Error('User is blocked');
-    }
     throw new Error('User not found');
   }
 

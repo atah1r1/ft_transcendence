@@ -1,13 +1,15 @@
 import styles from "../styles/conversation_box.module.css";
+import styles_p from "../styles/profile.module.css";
+import styles_f from "../styles/friends.module.css";
 import cn from "classnames";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { ChatContext, CurrentConvContext } from "../pages/_app";
-// import { ChatContext } from "../stores/chat_store";
 
-const ConversationBox = () =>
+const ConversationBox = ( { searchInput }: any ) =>
 {
+  const bottomRef = useRef<null | HTMLDivElement>( null );
   // format date
   const formatDateAndTime = ( date: string ) =>
   {
@@ -34,52 +36,76 @@ const ConversationBox = () =>
     } );
   }, [] );
 
-  return chats?.map( ( conv: any, i: number ) =>
+  useEffect( () =>
   {
-    // setCurrent_conv( conv );
-    console.log("conv.image: ", conv.image);
-    return (
-      <div key={ i }>
-        <div
-          onClick={ () =>
-          {
-            // console.log( "onclick conv is:", conv );
-            setCurrentConv( conv );
-          } }
-          className={ cn(
-            styles.conversation, ` ${ conv.roomId === currentConv.roomId && styles.current_conv }`
-          ) }
-        >
-          <div className={ styles.conversation_img }>
-            <Image
-              src={ conv.image === null ? "https://ui-avatars.com/api/?name=John+Doe" : conv.image }
-              alt="conversation_image"
-              width={ "42px" }
-              height={ "42px" }
-            ></Image>
-          </div>
-          <div>
-            <p className={ styles.conversation_name }>
-              { conv.name }
-            </p>
-            <p className={ styles.conversation_text }>{ conv.lastMessage?.message }</p>
-          </div>
-          <div>
-            <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
-            { conv.wasRead !== true && (
-              <p
+    // bottomRef.current?.scrollIntoView( { behavior: 'smooth' } )
+  }, [ chats ] )
+
+  const find = chats ? chats?.filter( ( chat: any ) => chat.name.toLowerCase().includes( searchInput.toLowerCase() ) ) : [];
+
+  return chats.length ?
+    (
+      find.length ?
+        find.map( ( conv: any, i: number, arr: any ) =>
+        {
+          return (
+            <div key={ i }>
+              <div
+                onClick={ () =>
+                {
+                  setCurrentConv( conv );
+                } }
                 className={ cn(
-                  styles.conversation_number
+                  styles.conversation, ` ${ conv.roomId === currentConv.roomId && styles.current_conv }`
                 ) }
               >
-                { conv.wasRead ? "" : "" }
-              </p> )
-            }
-          </div>
-        </div>
-      </div>
-    );
-  } );
+                <div className={ styles.conversation_img }>
+                  <Image
+                    src={ conv.image === null ? "https://avatars.dicebear.com/api/bottts/test.svg" : conv.image }
+                    alt="conversation_image"
+                    width={ "42px" }
+                    height={ "42px" }
+                    className={ styles_p.profile_avatar }
+                  ></Image>
+                </div>
+                <div>
+                  <p className={ styles.conversation_name }>
+                    { conv.name }
+                  </p>
+                  <p className={ styles.conversation_text }>{ conv.lastMessage?.message }</p>
+                </div>
+                <div>
+                  <p className={ styles.conversation_time }>{ formatDateAndTime( conv.lastMessage?.createdAt ) }</p>
+                  { conv.wasRead !== true && (
+                    <p
+                      className={ cn(
+                        styles.conversation_number
+                      ) }
+                    >
+                      { conv.wasRead ? "" : "" }
+                    </p> )
+                  }
+                </div>
+              </div>
+              <div ref={ bottomRef } />
+            </div>
+          );
+        } ) : <div className={ styles_f.noresult }>
+          <Image
+            src={ "/noresult1.png" }
+            alt="no_result_img"
+            width="80"
+            height="80"
+          ></Image>
+        </div> ) :
+    <div className={ styles_f.noresult }>
+      <Image
+        src={ "/noresult.png" }
+        alt="no_result_img"
+        width="80"
+        height="80"
+      ></Image>
+    </div>
 };
 
 export default ConversationBox;

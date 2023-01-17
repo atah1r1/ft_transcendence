@@ -1,22 +1,25 @@
 import axios from "axios";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styles from "../styles/chat.module.css";
-// import { MessagesContext } from "../stores/messages_store";
-import { CurrentConvContext, MessagesContext, SocketContext } from "../pages/_app";
+import styles_p from "../styles/profile.module.css";
+import { CurrentConvContext, MessagesContext, SocketContext, LastBlockedContext, UserStatusContext } from "../pages/_app";
 
 export default function ConversationBody ()
 {
+  const bottomRef = useRef<null | HTMLDivElement>( null );
   const [ messageInput, setMessageInput ] = useState( "" );
+  const [ userStatus, setUserStatus ] = useState( "NORMAL" );
   const [ messages, setMessages ] = useContext( MessagesContext );
   const [ currentConv, setCurrentConv ] = useContext( CurrentConvContext );
+  const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
+  const [ memberStatus, setMemberStatus ] = useContext( UserStatusContext );
   const socket = useContext( SocketContext );
 
   useEffect( () =>
   {
     if ( !currentConv.roomId ) return;
-    console.log( "USE EFF: CONV UPDATED", currentConv );
-    axios.get( `http://localhost:9000/api/chat/messages/${ currentConv.roomId }`, {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/messages/${ currentConv.roomId }`, {
       withCredentials: true,
     } ).then( ( res ) =>
     {
@@ -25,13 +28,11 @@ export default function ConversationBody ()
       setMessages( ms );
     } ).catch( ( err ) =>
     {
-      console.log( "AXIOS EXCEPT: ", err );
     } );
   }, [ currentConv ] );
 
   useEffect( () =>
   {
-    console.log( "USE EFF: MSGS UPDATED", currentConv );
     if ( currentConv && currentConv?.roomId )
     {
       socket?.emit( 'seen', {
@@ -45,10 +46,9 @@ export default function ConversationBody ()
   {
     return () =>
     {
-      console.log( "CURRENT CONV RESET" );
       setCurrentConv( {} );
     };
-  }, [] );
+  }, [ lastBlockedId ] );
 
   const handleSubmitMessages = ( e: any ) =>
   {
@@ -61,21 +61,41 @@ export default function ConversationBody ()
     setMessageInput( "" );
   };
 
+  useEffect( () =>
+  {
+    // 👇️ scroll to bottom every time messages change
+    bottomRef.current?.scrollIntoView( { behavior: 'smooth' } )
+  }, [ messages.get( currentConv?.roomId ), messageInput === '' ] );
+
+  useEffect( () =>
+  {
+    if ( !currentConv?.roomId ) return;
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/room/${ currentConv.roomId }/members`, {
+      withCredentials: true,
+    } ).then( ( res ) =>
+    {
+      setUserStatus( res.data.find( ( item: any ) => item.user.id === localStorage.getItem( 'userId' ) )?.status );
+    } ).catch( ( err ) =>
+    {
+      console.log( 'error: ', err );
+    } );
+  }, [ currentConv, memberStatus ] );
+
   return (
     <div className={ styles.conversation_body }>
       <div className={ styles.message_part_content }>
         { messages?.get( currentConv!.roomId )?.map( ( message: any, i: number ) =>
         {
-          console.log("message.user?.avatar: ", message.user?.avatar);
           return (
-            <div className={ styles.message_left } key={ i }>
+            <div className={ styles.message_left } key={ i } >
               <div className={ styles.message_box }>
                 <div className={ styles.message_avatar }>
                   <Image
-                    src={ message.user?.avatar }
+                    src={ message.user?.avatar ?? "https://picsum.photos/300/300" }
                     alt="message_avatar"
                     width={ "42px" }
                     height={ "42px" }
+                    className={ styles_p.profile_avatar }
                   />
                 </div>
                 <div style={ { width: "100%" } }>
@@ -84,7 +104,7 @@ export default function ConversationBody ()
                       { message.user?.username }
                     </div>
                     <div className={ styles.message_time }>
-                      { message.createdAt }
+                      { message.createdAt.split( "T" )[ 0 ] } { message.createdAt.split( "T" )[ 1 ].split( "." )[ 0 ] }
                     </div>
                   </div>
                   <div className={ styles.message_text }>
@@ -92,24 +112,37 @@ export default function ConversationBody ()
                   </div>
                 </div>
               </div>
+              <div ref={ bottomRef } />
             </div>
           );
         } ) }
       </div>
-      { currentConv.roomId &&
+      {
+        currentConv.roomId &&
         <div className={ styles.message_part_send }>
           <div className={ styles.message_box_sender }>
-
             <form
               className={ styles.message_form }
               onSubmit={ handleSubmitMessages }
             >
-              <input
-                type="search"
-                placeholder="Type a message here ."
-                onChange={ ( e ) => setMessageInput( e.target.value ) }
-                value={ messageInput }
-              ></input>
+              {
+                userStatus === 'NORMAL' ?
+                  <input
+                    type="search"
+                    placeholder="Type a message here ..."
+                    onChange={ ( e ) => setMessageInput( e.target.value ) }
+                    value={ messageInput }
+                  ></input> :
+                  <div className={ styles.input_disabled }>
+                    <input
+                      type="search"
+                      placeholder="You are muted"
+                      onChange={ ( e ) => setMessageInput( e.target.value ) }
+                      value={ messageInput }
+                      disabled
+                    ></input>
+                  </div>
+              }
             </form>
 
           </div>
@@ -126,6 +159,6 @@ export default function ConversationBody ()
           </div>
         </div>
       }
-    </div>
+    </div >
   )
 }

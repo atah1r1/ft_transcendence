@@ -13,45 +13,88 @@
 }
 
 .treepoints_box {
-  position: absolute;
-  right: 7rem;
-  top: 3.2%;
-  width: 22rem;
-  max-height: 36rem;
-  background-color: #0f3460;
-  padding: 1.6rem;
+  width: 26rem;
+  height: 100%;
+  background-color: #16213e;
+  padding: 1.2rem;
+  padding-top: 8rem;
   font-family: "Pixeboy";
   font-size: 1.6rem;
   border-radius: 1rem;
   z-index: 1;
   overflow-y: scroll;
-  opacity: 0.9;
+  scrollbar-color: #d9d9d9 #d9d9d9;
+  scrollbar-width: thin;
 }
 
 .treepoints_box::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 /* Handle */
 .treepoints_box::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 10px;
+  background-color: #d9d9d9;
+  display: none;
 }
 
-.treepoints_box_row {
+.treepoints_box_details {
+  width: 26rem;
+  height: 100%;
+  background-color: #16213e;
+  padding: 1.2rem;
+  padding-top: 6.8rem;
+  font-family: "Pixeboy";
+  font-size: 1.6rem;
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+.treepoints_box_conv {
+  width: 26rem;
+  height: 100%;
+  background-color: #16213e;
+  padding: 1.2rem;
+  padding-top: 2rem;
+  font-family: "Pixeboy";
+  font-size: 1.6rem;
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+.treepoints_box_row,
+.treepoints_box_row_users {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  padding: 1rem 0.8rem;
+  font-size: 2rem;
   cursor: pointer;
   transition: all 0.3s;
+  border-radius: 1rem;
 }
 
-.treepoints_box_row:not(:last-child) {
-  margin-bottom: 1.4rem;
+.treepoints_box_row_users {
+  margin-bottom: 1.2rem;
 }
 
 .treepoints_box_row:active {
-  transform: translateY(1.2px);
+  transform: translateY(1.6px);
+}
+
+.treepoints_box_row:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.treepoints_owner {
+  font-family: "Inter";
+  font-weight: bold;
+  font-size: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 1.2rem;
+  letter-spacing: 1.2px;
+  padding: 0.6rem 0;
 }
 
 .treePoints_box_avatar {
@@ -70,16 +113,20 @@
   right: -20%;
 }
 
+.treepoints_settings {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.treepoints_settings:active {
+  transform: translateY(1.6px);
+}
+
 /* media q--------------------- */
 
 @media (max-width: 1280px) {
-  .treepoints_box {
-    top: 42%;
-  }
-}
-
-@media (max-width: 700px) {
-  .treepoints_box {
-    top: 41.5%;
+  .treepoints_box,
+  .treepoints_box_details {
+    height: 93%;
   }
 }

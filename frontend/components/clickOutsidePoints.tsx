@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef} from "react";
 
 function useOutsideAlerter(ref: any, setTreePoints: any, setGroupBox: any) {
   useEffect(() => {

@@ -33,7 +33,7 @@
   font-family: "Pixeboy";
   background-color: #d9d9d9;
   border-radius: 1.6rem;
-  padding: 2rem 6.6rem;
+  padding: 1.8rem 5.8rem;
   text-align: center;
   font-size: 2.2rem;
   cursor: pointer;
@@ -56,11 +56,11 @@
 
 .setting_btn:active,
 .current_btn:active {
-  transform: translateY(1.5px);
+  transform: translateY(1.6px);
 }
 
 .setting_btn:not(:last-child) {
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.4rem;
 }
 
 /* media q--------------------- */

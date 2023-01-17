@@ -21,6 +21,18 @@ module.exports = {
         protocol: "https",
         hostname: "picsum.photos",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.dicebear.com",
+      },
     ],
+  },
+  compiler: {
+    // Enables the styled-components SWC transform
+    styledComponents: true,
   },
 };

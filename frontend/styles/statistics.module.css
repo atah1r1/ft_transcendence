@@ -177,16 +177,17 @@
     flex-direction: column;
     gap: 4rem;
     overflow-y: scroll;
+    scrollbar-color: #d9d9d9 #d9d9d9;
+    scrollbar-width: thin;
     padding: 1.6rem;
     margin: auto;
   }
   .ach_medal::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   /* Handle */
   .ach_medal::-webkit-scrollbar-thumb {
-    background: #aaa;
-    border-radius: 10px;
+    background-color: #d9d9d9;
   }
 }
 

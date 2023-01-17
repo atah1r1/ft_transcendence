@@ -9,7 +9,7 @@ import {
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from './chat.service';
 import { Socket, Server } from 'socket.io';
-import { RoomUser, RoomUserStatus } from '@prisma/client';
+import { RoomPrivacy, RoomUser, RoomUserStatus } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 
 const EV_CHAT_LIST = 'chat_list';
@@ -28,6 +28,7 @@ const EV_ADD_MEMBER = 'add_member';
 const EV_MAKE_ADMIN = 'make_admin';
 const EV_FIND_ROOM = 'find_room';
 const EV_BLOCK_USER = 'block_user';
+const EV_PROTECT_ROOM = 'protect_room';
 
 const EV_EMIT_ONLINE_FRIENDS = 'online_friends';
 const EV_EMIT_ROOM_CREATED = 'room_created';
@@ -37,6 +38,8 @@ const EV_EMIT_MEMBER_ADDED = 'member_added';
 const EV_EMIT_ADMIN_MADE = 'admin_made';
 const EV_EMIT_MEMBER_STATUS_CHANGED = 'member_status_changed';
 const EV_EMIT_USER_BLOCKED = 'user_blocked';
+const EV_EMIT_NEW_ROOM = 'room_created_notif';
+const EV_EMIT_ROOM_PROTECTED = 'room_protected';
 
 @WebSocketGateway({ namespace: 'chat', cors: true, origins: '*' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -54,7 +57,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       await this.verifyAndSave(client);
       // Add user to connectedUsers map.
-      console.log('CONNECT ID: ', client.data.id);
+      // console.log('CONNECT ID: ', client.data.id);
       this.chatService.addConnectedUser(client.data.id, client);
       await this.joinIORooms(client);
       await this.sendChatsToClient(client);
@@ -70,7 +73,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.chatService.removeConnectedUser(client.data.id, client);
       await this.sendOnlineFriendsOfUserId(client.data.id);
     }
-    console.log('disconnected: ', client.id);
+    // console.log('disconnected: ', client.id);
   }
 
   /* *******************
@@ -92,7 +95,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       // Send message and chats.
       await this.sendChatsToRoomMembers(client.data.id, payload.roomId);
-      this.server.to(payload.roomId).emit(EV_MESSAGE, formattedMessage);
+      // this.server.to(payload.roomId).emit(EV_MESSAGE, formattedMessage);
+      await this.sendMessageToRoomMembers(
+        client.data.id,
+        payload.roomId,
+        formattedMessage,
+      );
     } catch (err) {
       throw new WsException({
         error: EV_MESSAGE,
@@ -218,9 +226,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           message: 'Failed to leave room',
         });
       }
-      this.sendChatsToUser(client.data.id);
-      this.leaveIORoom(client.data.id, payload.roomId);
-      this.sendRoomLeftToClients(client.data.id, payload.roomId, ru);
+      await this.sendChatsToUser(client.data.id);
+      await this.leaveIORoom(client.data.id, payload.roomId);
+      await this.sendRoomLeftToClients(client.data.id, payload.roomId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_LEAVE_ROOM,
@@ -248,7 +256,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.leaveIORoom(payload.targetUserId, payload.roomId);
       await this.sendChatsToUser(client.data.id);
+      await this.sendChatsToUser(ru.userId);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_BAN_USER,
@@ -277,7 +287,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       this.joinIORoom(payload.targetUserId, payload.roomId);
       await this.sendChatsToUser(client.data.id);
+      await this.sendChatsToUser(ru.userId);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_UNBAN_USER,
@@ -305,6 +317,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.sendChatsToUser(client.data.id);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_MUTE_USER,
@@ -332,6 +345,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.sendChatsToUser(client.data.id);
       await this.sendMemberStatusToClient(client.data.id, ru);
+      await this.sendMemberStatusToClient(ru.userId, ru);
     } catch (err) {
       throw new WsException({
         error: EV_UNMUTE_USER,
@@ -399,8 +413,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       await this.userService.blockUser(client.data.id, payload.targetUserId);
       await this.sendChatsToUser(client.data.id);
+      if (dm) await this.sendChatsToUser(payload.targetUserId);
       await this.sendOnlineFriendsToUser(client.data.id);
-      await this.sendOnlineFriendsToUser(payload.targetUserId);
+      if (dm) await this.sendOnlineFriendsToUser(payload.targetUserId);
       await this.sendUserBlockedToUser(client.data.id, payload.targetUserId);
       await this.sendUserBlockedToUser(payload.targetUserId, client.data.id);
     } catch (err) {
@@ -445,6 +460,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage(EV_PROTECT_ROOM)
+  async protectRoom(client: Socket, payload: any) {
+    this.validateProtectRoom(payload);
+    try {
+      const chat = await this.chatService.makeRoomProtected(
+        client.data.id,
+        payload.roomId,
+        payload.password,
+      );
+      if (!chat) {
+        throw new Error('Failed to protect room');
+      }
+      await this.sendChatsToClient(client);
+      await this.sendRoomProtectedToClient(client.data.id, chat);
+    } catch (e) {
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: e.message,
+      });
+    }
+  }
+
   /* *******************
    *  HELPER METHODS   *
    ******************* */
@@ -481,10 +518,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const sockets = this.chatService.getConnectedUserById(userId);
     if (!sockets || sockets.length === 0) return;
     const chats = await this.chatService.getChatsByUserId(userId);
-    console.log('NUM CHATS: ', chats.length);
+    // console.log('NUM CHATS: ', chats.length);
     for (const socket of sockets) {
       this.server.to(socket.id).emit(EV_CHAT_LIST, chats);
     }
+  }
+
+  private async sendMessageToRoomMembers(
+    userId: string,
+    roomId: string,
+    message: any,
+  ) {
+    // Send message to all users in roomId.
+    const memebers: any[] = await this.chatService.getRoomUsersByRoomId(
+      userId,
+      roomId,
+    );
+    // send message to other members.
+    memebers.forEach(async (member) => {
+      if (member.status === RoomUserStatus.BANNED) return;
+      const sockets = this.chatService.getConnectedUserById(member.userId);
+      if (!sockets || sockets.length === 0) return;
+      sockets.forEach((s) => {
+        this.server.to(s.id).emit(EV_MESSAGE, message);
+      });
+    });
   }
 
   private async sendChatsToRoomMembers(userId: string, roomId: string) {
@@ -545,7 +603,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private async verifyAndSave(client: Socket) {
     const token: string = client.handshake.auth.token as string;
-    console.log('token: ', token);
+    // console.log('token: ', token);
     const decoded = await this.authService.verifyToken(token);
     // save the user id in the socket
     client.data = decoded;
@@ -557,6 +615,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sockets.forEach((s) => {
       this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, chat);
     });
+    this.server.emit(EV_EMIT_NEW_ROOM, chat);
+  }
+
+  private async sendRoomProtectedToClient(userId: string, chat: any) {
+    const sockets = this.chatService.getConnectedUserById(userId);
+    if (!sockets || sockets.length === 0) return;
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_ROOM_PROTECTED, chat);
+    });
+    this.server.emit(EV_EMIT_NEW_ROOM, chat);
   }
 
   private async sendRoomJoinedToClients(
@@ -564,13 +632,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     roomId: string,
     rUser: RoomUser,
   ) {
-    const members = await this.chatService.getRoomUsersByRoomId(userId, roomId);
-    members.forEach((member) => {
+    const room = await this.chatService.getRoomById(roomId, true);
+    const members = room.members;
+    members.forEach(async (member: any) => {
       if (member.status === RoomUserStatus.BANNED) return;
+      const chat = await this.chatService.formatChat(member.userId, room, true);
       const sockets = this.chatService.getConnectedUserById(member.userId);
       if (!sockets || sockets.length === 0) return;
       sockets.forEach((s) => {
-        this.server.to(s.id).emit(EV_EMIT_ROOM_JOINED, rUser);
+        this.server
+          .to(s.id)
+          .emit(EV_EMIT_ROOM_JOINED, { roomUser: rUser, chat: chat });
       });
     });
   }
@@ -580,13 +652,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     roomId: string,
     rUser: RoomUser,
   ) {
+    const sockets = this.chatService.getConnectedUserById(rUser.userId);
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, rUser);
+    });
+
     const members = await this.chatService.getRoomUsersByRoomId(userId, roomId);
     members.forEach((member) => {
       if (member.status === RoomUserStatus.BANNED) return;
       const sockets = this.chatService.getConnectedUserById(member.userId);
       if (!sockets || sockets.length === 0) return;
       sockets.forEach((s) => {
-        this.server.to(s.id).emit(EV_EMIT_ROOM_LEFT, rUser);
+        s.emit(EV_EMIT_ROOM_LEFT, rUser);
       });
     });
   }
@@ -694,6 +771,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         message: 'Invalid create room object',
       });
     }
+    if (payload.privacy === RoomPrivacy.PROTECTED) {
+      if (payload.password === '') {
+        throw new WsException({
+          error: EV_PROTECT_ROOM,
+          message: "password can't be empty",
+        });
+      }
+    }
   }
 
   private validateJoinRoom(payload: any) {
@@ -788,6 +873,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException({
         error: EV_BLOCK_USER,
         message: 'Invalid block user object',
+      });
+    }
+  }
+
+  private validateProtectRoom(payload: any) {
+    if (!('roomId' in payload && 'password' in payload)) {
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: 'Invalid protect room object',
+      });
+    }
+    if (
+      typeof payload.roomId !== 'string' ||
+      typeof payload.password !== 'string'
+    ) {
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: 'Invalid protect room object',
+      });
+    }
+    if (payload.password === '') {
+      throw new WsException({
+        error: EV_PROTECT_ROOM,
+        message: "password can't be empty",
       });
     }
   }

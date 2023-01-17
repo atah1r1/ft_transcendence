@@ -4,7 +4,6 @@ import {
   Post,
   Req,
   UseGuards,
-  Res,
   Body,
   UseInterceptors,
   ClassSerializerInterceptor,
@@ -15,6 +14,7 @@ import {
   HttpStatus,
   Param,
   Query,
+  Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
@@ -24,7 +24,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { User } from '@prisma/client';
-import { use } from 'passport';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
@@ -80,13 +79,14 @@ export class UserController {
   ) {
     try {
       const { secure_url } = await this.cloudinary.uploadImage(file);
+      //console.log('secure_url', secure_url);
       const user = await this.prisma.user.update({
         where: { id: req.user.id },
         data: { avatar: secure_url },
       });
       return { avatar: user.avatar };
-    } catch {
-      throw new BadRequestException('Error uploading image');
+    } catch (e) {
+      throw new BadRequestException('Error uploading image' + e.message);
     }
   }
 
@@ -144,11 +144,15 @@ export class UserController {
   // get All users
   @Get('all')
   async getAllUsers(@Req() req: any): Promise<User[]> {
-    const users = await this.userService.getAllUsers(req.user.id);
-    if (users) {
-      return users;
+    try {
+      const users = await this.userService.getAllUsers(req.user.id);
+      if (users) {
+        return users;
+      }
+      return [];
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
   // search user by username

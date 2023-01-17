@@ -86,6 +86,22 @@ export class ChatService {
     }
   }
 
+  async getFriendsForRoom(userId: string, roomId: string) {
+    const friends = await this.userService.getFriends(userId);
+    const members = await this.getRoomMembersByRoomId(userId, roomId);
+
+    const membersUserIds = members?.map((m) => m.userId);
+
+    console.table(membersUserIds);
+
+    const friendsNotInRoom = friends?.filter((friend) => {
+      const res = !membersUserIds.includes(friend.id);
+      //console.log('ID: ', friend.id, ', ', res);
+      return res;
+    });
+    return friendsNotInRoom ?? [];
+  }
+
   // Rooms
   /**
    * Create new DM room between two users
@@ -94,10 +110,11 @@ export class ChatService {
    * @returns Room object or throws error
    */
   async createDm(userId: string, otherUserId: string): Promise<any> {
-    const _existingDm = await this.getDmByUserIds(userId, otherUserId);
-    if (_existingDm) return this.formatChat(userId, _existingDm, true);
+    const _existingDm = await this.getDmByUserIds(userId, otherUserId, true);
+    if (_existingDm) return await this.formatChat(userId, _existingDm, true);
 
     const otherUser = await this.userService.getUserById(userId, otherUserId);
+    // console.log('OTHER USER: ', otherUser);
     if (!otherUser) throw new Error('User does not exist or blocked');
 
     const _room = await this.prisma.room.create({
@@ -236,7 +253,11 @@ export class ChatService {
    * @param otherUserId second user in DM
    * @returns Room object or null
    */
-  async getDmByUserIds(userId: string, otherUserId: string): Promise<any> {
+  async getDmByUserIds(
+    userId: string,
+    otherUserId: string,
+    includeMembers = false,
+  ): Promise<any> {
     const _room = await this.prisma.room.findFirst({
       where: {
         isDm: true,
@@ -245,6 +266,13 @@ export class ChatService {
             userId: {
               in: [userId, otherUserId],
             },
+          },
+        },
+      },
+      include: {
+        members: {
+          include: {
+            user: includeMembers,
           },
         },
       },
@@ -624,7 +652,7 @@ export class ChatService {
   }
 
   /**
-   * find and return RoomUsers of a room except RoomUserStatus.LEFT users.
+   * find and return RoomUsers of a room except RoomUserStatus.LEFT users and blocked.
    * @param userId User excuting the action
    * @param roomId Target room
    * @param includeUser should the user object be included in the result
@@ -667,10 +695,13 @@ export class ChatService {
    * @returns list of RoomUser objects or throws error
    */
   async getRoomMembersByRoomId(userId: string, roomId: string): Promise<any[]> {
+    const room = await this.getRoomById(roomId);
+    if (!room) throw new Error(`Room does not exist ${room}`);
+
     const ru = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
 
     if (!ru || ru.status === RoomUserStatus.LEFT)
-      throw new Error('You are not in room');
+      throw new Error(`You are not in room ${ru}`);
 
     if (ru.status === RoomUserStatus.BANNED)
       throw new Error('You are banned from room');
@@ -689,23 +720,6 @@ export class ChatService {
     }
     return members ?? [];
   }
-
-  // async getRoomUsersByUserId(
-  //   userId: string,
-  //   includeUser = false,
-  //   includeRoom = false,
-  // ): Promise<any[]> {
-  //   const _roomUsers = await this.prisma.roomUser.findMany({
-  //     where: {
-  //       userId: userId,
-  //     },
-  //     include: {
-  //       user: includeUser,
-  //       room: includeRoom,
-  //     },
-  //   });
-  //   return _roomUsers;
-  // }
 
   /**
    * Finds RoomUser by userId and roomId, returns null if not found.
@@ -785,17 +799,74 @@ export class ChatService {
     const _rooms = await this.prisma.room.findMany({
       where: {
         isDm: false,
-        NOT: {
-          privacy: RoomPrivacy.PRIVATE,
-          members: {
-            some: {
-              userId: userId,
+        privacy: {
+          not: RoomPrivacy.PRIVATE,
+        },
+        OR: [
+          {
+            members: {
+              every: {
+                userId: {
+                  not: userId,
+                },
+              },
             },
+          },
+          {
+            members: {
+              some: {
+                userId: userId,
+                status: RoomUserStatus.LEFT,
+              },
+            },
+          },
+        ],
+      },
+    });
+    return _rooms;
+  }
+
+  async makeRoomProtected(
+    userId: string,
+    roomId: string,
+    password: string,
+  ): Promise<any> {
+    const room: Room = await this.getRoomById(roomId);
+    if (!room) throw new Error('Room does not exist');
+    const ru: RoomUser = await this.getRoomUserByUserIdAndRoomId(
+      userId,
+      roomId,
+    );
+    if (!ru || ru.status === RoomUserStatus.LEFT)
+      throw new Error('You are not in room');
+    if (ru.role !== RoomRole.OWNER) throw new Error('You are not an owner');
+
+    if (room.isDm) throw new Error('Room is a dm');
+    if (room.privacy === RoomPrivacy.PRIVATE)
+      throw new Error('Room is private');
+    if (room.privacy === RoomPrivacy.PROTECTED)
+      throw new Error('Room is already protected');
+
+    const hashed = await this.encryptRoomPassword(password);
+
+    const r = await this.prisma.room.update({
+      where: {
+        id: roomId,
+      },
+      data: {
+        privacy: RoomPrivacy.PROTECTED,
+        password: hashed,
+      },
+      include: {
+        members: {
+          include: {
+            user: true,
           },
         },
       },
     });
-    return _rooms;
+
+    return await this.formatChat(userId, r, true);
   }
 
   /**
@@ -841,6 +912,7 @@ export class ChatService {
       wasRead: _wasRead,
       existing: existing,
       members: _members,
+      privacy: room.privacy,
     };
   }
 
@@ -982,6 +1054,8 @@ export class ChatService {
     if (!room) throw new Error('Room does not exist');
 
     const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
+    //console.log('UID: ', userId);
+    //console.log('RU: \n', _roomUser);
     if (!_roomUser || _roomUser.status === RoomUserStatus.LEFT)
       throw new Error('You are not in room');
 

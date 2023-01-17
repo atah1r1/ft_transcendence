@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Room } from '@prisma/client';
+import { Room, User } from '@prisma/client';
 import { ChatService } from './chat.service';
 
 @Controller('chat')
@@ -44,7 +44,6 @@ export class ChatController {
 
   @Get('messages/:roomId')
   async getMessages(@Req() req: any) {
-    console.log('PARAMS: ', req.params);
     try {
       return await this.chatService.getMessagesByRoomIdFormatted(
         req.user.id,
@@ -87,6 +86,25 @@ export class ChatController {
       return rooms;
     } catch (error) {
       throw new HttpException('No Rooms match query', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Get('room/:roomId/friendstoadd')
+  async getFriends(
+    @Req() req: any,
+    @Param('roomId') roomId: string,
+  ): Promise<User[]> {
+    try {
+      const friends = await this.chatService.getFriendsForRoom(
+        req.user.id,
+        roomId,
+      );
+      if (friends) {
+        return friends;
+      }
+      return [];
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 }

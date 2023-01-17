@@ -105,7 +105,7 @@
 .cancel:active,
 .create:active,
 .remove:active {
-  transform: translateY(1.5px);
+  transform: translateY(1.6px);
 }
 
 .text {
@@ -127,9 +127,9 @@
 }
 
 .creat_join_btn div {
-  font-size: 2.4rem;
-  width: 21.2rem;
-  height: 5.6rem;
+  font-size: 3.4rem;
+  width: 26rem;
+  height: 8rem;
 }
 
 .join_box {
@@ -170,4 +170,24 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   letter-spacing: 1px;
   color: #222;
+}
+
+.leave_room_box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  line-height: 2.6rem;
+  font-family: "Inter";
+  width: 80%;
+  color: #fff;
+}
+
+.leave_room_box span {
+  font-weight: bold;
 }
