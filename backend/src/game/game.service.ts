@@ -4,7 +4,6 @@ import { Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import Queue from 'src/utils/queue';
-import { json } from 'stream/consumers';
 import Game, {
   Ball,
   GameStatus,
