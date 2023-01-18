@@ -2,27 +2,42 @@
     background-image: url("/bg.jpeg");
     background-size: cover;
     height: 100%;
+    /* width: 100%; */
     margin: 0;
+
+
+
+    padding: 20px;
+    border-radius: 2.2rem;
+}
+
+.games_header{
+    font-size: 30px;
+    font-family: 'Pixeboy';
+    font-weight: 400;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.games {
 
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
     grid-column-gap: 10px;
     grid-row-gap: 10px;
-
-    padding: 50px;
-    border-radius: 2.2rem;
+    max-height: 500px;
     overflow-x: auto;
 }
 
 @media (max-width: 768px) {
-    .container {
+    .games {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (min-width: 768px) and (max-width: 1440px) {
-    .container {
+    .games {
         grid-template-columns: repeat(3, 1fr);
     }
 }
@@ -107,4 +122,29 @@
 
 .score {
     font-size: 20px;
+}
+
+.gameBtns {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 20px;
+}
+
+.gameBtns button{
+    background-color: #690759;
+    color: white;
+    padding: 30px 30px;
+    border: 1px solid white;
+    cursor: pointer;
+    border-radius: 10px;
+    font-family: 'Pixeboy';
+    font-size: 30px;
+    transition: all .3s;
+    font-weight: 500;
+    width: 200px;
+}
+
+.gameBtns button:hover{
+    background-color: #500243;
 }

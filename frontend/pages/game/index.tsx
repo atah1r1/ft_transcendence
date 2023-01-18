@@ -87,65 +87,60 @@ const JoinRoomButton = styled.button`
 
 `;
 
-function Home() {
-    const [menu, setMenu] = useState(false);
+function Home ()
+{
+    const [ menu, setMenu ] = useState( false );
     const router = useRouter();
 
-    const playGame = (e: any) => {
-        e.preventDefault();
-        router.push('/game/play');
+    const playGame = ( ) =>
+    {
+        router.push( '/game/play' );
         // socket.emit('join_game');
-        console.log("join game");
+        console.log( "join game" );
     }
 
-    const singlePmode = (e: any) => {
-        e.preventDefault();
-        router.push('/game/play/vbot');
+    const singlePmode = ( ) =>
+    {
+        router.push( '/game/play/vbot' );
     }
 
 
 
     return (
         <>
-            <MenuNav menu={menu} setMenu={setMenu} />
-            <div className={styles_box.container}>
-                <SettingsNav selected={"game"} menu={menu} />
-                <div className={styles_box.profile_details}>
+            <MenuNav menu={ menu } setMenu={ setMenu } />
+            <div className={ styles_box.container }>
+                <SettingsNav selected={ "game" } menu={ menu } />
+                <div className={ styles_box.profile_details }>
                     <Logout />
-                    {/* <form>
-                            <JoinRoomButton
-                                type="submit"
-                                onClick={ playGame }
-                            >PLAY
-                                <p>PvP</p>
-                            </JoinRoomButton>
-                            <JoinRoomButton
-                                type="submit"
-                                onClick={ singlePmode }
-                            >PLAY
-                                <p>PvAI</p>
-                            </JoinRoomButton>
-                        </form> */}
-                    <div className={styles.container}>
-                        {new Array(10).fill(0).map((match) => {
-                            return (
-                                <div className={styles.cardContainer}>
-                                    <div className={styles.players}>
-                                        <div className={styles.player}>
-                                            <img src="https://api.dicebear.com/5.x/bottts/svg?seed=Felix" width="40"></img>
-                                            <h1>Player 1</h1>
-                                            <div className={styles.score}>10</div>
-                                        </div>
-                                        <div className={styles.vs}>VS</div>
-                                        <div className={styles.player}>
-                                            <img src="https://api.dicebear.com/5.x/bottts/svg?seed=Hakam" width="40"></img>
-                                            <h1>Player 2</h1>
-                                            <div className={styles.score}>0</div>
+                    <div className={ styles.container }>
+                        <div className={ styles.gameBtns }>
+                            <button className={ styles.queue } onClick={ playGame }>QUEUE</button>
+                            <button className={ styles.bot } onClick={ singlePmode }>VS BOT</button>
+                        </div>
+                        <h1 className={styles.games_header}>LIVE GAMES</h1>
+                        <div className={ styles.games }>
+                            { new Array( 5 ).fill( 0 ).map( ( match ) =>
+                            {
+                                return (
+                                    <div className={ styles.cardContainer }>
+                                        <div className={ styles.players }>
+                                            <div className={ styles.player }>
+                                                <img src="https://api.dicebear.com/5.x/bottts/svg?seed=Felix" width="40"></img>
+                                                <h1>Player 1</h1>
+                                                <div className={ styles.score }>10</div>
+                                            </div>
+                                            <div className={ styles.vs }>VS</div>
+                                            <div className={ styles.player }>
+                                                <img src="https://api.dicebear.com/5.x/bottts/svg?seed=Hakam" width="40"></img>
+                                                <h1>Player 2</h1>
+                                                <div className={ styles.score }>0</div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )
-                        })}
+                                )
+                            } ) }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -155,9 +150,10 @@ function Home() {
 
 export default Home;
 
-export const getServerSideProps = requireAuthentication(async () => {
+export const getServerSideProps = requireAuthentication( async () =>
+{
     return {
         props: {
         }, // will be passed to the page component as props
     }
-})
+} )
