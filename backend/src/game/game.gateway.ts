@@ -239,7 +239,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('PLAY AGAINST ACCEPT: ', payload);
     this.validatePlayAgainst(payload);
     try {
-      const game = this.gameService.acceptPlayAgainst(
+      const game = await this.gameService.acceptPlayAgainst(
         client.data.id,
         payload.userId,
         client,
@@ -303,7 +303,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async startGame(client: any, payload: any) {
     this.validatePlayAgainst(payload);
     try {
-      this.gameService.startGame(client.data.id, payload.userId);
+      this.gameService.startGame(client.data.id, payload.userId, this.server);
     } catch (err) {
       throw new WsException({
         error: EV_START_GAME,
@@ -316,7 +316,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async leaveGame(client: any, payload: any) {
     this.validatePlayAgainst(payload);
     try {
-      this.gameService.leaveGame(client.data.id, payload.userId);
+      this.gameService.leaveGame(client.data.id, payload.userId, this.server);
     } catch (err) {
       throw new WsException({
         error: EV_LEAVE_GAME,
@@ -326,7 +326,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(EV_LEAVE_QUEUE)
-  async leaveQueue(client: any, payload: any) {
+  async leaveQueue(client: any) {
     try {
       const left = await this.gameService.leaveQueue(client.data.id);
       this.sendQueueLeftToClient(client, left ?? false);

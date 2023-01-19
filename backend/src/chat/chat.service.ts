@@ -879,7 +879,7 @@ export class ChatService {
   async formatChat(userId: string, room: any, existing: boolean): Promise<any> {
     let _name: string = null;
     let _image: string = null;
-    const _members: User[] = room.members.map((ru) => {
+    const _members: User[] = room.members.map((ru: any) => {
       delete ru.user.two_factor_auth;
       delete ru.user.two_factor_auth_uri;
       delete ru.user.two_factor_auth_key;

@@ -38,6 +38,8 @@ export default class Game {
   timer: NodeJS.Timer;
   ball: Ball;
   paddle: Map<string, Paddle>;
+  usernames: Map<string, string>;
+  avatars: Map<string, string>;
 
   convertToJSON() {
     let score = {};
@@ -61,6 +63,13 @@ export default class Game {
         [this.players[1]]: this.paddle.get(this.players[1]),
       };
     }
+    let usernames = {};
+    if (this.usernames) {
+      usernames = {
+        [this.players[0]]: this.usernames.get(this.players[0]),
+        [this.players[1]]: this.usernames.get(this.players[1]),
+      };
+    }
 
     return {
       id: this.id,
@@ -68,6 +77,7 @@ export default class Game {
       spectators: this.spectators,
       status: this.status,
       ball: this.ball,
+      usernames: usernames,
       score: score,
       playerStatus: playerStatus,
       paddle: paddle,

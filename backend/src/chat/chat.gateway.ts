@@ -9,7 +9,7 @@ import {
 import { AuthService } from '../auth/auth.service';
 import { ChatService } from './chat.service';
 import { Socket, Server } from 'socket.io';
-import { RoomPrivacy, RoomUser, RoomUserStatus } from '@prisma/client';
+import { RoomPrivacy, RoomUser, RoomUserStatus, User } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 
 const EV_CHAT_LIST = 'chat_list';
@@ -32,6 +32,7 @@ const EV_PROTECT_ROOM = 'protect_room';
 
 const EV_EMIT_ONLINE_FRIENDS = 'online_friends';
 const EV_EMIT_ROOM_CREATED = 'room_created';
+const EV_EMIT_NEW_FRIENDSHIP = 'new_friendship';
 const EV_EMIT_ROOM_JOINED = 'room_joined';
 const EV_EMIT_ROOM_LEFT = 'room_left';
 const EV_EMIT_MEMBER_ADDED = 'member_added';
@@ -137,7 +138,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       if (!chat) {
         throw new WsException({
-          error: EV_CREATE_ROOM,
+          error: EV_CREATE_DM,
           message: 'Failed to create room',
         });
       }
@@ -152,6 +153,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.sendOnlineFriendsToClient(client);
       await this.sendOnlineFriendsOfUserId(client.data.id);
       await this.sendRoomCreatedToClient(client.data.id, chat);
+      await this.sendNewFriendshipToClient(
+        payload.otherUserId,
+        chat.members.find((m: User) => m.id !== payload.otherUserId) ?? {},
+      );
     } catch (err) {
       throw new WsException({
         error: EV_CREATE_DM,
@@ -615,7 +620,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sockets.forEach((s) => {
       this.server.to(s.id).emit(EV_EMIT_ROOM_CREATED, chat);
     });
-    this.server.emit(EV_EMIT_NEW_ROOM, chat);
+    if (!chat.isDm) this.server.emit(EV_EMIT_NEW_ROOM, chat);
+  }
+
+  private async sendNewFriendshipToClient(userId: string, user: User) {
+    const sockets = this.chatService.getConnectedUserById(userId);
+    if (!sockets || sockets.length === 0) return;
+    sockets.forEach((s) => {
+      this.server.to(s.id).emit(EV_EMIT_NEW_FRIENDSHIP, user);
+    });
   }
 
   private async sendRoomProtectedToClient(userId: string, chat: any) {
