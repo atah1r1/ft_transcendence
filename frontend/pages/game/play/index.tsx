@@ -170,7 +170,6 @@ function Game() {
 
   // Rendering
   useEffect(() => {
-    console.log("GRAPHICS EFFECT CALLED");
     canvasRef.current?.focus();
     render();
   }, []);

@@ -47,7 +47,6 @@ export const GameSocketContext = React.createContext<Socket>(gameSocket);
 export const GameDataContext = React.createContext<any[]>([null, () => {}]);
 export const GamesCountContext = React.createContext<any[]>([0, () => {}]);
 export const LiveGamesContext = React.createContext<any[]>([[], () => {}]);
-
 export const DataContext = React.createContext<any[]>([{}, () => {}]);
 export const ChatContext = React.createContext<any[]>([[], () => {}]);
 export const OnlineFriendsContext = React.createContext<any[]>([[], () => {}]);
@@ -86,6 +85,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [gameRequestUser, setGameRequestUser] = useState<any>(null);
   const [gamesCount, setGamesCount] = useState<any>(0);
   const [liveGames, setLiveGames] = useState([]);
+  const [gameRequestUserId, setGameRequestUserId] = useState<any>(null);
 
   const toastOptions: ToastOptions<{}> = {
     position: "top-right",
@@ -109,17 +109,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     socket.on("connect_error", () => {
       console.log("connect_error: ", socket.id);
-      toast.error("Websocket connection failed.", toastOptions);
-      // TODO: redirect to login page.
+      toast.error("Failed to connect, retrying...", toastOptions);
       socket.connect();
     });
 
     socket.on("exception", (exception) => {
       console.log("exception: ", socket.id);
-      toast.error(
-        `Error: ${exception.error}: ${exception.message}`,
-        toastOptions
-      );
+      toast.error(`Error: ${exception.message}`, toastOptions);
     });
 
     socket.on("chat_list", (data: any) => {
@@ -257,25 +253,32 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     gameSocket.on("exception", (exception) => {
       console.log("exception: ", socket.id);
-      toast.error(
-        `Error: ${exception.error}: ${exception.message}`,
-        toastOptions
-      );
+      toast.error(`Error: ${exception.message}`, toastOptions);
     });
 
     gameSocket.on("emit_play_against_request", (user: any) => {
-      console.log("play_against: ", socket.id);
-      console.log("user: ", user);
       setGameRequestUser(user);
+    });
+
+    gameSocket.on("emit_play_against_request_sent", (data: any) => {
+      setGameRequestUserId(data?.userId);
     });
 
     gameSocket.on("emit_play_queue", (data: any) => {
       // when you send req for queue, you receieve this one back.
       // it will have either status: ACCPTED or QUEUED.
+      console.log("emit_play_queue: ", data);
+      if (data.status === GameStatus.ACCEPTED) {
+        setGame(data);
+        router.push({ pathname: `/game/play`, query: { isPlaying: true } });
+      } else if (data.status === GameStatus.QUEUED) {
+        setGame(data);
+      }
     });
 
     gameSocket.on("emit_play_against_accept", (gameData: any) => {
-      console.log("play_against_accept: ", gameData);
+      setGameRequestUser(null);
+      setGameRequestUserId(null);
       if (gameData.status === GameStatus.ACCEPTED) {
         setGame(gameData);
         router.push({ pathname: `/game/play`, query: { isPlaying: true } });
@@ -289,8 +292,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     gameSocket.on("emit_play_against_decline", (data: any) => {
-      //if rejected by other user, show toast.
-      // cancel waiting popup.
+      setGameRequestUser(null);
+      setGameRequestUserId(null);
       toast.info(`You request was denied by the other user.`, toastOptions);
     });
 
@@ -298,6 +301,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       //if you cancelled request, you will receive this.
       // data = Game(status: "CANCELLED",... )
       // the waiting popup will be closed.
+      setGameRequestUser(null);
+      setGameRequestUserId(null);
     });
 
     gameSocket.on("emit_spectate_game", (gameData: any) => {
@@ -421,15 +426,114 @@ function MyApp({ Component, pageProps }: AppProps) {
                                         }
                                       />
                                     )}
+                                  </div>
+                                  <div>
+                                    {game &&
+                                      game.status === GameStatus.QUEUED && (
+                                        <Modal
+                                          content={
+                                            <>
+                                              <div
+                                                className={styles_r_w.part_up}
+                                              >
+                                                <div
+                                                  className={styles_r_w.text}
+                                                >
+                                                  Queue
+                                                </div>
+                                              </div>
+                                              <div
+                                                className={
+                                                  styles_r_w.leave_room_box
+                                                }
+                                              >
+                                                <div
+                                                  className={
+                                                    styles_r_w.leave_room
+                                                  }
+                                                >
+                                                  You are in queue. Waiting...
+                                                </div>
+                                              </div>
+                                              <div
+                                                className={styles_r_w.part_down}
+                                              >
+                                                <div
+                                                  className={styles_r_w.cancel}
+                                                  onClick={() => {
+                                                    gameSocket.emit(
+                                                      "leave_queue",
+                                                      {}
+                                                    );
+                                                    setGame(null);
+                                                  }}
+                                                >
+                                                  LEAVE
+                                                </div>
+                                              </div>
+                                            </>
+                                          }
+                                        />
+                                      )}
+                                  </div>
+                                  <div>
+                                    {gameRequestUserId && (
+                                      <Modal
+                                        content={
+                                          <>
+                                            <div className={styles_r_w.part_up}>
+                                              <div className={styles_r_w.text}>
+                                                Game Request Sent
+                                              </div>
+                                            </div>
+                                            <div
+                                              className={
+                                                styles_r_w.leave_room_box
+                                              }
+                                            >
+                                              <div
+                                                className={
+                                                  styles_r_w.leave_room
+                                                }
+                                              >
+                                                Waiting Response...
+                                              </div>
+                                            </div>
+                                            <div
+                                              className={styles_r_w.part_down}
+                                            >
+                                              <div
+                                                className={styles_r_w.cancel}
+                                                onClick={() => {
+                                                  gameSocket.emit(
+                                                    "play_against_cancel",
+                                                    {
+                                                      userId: gameRequestUserId,
+                                                    }
+                                                  );
+                                                  setGameRequestUserId(null);
+                                                }}
+                                              >
+                                                CANCEL
+                                              </div>
+                                            </div>
+                                          </>
+                                        }
+                                      />
+                                    )}
                                     <div
                                       className={
-                                        gameRequestUser && styles_r_w.room
+                                        (gameRequestUser ||
+                                          gameRequestUserId ||
+                                          (game &&
+                                            game.status ===
+                                              GameStatus.QUEUED)) &&
+                                        styles_r_w.room
                                       }
                                     >
                                       <Component {...pageProps} />
                                     </div>
                                   </div>
-
                                   <ToastContainer
                                     style={{ fontSize: "1.2rem" }}
                                   />

@@ -21,8 +21,7 @@ function Home() {
   const router = useRouter();
 
   const playGame = () => {
-    router.push("/game/play");
-    console.log("join game");
+    gameSocket.emit("play_queue", {});
   };
 
   const singlePmode = () => {

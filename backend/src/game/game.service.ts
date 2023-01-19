@@ -204,6 +204,53 @@ export class GameService {
     return players;
   }
 
+  // Sends game data to all players and spectators
+  // Change the data being sent to aminimal object
+  private sendGameUpdateToClients(game: Game) {
+    const players = game.players;
+    const spectators = game.spectators;
+    players.forEach((p) => {
+      const s = this.getPlayerById(p);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
+      }
+    });
+    // in case there are spectators
+    spectators.forEach((sp) => {
+      const s = this.getSpectatorById(sp);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
+      }
+    });
+  }
+
+  private sendGameFinishToClients(game: Game) {
+    const players = game.players;
+    const spectators = game.spectators;
+    players.forEach((p) => {
+      const s = this.getPlayerById(p);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      }
+    });
+    // in case there are spectators
+    spectators.forEach((sp) => {
+      const s = this.getSpectatorById(sp);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      }
+    });
+  }
+
+  private sendLiveGamesUpdatedToAll(server: Server) {
+    let gamesTotalScore = 0;
+    GameRepository.getInstance().games.forEach((game) => {
+      gamesTotalScore += game.score.get(game.players[0]);
+      gamesTotalScore += game.score.get(game.players[1]);
+    });
+    server.emit(EV_EMIT_LIVE_GAMES_UPDATED, gamesTotalScore);
+  }
+
   // Join the auto-match queue
   // If you can play with player before you (not blocked)
   // the game will be created, next, both players need to send startGame event
@@ -234,7 +281,8 @@ export class GameService {
           otherId,
           GameRepository.getInstance().connectedUsers.get(opId)[0],
         );
-        const newGame = this.createNewGame(userId, opId);
+        const newGame = await this.createNewGame(userId, opId);
+        GameRepository.getInstance().games.set(newGame.id, newGame);
         return newGame;
       }
     }
@@ -329,53 +377,6 @@ export class GameService {
     else if (!p2Sock) game.score.set(game.players[0], 10);
     this.finishGame(game, server);
     return false;
-  }
-
-  // Sends game data to all players and spectators
-  // Change the data being sent to aminimal object
-  private sendGameUpdateToClients(game: Game) {
-    const players = game.players;
-    const spectators = game.spectators;
-    players.forEach((p) => {
-      const s = this.getPlayerById(p);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
-      }
-    });
-    // in case there are spectators
-    spectators.forEach((sp) => {
-      const s = this.getSpectatorById(sp);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
-      }
-    });
-  }
-
-  private sendGameFinishToClients(game: Game) {
-    const players = game.players;
-    const spectators = game.spectators;
-    players.forEach((p) => {
-      const s = this.getPlayerById(p);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
-      }
-    });
-    // in case there are spectators
-    spectators.forEach((sp) => {
-      const s = this.getSpectatorById(sp);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
-      }
-    });
-  }
-
-  private sendLiveGamesUpdatedToAll(server: Server) {
-    let gamesTotalScore = 0;
-    GameRepository.getInstance().games.forEach((game) => {
-      gamesTotalScore += game.score.get(game.players[0]);
-      gamesTotalScore += game.score.get(game.players[1]);
-    });
-    server.emit(EV_EMIT_LIVE_GAMES_UPDATED, gamesTotalScore);
   }
 
   // Updates game state
@@ -728,10 +729,7 @@ export class GameService {
     return history;
   }
 
-  async getGameHistoryByUserId(
-    userId: string,
-    id: string,
-  ): Promise<GameHistory[]> {
+  async getGameHistoryByUserId(userId: string, id: string): Promise<any[]> {
     const blocked = await this.userService.getBlockedUsers(userId);
     const blockedUsersIds = blocked.map((user) => user.id);
     if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
@@ -740,41 +738,43 @@ export class GameService {
       where: {
         OR: [{ winnerId: id }, { loserId: id }],
       },
-    });
-    return history;
-  }
-
-  async getWonGamesByUserId(
-    userId: string,
-    id: string,
-  ): Promise<GameHistory[]> {
-    const blocked = await this.userService.getBlockedUsers(userId);
-    const blockedUsersIds = blocked.map((user) => user.id);
-    if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
-
-    const history = await this.prisma.gameHistory.findMany({
-      where: {
-        winnerId: id,
+      include: {
+        loser: true,
+        winner: true,
       },
     });
     return history;
   }
 
-  async getLostGamesByUserId(
-    userId: string,
-    id: string,
-  ): Promise<GameHistory[]> {
-    const blocked = await this.userService.getBlockedUsers(userId);
-    const blockedUsersIds = blocked.map((user) => user.id);
-    if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
+  // async getWonGamesByUserId(
+  //   userId: string,
+  //   id: string,
+  // ): Promise<GameHistory[]> {
+  //   const blocked = await this.userService.getBlockedUsers(userId);
+  //   const blockedUsersIds = blocked.map((user) => user.id);
+  //   if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
+  //   const history = await this.prisma.gameHistory.findMany({
+  //     where: {
+  //       winnerId: id,
+  //     },
+  //   });
+  //   return history;
+  // }
 
-    const history = await this.prisma.gameHistory.findMany({
-      where: {
-        loserId: id,
-      },
-    });
-    return history;
-  }
+  // async getLostGamesByUserId(
+  //   userId: string,
+  //   id: string,
+  // ): Promise<GameHistory[]> {
+  //   const blocked = await this.userService.getBlockedUsers(userId);
+  //   const blockedUsersIds = blocked.map((user) => user.id);
+  //   if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
+  //   const history = await this.prisma.gameHistory.findMany({
+  //     where: {
+  //       loserId: id,
+  //     },
+  //   });
+  //   return history;
+  // }
 
   async getGameHistoryByGameId(
     userId: string,
