@@ -2,7 +2,7 @@ import cn from "classnames";
 import styles from "../../styles/profile.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import styles_st from "../../styles/statistics.module.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import MenuNav from "../../components/menuNav";
 import SettingsNav from "../../components/settings_nav";
@@ -13,9 +13,29 @@ import Logout from "../../components/logout";
 import ErrorPage from 'next/error';
 import Loading from '../../components/Loading';
 import HistoryBox from "../../components/history_box";
+import { AddCircleOutline, ChatbubbleOutline, PersonCircleOutline, RemoveCircleOutline } from "react-ionicons";
+import { LastBlockedContext } from "../_app";
 
 const FriendProfile = () =>
 {
+  const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
+  const [ friends, setFriends ] = useState( [] );
+  const [ profileFriend, setProfileFriend ] = useState(
+    {
+      avatar: null,
+      code_verified: false,
+      createdAt: "",
+      first_name: "",
+      id: "",
+      intra_name: "",
+      isFriend: true,
+      last_name: "",
+      two_factor_auth: false,
+      two_factor_auth_uri: null,
+      updatedAt: "",
+      username: "",
+    }
+  );
   const [ history, setHistory ] = useState( [
     {
       avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
@@ -152,6 +172,21 @@ const FriendProfile = () =>
     } )
   }, [] )
 
+  useEffect( () =>
+  {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/all`, {
+      withCredentials: true,
+    } ).then( ( res ) =>
+    {
+      setProfileFriend( res.data.filter( ( ele: any ) => ele.id === id )[0] );
+      setFriends( res.data );
+    } ).catch( ( err ) =>
+    {
+      console.log( err );
+    } );
+  }, [ lastBlockedId ] );
+  console.log( profileFriend )
+
   if ( loading )
   {
     return <Loading />
@@ -188,6 +223,44 @@ const FriendProfile = () =>
                   ></Image>
                 </div>
                 { <p>{ data?.username }</p> }
+              </div>
+              <div className={ styles.friends_options }>
+                {
+                  profileFriend.isFriend === false &&
+                  <div onClick={ () =>
+                  {
+                    // socket?.emit( "create_dm", { otherUserId: ele.id } );
+                  } }>
+                    <AddCircleOutline
+                      color={ '#ffffff' }
+                      height="60px"
+                      width="60px"
+                    />
+                  </div>
+                }
+                {
+                  profileFriend.isFriend === true &&
+                  <div onClick={ () =>
+                  {
+                    // socket?.emit( "create_dm", { otherUserId: ele.id } );
+                  } }>
+                    <ChatbubbleOutline
+                      color={ '#ffffff' }
+                      height="60px"
+                      width="60px"
+                    />
+                  </div>
+                }
+                <div onClick={ () =>
+                {
+                  // socket?.emit( "block_user", { targetUserId: friends[ i ].id } );
+                } }>
+                  <RemoveCircleOutline
+                    color={ '#ffffff' }
+                    height="60px"
+                    width="60px"
+                  />
+                </div>
               </div>
             </div>
             <div className={ styles.details_down }>
