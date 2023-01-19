@@ -16,33 +16,55 @@ const History = () =>
   const [ data, setData ] = useContext( DataContext );
   const [ menu, setMenu ] = useState( false );
   const [ history, setHistory ] = useState( [
-    // {
-    //   avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-    //   numberGame: "2",
-    //   score: "1250",
-    //   points: "-15",
-    //   achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-    //   victory: "2",
-    //   defeat: "10",
-    //   gameMode: "game Mode",
-    //   time: "17:06PM 06/10/2022",
-    // },
+    {
+      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
+      numberGame: "2",
+      score: "1250",
+      points: "-15",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
+      victory: "2",
+      defeat: "10",
+      gameMode: "game Mode",
+      time: "17:06PM 06/10/2022",
+    },
+    {
+      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
+      numberGame: "2",
+      score: "1250",
+      points: "-15",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
+      victory: "2",
+      defeat: "10",
+      gameMode: "game Mode",
+      time: "17:06PM 06/10/2022",
+    },
+    {
+      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
+      numberGame: "2",
+      score: "1250",
+      points: "-15",
+      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
+      victory: "2",
+      defeat: "10",
+      gameMode: "game Mode",
+      time: "17:06PM 06/10/2022",
+    },
   ] );
 
-  useEffect( () =>
-  {
-    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/game/${ data.id }/history`,
-      { withCredentials: true } )
-      .then( ( res ) =>
-      {
-        setHistory( res.data );
-        console.log( 'res: ', res );
-      } )
-      .catch( ( error ) =>
-      {
-        console.log( 'error: ', error );
-      } )
-  }, [] )
+  // useEffect( () =>
+  // {
+  //   axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/game/${ data.id }/history`,
+  //     { withCredentials: true } )
+  //     .then( ( res ) =>
+  //     {
+  //       setHistory( res.data );
+  //       console.log( 'res: ', res );
+  //     } )
+  //     .catch( ( error ) =>
+  //     {
+  //       console.log( 'error: ', error );
+  //     } )
+  // }, [] )
 
   return (
     <>
