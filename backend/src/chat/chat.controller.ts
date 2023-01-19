@@ -22,7 +22,7 @@ export class ChatController {
     try {
       return await this.chatService.getChatsByUserId(req.user.id);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -50,7 +50,7 @@ export class ChatController {
         req.params.roomId,
       );
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
