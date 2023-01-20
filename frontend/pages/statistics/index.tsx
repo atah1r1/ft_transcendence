@@ -8,11 +8,29 @@ import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 import { DataContext } from "../_app";
+import cn from "classnames";
+import axios from "axios";
 
 const History = () =>
 {
   const [ data, setData ] = useContext( DataContext );
   const [ menu, setMenu ] = useState( false );
+  const [ history, setHistory ] = useState( [] );
+
+  useEffect( () =>
+  {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/game/${ data.id }/history`,
+      { withCredentials: true } )
+      .then( ( res ) =>
+      {
+        setHistory( res.data );
+        console.log( 'history: ', res.data );
+      } )
+      .catch( ( error ) =>
+      {
+        console.log( 'error: ', error );
+      } )
+  }, [ data.id ] )
 
   return (
     <>
@@ -62,40 +80,40 @@ const History = () =>
             <div className={ styles.part_two }>
               <p className={ styles.ach_text }>ACHIEVMENTS</p>
               <div className={ styles.ach_medal }>
-                <div className={ styles.ach_medal_box }>
+                <div className={ cn( styles.ach_medal_box, `${ !history.length && styles.non_medal }` ) }>
                   <div className={ styles.ach_goal }>first match</div>
                   <Image
                     src="/ach1.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
-                <div className={ styles.ach_medal_box }>
+                <div className={ cn( styles.ach_medal_box, styles.non_medal ) }>
                   <div className={ styles.ach_goal }></div>
                   <Image
                     src="/ach2.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
-                <div className={ styles.ach_medal_box }>
+                <div className={ cn( styles.ach_medal_box, styles.non_medal ) }>
                   <div className={ styles.ach_goal }></div>
                   <Image
                     src="/ach3.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
-                <div className={ styles.ach_medal_box }>
+                <div className={ cn( styles.ach_medal_box, styles.non_medal ) }>
                   <div className={ styles.ach_goal }></div>
                   <Image
                     src="/ach4.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
               </div>

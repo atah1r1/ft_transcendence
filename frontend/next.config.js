@@ -8,6 +8,8 @@ module.exports = nextConfig;
 
 module.exports = {
   images: {
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: "https",
@@ -28,6 +30,10 @@ module.exports = {
       {
         protocol: "https",
         hostname: "avatars.dicebear.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
       },
     ],
   },

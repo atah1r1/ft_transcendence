@@ -82,6 +82,7 @@
 .details_medals {
   display: flex;
   justify-content: flex-end;
+  gap: 1.6rem;
 }
 
 .details_info {

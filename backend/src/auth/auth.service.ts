@@ -50,7 +50,9 @@ export class AuthService {
         username: 'USER' + userNumber,
         first_name: 'USER ' + userNumber,
         last_name: 'USER ' + userNumber,
-        avatar: null,
+        avatar: `https://api.dicebear.com/5.x/bottts/svg?seed=${
+          'USER' + userNumber
+        }`,
         two_factor_auth_key: authenticator.generateSecret(),
       },
     });

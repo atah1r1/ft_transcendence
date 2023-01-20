@@ -2,12 +2,13 @@ import styles from "../styles/history.module.css";
 import styles_p from "../styles/profile.module.css";
 import styles_f from "../styles/friends.module.css";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ScoreContext } from "../pages/_app";
 
-const HistoryBox = ( { history }: any ) =>
+const HistoryBox = ( { history, id }: any ) =>
 {
-
   const [ empty, setEmpty ] = useState( false );
+  var [ score, setScore ] = useContext( ScoreContext );
 
   useEffect( () =>
   {
@@ -23,54 +24,36 @@ const HistoryBox = ( { history }: any ) =>
       return (
         <div className={ styles.history_box } key={ i }>
           <div className={ styles.history_avatar }>
-            <Image src={ ele?.avatar ?? "https://picsum.photos/300/300" } alt={ "avatar" } width={ 54 } height={ 54 } layout="fixed" className={ styles_p.profile_avatar } />
-            <div className={ styles.history_numberGame }>{ ele.numberGame }</div>
+            <Image src={ ( id === ele.loserId ? ( ele.winner.avatar ?? "https://picsum.photos/300/300" ) : ( ele.loser.avatar ?? "https://picsum.photos/301/301" ) ) } alt={ "avatar" } width={ 54 } height={ 54 } layout="fixed" className={ styles_p.profile_avatar } />
           </div>
           <div className={ styles.history_score_points }>
-            <div>score { ele.score }</div>
+            <div>score { id === ele.winnerId ? score += 50 : score -= 50 }</div>
             <div
               style={ {
-                color: `${ Number( ele.victory ) > Number( ele.defeat ) ? "#3BA658" : "#EA4335"
-                  }`,
+                color: `${ id === ele.winnerId ? "#3BA658" : "#EA4335" }`,
               } }
             >
-              { ele.points }
+              { `${ id === ele.winnerId ? '+50' : '-50' }` }
             </div>
-          </div>
-          <div className={ styles.history_achievements }>
-            { ele.achievements.map( ( ele: string, i: number ) =>
-            {
-              return ( <Image
-                key={ i.toString() }
-                src={ ele }
-                alt={ "achivement" }
-                width={ "28%" }
-                height={ "28%" }
-              /> )
-            } ) }
           </div>
           <div className={ styles.history_victory_defeat }>
             <div className={ styles.history_victory_defeat_box }>
               <p
                 style={ {
-                  color: `${ Number( ele.victory ) > Number( ele.defeat )
-                    ? "#3BA658"
-                    : "#EA4335"
-                    }`,
+                  color: `${ id === ele.winnerId ? "#3BA658" : "#EA4335" }`,
                 } }
               >
-                { Number( ele.victory ) > Number( ele.defeat ) ? "vectory" : "defeat" }
+                { id === ele.winnerId ? "vectory" : "defeat" }
               </p>
               <div className={ styles.victory_defeat_box }>
-                <div>{ ele.victory }</div>
+                <div>{ ele.winnerScore }</div>
                 <p>-</p>
-                <div>{ ele.defeat }</div>
+                <div>{ ele.loserScore }</div>
               </div>
             </div>
           </div>
           <div className={ styles.history_gameMode_time }>
-            <div>{ ele.gameMode }</div>
-            <div>{ ele.time }</div>
+            <div>{ ele.createdAt.split( "T" )[ 1 ].split( "." )[ 0 ] }</div>
           </div>
         </div>
       );

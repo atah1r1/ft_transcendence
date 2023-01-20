@@ -90,8 +90,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
   padding: 6rem 0;
+  margin-top: 4rem;
   gap: 8rem;
 }
 
@@ -124,6 +125,11 @@
 .ach_medal_box {
   position: relative;
   transition: all 1s;
+}
+
+.non_medal {
+  opacity: 0.2;
+  pointer-events: none;
 }
 
 .ach_medal_box:hover {

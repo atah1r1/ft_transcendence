@@ -1,5 +1,6 @@
 import cn from "classnames";
 import styles from "../../styles/profile.module.css";
+import styles_f from "../../styles/friends.module.css";
 import styles_box from "../../styles/style_box.module.css";
 import styles_st from "../../styles/statistics.module.css";
 import { useContext, useEffect, useState } from "react";
@@ -13,11 +14,12 @@ import Logout from "../../components/logout";
 import ErrorPage from 'next/error';
 import Loading from '../../components/Loading';
 import HistoryBox from "../../components/history_box";
-import { AddCircleOutline, ChatbubbleOutline, PersonCircleOutline, RemoveCircleOutline } from "react-ionicons";
-import { LastBlockedContext } from "../_app";
+import { AddCircleOutline, ChatbubbleOutline, GameControllerOutline, PersonCircleOutline, RemoveCircleOutline } from "react-ionicons";
+import { LastBlockedContext, SocketContext } from "../_app";
 
 const FriendProfile = () =>
 {
+  const socket = useContext( SocketContext );
   const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
   const [ friends, setFriends ] = useState( [] );
   const [ profileFriend, setProfileFriend ] = useState(
@@ -36,107 +38,8 @@ const FriendProfile = () =>
       username: "",
     }
   );
-  const [ history, setHistory ] = useState( [
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "20",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "2",
-      defeat: "1",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "2",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "2",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "2",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "20",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "2",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "2",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-    {
-      avatar: "https://cdn.intra.42.fr/users/df0bbcb990c18df8514510c3ce52b34a/bsanaoui.jpg",
-      numberGame: "2",
-      score: "1250",
-      points: "-15",
-      achievements: [ "/ach1.png", "/ach2.png", "/ach3.png" ],
-      victory: "2",
-      defeat: "10",
-      gameMode: "game Mode",
-      time: "17:06PM 06/10/2022",
-    },
-  ] );
+  const [ history, setHistory ] = useState( [] );
+  const [ friendHistory, setFriendHistory ] = useState( [] );
   const [ notFound, setNotFound ] = useState( true );
   const [ loading, setLoading ] = useState( true );
   const [ data, setData ] = useState(
@@ -154,6 +57,36 @@ const FriendProfile = () =>
   const [ menu, setMenu ] = useState( false );
   const router = useRouter()
   const { id } = router.query;
+
+  useEffect( () =>
+  {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/game/${ data.id }/history`,
+      { withCredentials: true } )
+      .then( ( res ) =>
+      {
+        setHistory( res.data );
+        console.log( 'history: ', res.data );
+      } )
+      .catch( ( error ) =>
+      {
+        console.log( 'error: ', error );
+      } )
+  }, [ data.id ] )
+
+  useEffect( () =>
+  {
+    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/game/${ id }/history`,
+      { withCredentials: true } )
+      .then( ( res ) =>
+      {
+        setFriendHistory( res.data );
+        console.log( 'fr_history: ', res.data );
+      } )
+      .catch( ( error ) =>
+      {
+        console.log( 'error: ', error );
+      } )
+  }, [ id ] )
 
   useEffect( () =>
   {
@@ -178,7 +111,7 @@ const FriendProfile = () =>
       withCredentials: true,
     } ).then( ( res ) =>
     {
-      setProfileFriend( res.data.filter( ( ele: any ) => ele.id === id )[0] );
+      setProfileFriend( res.data.filter( ( ele: any ) => ele.id === id )[ 0 ] );
       setFriends( res.data );
     } ).catch( ( err ) =>
     {
@@ -224,17 +157,27 @@ const FriendProfile = () =>
                 </div>
                 { <p>{ data?.username }</p> }
               </div>
-              <div className={ styles.friends_options }>
+              <div className={ cn( styles_f.friends_options, styles_f.left ) }>
+                <div onClick={ () =>
+                {
+                  socket?.emit( "play_against", { targetUserId: id } );
+                } }>
+                  <GameControllerOutline
+                    color={ '#ffffff' }
+                    height="36px"
+                    width="36px"
+                  />
+                </div>
                 {
                   profileFriend.isFriend === false &&
                   <div onClick={ () =>
                   {
-                    // socket?.emit( "create_dm", { otherUserId: ele.id } );
+                    socket?.emit( "create_dm", { otherUserId: id } );
                   } }>
                     <AddCircleOutline
                       color={ '#ffffff' }
-                      height="60px"
-                      width="60px"
+                      height="36px"
+                      width="36px"
                     />
                   </div>
                 }
@@ -242,23 +185,23 @@ const FriendProfile = () =>
                   profileFriend.isFriend === true &&
                   <div onClick={ () =>
                   {
-                    // socket?.emit( "create_dm", { otherUserId: ele.id } );
+                    socket?.emit( "create_dm", { otherUserId: id } );
                   } }>
                     <ChatbubbleOutline
                       color={ '#ffffff' }
-                      height="60px"
-                      width="60px"
+                      height="36px"
+                      width="36px"
                     />
                   </div>
                 }
                 <div onClick={ () =>
                 {
-                  // socket?.emit( "block_user", { targetUserId: friends[ i ].id } );
+                  socket?.emit( "block_user", { targetUserId: id } );
                 } }>
                   <RemoveCircleOutline
                     color={ '#ffffff' }
-                    height="60px"
-                    width="60px"
+                    height="36px"
+                    width="36px"
                   />
                 </div>
               </div>
@@ -268,7 +211,7 @@ const FriendProfile = () =>
                 <div className={ styles.fr_avatars }>
                   <p className={ styles.ach_text }>ACHIEVMENTS</p>
                   <div className={ styles.ach_medal }>
-                    <div className={ styles.ach_medal_box }>
+                    <div className={ cn( styles.ach_medal_box, `${ !friendHistory.length && styles_st.non_medal }` ) }>
                       <div className={ styles.ach_goal }>first match</div>
                       <Image
                         src="/ach1.png"
@@ -277,7 +220,7 @@ const FriendProfile = () =>
                         height="100%"
                       ></Image>
                     </div>
-                    <div className={ styles.ach_medal_box }>
+                    <div className={ cn( styles.ach_medal_box, styles_st.non_medal ) }>
                       <div className={ styles.ach_goal }></div>
                       <Image
                         src="/ach2.png"
@@ -286,7 +229,7 @@ const FriendProfile = () =>
                         height="100%"
                       ></Image>
                     </div>
-                    <div className={ styles.ach_medal_box }>
+                    <div className={ cn( styles.ach_medal_box, styles_st.non_medal ) }>
                       <div className={ styles.ach_goal }></div>
                       <Image
                         src="/ach3.png"
@@ -295,7 +238,7 @@ const FriendProfile = () =>
                         height="100%"
                       ></Image>
                     </div>
-                    <div className={ styles.ach_medal_box }>
+                    <div className={ cn( styles.ach_medal_box, styles_st.non_medal ) }>
                       <div className={ styles.ach_goal }></div>
                       <Image
                         src="/ach4.png"
@@ -324,7 +267,7 @@ const FriendProfile = () =>
                 </div>
               </div>
               <div className={ styles.fr_history }>
-                <HistoryBox history={ history }></HistoryBox>
+                <HistoryBox history={ history } id={ data.id }></HistoryBox>
               </div>
             </div>
           </div>

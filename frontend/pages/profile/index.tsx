@@ -246,9 +246,7 @@ const Profile = () =>
                           <Image
                             className={ styles.profile_avatar }
                             src={
-                              data?.avatar
-                                ? data.avatar
-                                : "https://picsum.photos/300/300"
+                              data?.avatar ?? "https://picsum.photos/300/300"
                             }
                             alt="avatar_profile"
                             width="180px"

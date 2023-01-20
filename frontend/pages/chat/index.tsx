@@ -214,37 +214,6 @@ const Chat = () =>
           }
         />
       ) }
-      {/* {gamePlay && (
-        <Modal
-          content={
-            <>
-              <div className={styles_r_w.part_up}>
-                <div className={styles_r_w.text}>game invitaion</div>
-              </div>
-              <div className={styles_r_w.leave_room_box}>
-                  <div className={styles_r_w.leave_room}>
-                    Are you sure you want to leave this room?
-                  </div>
-                </div>
-              <div className={styles_r_w.part_down}>
-                <div
-                  className={styles_r_w.cancel}
-                  onClick={() => setGamePlay(false)}
-                >
-                  DENY
-                </div>
-                <button
-                  className={styles_r_w.create}
-                  type="submit"
-                  onClick={() => setGamePlay(false)}
-                >
-                  ACCEPT
-                </button>
-              </div>
-            </>
-          }
-        />
-      )} */}
       { room && (
         <Modal
           content={
