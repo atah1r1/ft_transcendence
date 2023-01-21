@@ -10,6 +10,8 @@ import { GameDataContext, GameSocketContext, GameStatus } from "../../_app";
 import { useRouter } from "next/router";
 import Modal from "../../../components/modal_dialog";
 import styles_r_w from "../../../styles/chatroom_window.module.css";
+import axios from "axios";
+import Imag from "next/image";
 
 const Container = styled.div`
   background-image: linear-gradient(
@@ -59,7 +61,7 @@ function Game() {
 
   const getOpponentId = (gameData: any): string => {
     const userId = localStorage.getItem("userId");
-    const opId = gameData.players.find(
+    const opId = gameData?.players.find(
       (playerId: string) => playerId !== userId
     );
     return opId;
@@ -67,7 +69,7 @@ function Game() {
 
   const getMyId = (gameData: any): string => {
     const userId = localStorage.getItem("userId");
-    const myId = gameData.players.find(
+    const myId = gameData?.players.find(
       (playerId: string) => playerId === userId
     );
     return myId;
@@ -184,6 +186,28 @@ function Game() {
     }
   };
 
+  const [myData, setMyData] = useState<any>(null);
+  const [opData, setOpData] = useState<any>(null);
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/${getMyId(game)}`, {
+      withCredentials: true,
+    }).then((res) => {
+      setMyData(res.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, [game && game?.status === GameStatus.FINISHED]);
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/${getOpponentId(game)}`, {
+      withCredentials: true,
+    }).then((res) => {
+      setOpData(res.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, [game && game?.status === GameStatus.FINISHED]);
+
   return (
     <div>
       {game && game?.status === GameStatus.FINISHED && (
@@ -196,12 +220,28 @@ function Game() {
               <div className={styles_r_w.leave_room_box}>
                 <div className={styles_r_w.leave_room}>
                   {game.score[getOpponentId(game)] > game.score[getMyId(game)]
-                    ? `You Lost The Game: ${
-                        game.score[getOpponentId(game)]
-                      } - ${game.score[getMyId(game)]}`
-                    : `You Won The Game: ${game.score[getMyId(game)]} - ${
-                        game.score[getOpponentId(game)]
-                      }`}
+                    ? `You Lost The Game: ${game.score[getOpponentId(game)]
+                    } - ${game.score[getMyId(game)]}`
+                    : `You Won The Game: ${game.score[getMyId(game)]} - ${game.score[getOpponentId(game)]
+                    }`}
+                </div>
+                <div className={styles_r_w.game_avatars}>
+                  <div>
+                    <Imag
+                      src={myData.avatar}
+                      alt="avatar"
+                      width="100"
+                      height="100"
+                    ></Imag>
+                  </div>
+                  <div>
+                    <Imag
+                      src={opData.avatar}
+                      alt="avatar"
+                      width="100"
+                      height="100"
+                    ></Imag>
+                  </div>
                 </div>
               </div>
               <div className={styles_r_w.part_down}>
