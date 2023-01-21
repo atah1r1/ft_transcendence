@@ -7,81 +7,80 @@ import { useContext, useEffect, useState } from "react";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
-import { DataContext } from "../_app";
+import { achievmentsContext, DataContext, ScoreContext } from "../_app";
 import cn from "classnames";
 import axios from "axios";
 
-const History = () =>
-{
-  const [ data, setData ] = useContext( DataContext );
-  const [ menu, setMenu ] = useState( false );
-  const [ history, setHistory ] = useState( [] );
+const History = () => {
+  const [achievments, setAchievments] = useContext(achievmentsContext);
+  const [score, setScore] = useContext(ScoreContext);
+  const [data, setData] = useContext(DataContext);
+  const [menu, setMenu] = useState(false);
+  const [history, setHistory] = useState([]);
 
-  useEffect( () =>
-  {
-    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/game/${ data.id }/history`,
-      { withCredentials: true } )
-      .then( ( res ) =>
-      {
-        setHistory( res.data );
-        console.log( 'history: ', res.data );
-      } )
-      .catch( ( error ) =>
-      {
-        console.log( 'error: ', error );
-      } )
-  }, [ data.id ] )
+  console.log('achievements: ', achievments);
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
+      { withCredentials: true })
+      .then((res) => {
+        setHistory(res.data);
+        console.log('history: ', res.data);
+      })
+      .catch((error) => {
+        console.log('error: ', error);
+      })
+  }, [data.id])
 
   return (
     <>
-      <MenuNav menu={ menu } setMenu={ setMenu } />
-      <div className={ styles_box.container }>
-        <SettingsNav selected={ "statistics" } menu={ menu } />
-        <div className={ styles_box.profile_details }>
+      <MenuNav menu={menu} setMenu={setMenu} />
+      <div className={styles_box.container}>
+        <SettingsNav selected={"statistics"} menu={menu} />
+        <div className={styles_box.profile_details}>
           <Logout />
-          <div className={ styles.statistics_box }>
-            <div className={ styles.part_one }>
-              <div className={ styles.left }>
-                <div className={ styles.avatar }>
+          <div className={styles.statistics_box}>
+            <div className={styles.part_one}>
+              <div className={styles.left}>
+                <div className={styles.avatar}>
                   <Image
-                    src={ data?.avatar ?? "https://picsum.photos/300/300" }
+                    src={data?.avatar ?? "https://picsum.photos/300/300"}
                     alt="user_img"
-                    width={ "100px" }
-                    height={ "100px" }
-                    className={ styles_p.profile_avatar }
+                    width={"100px"}
+                    height={"100px"}
+                    className={styles_p.profile_avatar}
                   ></Image>
                 </div>
                 <div>
-                  <p className={ styles.user_name }>{ data.username }</p>
-                  <div className={ styles.level_box }>
-                    <div className={ styles.level_line }></div>
-                    <div className={ styles.level_number_box }>
+                  <p className={styles.user_name}>{data.username}</p>
+                  <div className={styles.level_box}>
+                    <div className={styles.level_line}></div>
+                    <div className={styles.level_number_box}>
                       <p>LEVEL 2</p>
                       <p>LEVEL 3</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className={ styles.right }>
-                <p className={ styles.title }>MATCH PLAYED</p>
-                <p className={ styles.match_number }>50</p>
-                <div className={ styles.def_vic_box }>
-                  <div className={ styles.defeat_box }>
-                    <p className={ styles.defeat_text }>DEFEAT</p>
-                    <p className={ styles.defeat_number }>20</p>
+              <div className={styles.right}>
+                <p className={styles.title}>MATCH PLAYED</p>
+                <p className={styles.match_number}>50</p>
+                <div className={styles.def_vic_box}>
+                  <div className={styles.defeat_box}>
+                    <p className={styles.defeat_text}>DEFEAT</p>
+                    <p className={styles.defeat_number}>20</p>
                   </div>
-                  <div className={ styles.victory_box }>
-                    <p className={ styles.victory_text }>VICTORY</p>
-                    <p className={ styles.victory_number }>30</p>
+                  <div className={styles.victory_box}>
+                    <p className={styles.victory_text}>VICTORY</p>
+                    <p className={styles.victory_number}>30</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className={ styles.part_two }>
-              <p className={ styles.ach_text }>ACHIEVMENTS</p>
-              <div className={ styles.ach_medal }>
-                <div className={ cn( styles.ach_medal_box, `${ !history.length && styles.non_medal }` ) }>
-                  <div className={ styles.ach_goal }>first match</div>
+            <div className={styles.part_two}>
+              <p className={styles.ach_text}>ACHIEVMENTS</p>
+              <div className={styles.ach_medal}>
+                <div className={cn(styles.ach_medal_box, `${!achievments.ach1 && styles.non_medal}`)}>
+                  <div className={styles.ach_goal}>First match</div>
                   <Image
                     src="/ach1.png"
                     alt="medal_img"
@@ -89,8 +88,8 @@ const History = () =>
                     height="150%"
                   ></Image>
                 </div>
-                <div className={ cn( styles.ach_medal_box, styles.non_medal ) }>
-                  <div className={ styles.ach_goal }></div>
+                <div className={cn(styles.ach_medal_box, `${!achievments.ach2 && styles.non_medal}`)}>
+                  <div className={styles.ach_goal}>Reaching 350 points</div>
                   <Image
                     src="/ach2.png"
                     alt="medal_img"
@@ -98,8 +97,8 @@ const History = () =>
                     height="150%"
                   ></Image>
                 </div>
-                <div className={ cn( styles.ach_medal_box, styles.non_medal ) }>
-                  <div className={ styles.ach_goal }></div>
+                <div className={cn(styles.ach_medal_box, `${!achievments.ach3 && styles.non_medal}`)}>
+                  <div className={styles.ach_goal}>Three consecutive wins</div>
                   <Image
                     src="/ach3.png"
                     alt="medal_img"
@@ -107,8 +106,8 @@ const History = () =>
                     height="150%"
                   ></Image>
                 </div>
-                <div className={ cn( styles.ach_medal_box, styles.non_medal ) }>
-                  <div className={ styles.ach_goal }></div>
+                <div className={cn(styles.ach_medal_box, `${!achievments.ach4 && styles.non_medal}`)}>
+                  <div className={styles.ach_goal}>1000 Points</div>
                   <Image
                     src="/ach4.png"
                     alt="medal_img"
@@ -127,10 +126,9 @@ const History = () =>
 
 export default History;
 
-export const getServerSideProps = requireAuthentication( async () =>
-{
+export const getServerSideProps = requireAuthentication(async () => {
   return {
     props: {
     }, // will be passed to the page component as props
   }
-} )
+})

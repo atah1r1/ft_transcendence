@@ -9,37 +9,33 @@ import requireAuthentication from "../../hooks/requiredAuthentication";
 import axios from "axios";
 import { DataContext } from "../_app";
 
-const History = () =>
-{
-  const [ inputForm, setInputForm ] = useState( "" );
-  const [ data, setData ] = useContext( DataContext );
-  const [ menu, setMenu ] = useState( false );
-  const [ history, setHistory ] = useState( [] );
+const History = () => {
+  const [inputForm, setInputForm] = useState("");
+  const [data, setData] = useContext(DataContext);
+  const [menu, setMenu] = useState(false);
+  const [history, setHistory] = useState([]);
 
-  useEffect( () =>
-  {
-    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/game/${ data.id }/history`,
-      { withCredentials: true } )
-      .then( ( res ) =>
-      {
-        setHistory( res.data );
-        console.log( 'history: ', res.data );
-      } )
-      .catch( ( error ) =>
-      {
-        console.log( 'error: ', error );
-      } )
-  }, [ data.id ] )
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
+      { withCredentials: true })
+      .then((res) => {
+        setHistory(res.data);
+        console.log('history: ', res.data);
+      })
+      .catch((error) => {
+        console.log('error: ', error);
+      })
+  }, [data.id])
 
   return (
     <>
-      <MenuNav menu={ menu } setMenu={ setMenu } />
-      <div className={ styles_box.container }>
-        <SettingsNav selected={ "history" } menu={ menu } />
-        <div className={ styles_box.profile_details }>
+      <MenuNav menu={menu} setMenu={setMenu} />
+      <div className={styles_box.container}>
+        <SettingsNav selected={"history"} menu={menu} />
+        <div className={styles_box.profile_details}>
           <Logout />
-          <div className={ styles_h.history }>
-            <HistoryBox history={ history } id={ data.id }></HistoryBox>
+          <div className={styles_h.history}>
+            <HistoryBox history={history.reverse()} id={data.id}></HistoryBox>
           </div>
         </div>
       </div>
@@ -49,10 +45,9 @@ const History = () =>
 
 export default History;
 
-export const getServerSideProps = requireAuthentication( async () =>
-{
+export const getServerSideProps = requireAuthentication(async () => {
   return {
     props: {
     }, // will be passed to the page component as props
   }
-} )
+})
