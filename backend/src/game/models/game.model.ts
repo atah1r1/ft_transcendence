@@ -70,6 +70,13 @@ export default class Game {
         [this.players[1]]: this.usernames.get(this.players[1]),
       };
     }
+    let avatars = {};
+    if (this.avatars) {
+      avatars = {
+        [this.players[0]]: this.avatars.get(this.players[0]),
+        [this.players[1]]: this.avatars.get(this.players[1]),
+      };
+    }
 
     return {
       id: this.id,
@@ -78,8 +85,43 @@ export default class Game {
       status: this.status,
       ball: this.ball,
       usernames: usernames,
+      avatars: avatars,
       score: score,
       playerStatus: playerStatus,
+      paddle: paddle,
+    };
+  }
+
+  convertToMinifyedJSON() {
+    let score = {};
+    if (this.score) {
+      score = {
+        [this.players[0]]: this.score.get(this.players[0]),
+        [this.players[1]]: this.score.get(this.players[1]),
+      };
+    }
+    let paddle = {};
+    if (this.paddle) {
+      paddle = {
+        [this.players[0]]: this.paddle.get(this.players[0]),
+        [this.players[1]]: this.paddle.get(this.players[1]),
+      };
+    }
+    let usernames = {};
+    if (this.usernames) {
+      usernames = {
+        [this.players[0]]: this.usernames.get(this.players[0]),
+        [this.players[1]]: this.usernames.get(this.players[1]),
+      };
+    }
+
+    return {
+      id: this.id,
+      players: this.players,
+      status: this.status,
+      ball: this.ball,
+      usernames: usernames,
+      score: score,
       paddle: paddle,
     };
   }

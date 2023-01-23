@@ -212,14 +212,14 @@ export class GameService {
     players.forEach((p) => {
       const s = this.getPlayerById(p);
       if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
+        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToMinifyedJSON());
       }
     });
     // in case there are spectators
     spectators.forEach((sp) => {
       const s = this.getSpectatorById(sp);
       if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
+        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToMinifyedJSON());
       }
     });
   }
@@ -367,6 +367,7 @@ export class GameService {
     //   return false;
     // }
   }
+
   // Checks if any player has disconnected
   // Sets other player as winner and sets game as finished
   private checkGameDisconnection(game: Game, server: Server): boolean {
@@ -745,36 +746,6 @@ export class GameService {
     });
     return history;
   }
-
-  // async getWonGamesByUserId(
-  //   userId: string,
-  //   id: string,
-  // ): Promise<GameHistory[]> {
-  //   const blocked = await this.userService.getBlockedUsers(userId);
-  //   const blockedUsersIds = blocked.map((user) => user.id);
-  //   if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
-  //   const history = await this.prisma.gameHistory.findMany({
-  //     where: {
-  //       winnerId: id,
-  //     },
-  //   });
-  //   return history;
-  // }
-
-  // async getLostGamesByUserId(
-  //   userId: string,
-  //   id: string,
-  // ): Promise<GameHistory[]> {
-  //   const blocked = await this.userService.getBlockedUsers(userId);
-  //   const blockedUsersIds = blocked.map((user) => user.id);
-  //   if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
-  //   const history = await this.prisma.gameHistory.findMany({
-  //     where: {
-  //       loserId: id,
-  //     },
-  //   });
-  //   return history;
-  // }
 
   async getGameHistoryByGameId(
     userId: string,
