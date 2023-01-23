@@ -9,6 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Modal from "../components/modal_dialog";
 import styles_r_w from "../styles/chatroom_window.module.css";
+import Image from "next/image";
+import cn from 'classnames';
 
 export enum GameStatus {
   ACCEPTED,
@@ -269,6 +271,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     gameSocket.on("emit_play_against_request", (user: any) => {
+      console.log('user: ', user);
       setGameRequestUser(user);
     });
 
@@ -397,9 +400,15 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                     styles_r_w.leave_room
                                                   }
                                                 >
-                                                  {gameRequestUser.username} has
-                                                  invited to play a pong game.
+                                                   <span>{gameRequestUser.username}</span> has
+                                                  invited you to play a pong game.
                                                 </div>
+                                                <Image
+                                                  src={gameRequestUser.avatar}
+                                                  alt="spinner"
+                                                  width="180px"
+                                                  height="180px"
+                                                ></Image>
                                               </div>
                                               <div
                                                 className={styles_r_w.part_down}
@@ -462,11 +471,11 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                   }
                                                 >
                                                   <div
-                                                    className={
-                                                      styles_r_w.leave_room
+                                                    className={cn(
+                                                      styles_r_w.leave_room, styles_r_w.dot_box)
                                                     }
                                                   >
-                                                    You are in queue. Waiting...
+                                                    You are in queue. Waiting <span className={styles_r_w.dot_pulse}></span>
                                                   </div>
                                                 </div>
                                                 <div
@@ -506,11 +515,11 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                 }
                                               >
                                                 <div
-                                                  className={
-                                                    styles_r_w.leave_room
+                                                  className={cn(
+                                                    styles_r_w.leave_room, styles_r_w.dot_box)
                                                   }
                                                 >
-                                                  Waiting Response...
+                                                  Waiting Response <span className={styles_r_w.dot_pulse}></span> 
                                                 </div>
                                               </div>
                                               <div
