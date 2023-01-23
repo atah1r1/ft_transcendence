@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import paddle from "./paddle";
+import paddle from "../../../components/paddle";
 import { JoinRoom } from "../../../components/Joinroom";
 import Score from "../../../components/score";
 import styled from "styled-components";

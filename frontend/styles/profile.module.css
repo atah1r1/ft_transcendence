@@ -244,6 +244,7 @@ input:checked+.slider:before {
   top: -5rem;
   height: 80%;
   width: 100%;
+  gap: 2.6rem;
 }
 
 .box {
@@ -280,19 +281,18 @@ input:checked+.slider:before {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  line-height: 1.8rem;
+  font-size: 1.6rem;
+  line-height: 1.6rem;
   color: #fff;
-  font-family: "Phosphate";
+  font-family: "Pixeboy";
   border-radius: 2rem;
   position: absolute;
   text-align: center;
   width: 100%;
   height: 100%;
   background-color: rgba(255, 255, 255, 0.1);
-  opacity: 0;
   z-index: 1;
-  transform: scale(1.2);
+  transform: scale(1.1);
   padding: 0.8rem;
 }
 
@@ -301,15 +301,29 @@ input:checked+.slider:before {
   transition: all 1s;
 }
 
-.ach_medal_box:hover {
-  transform: translateY(-1.2rem);
+.non_medal {
+  opacity: 0.2;
+  pointer-events: none;
 }
 
-.ach_medal_box:hover .ach_goal {
+/* .non_medal_p {
+  opacity: 0;
+  pointer-events: none;
+} */
+
+.medal .ach_goal {
+  opacity: 0;
+}
+
+.medal.ach_medal_box:hover {
+  transform: translateY(-0.6rem);
+}
+
+.medal.ach_medal_box:hover .ach_goal {
   opacity: 1;
 }
 
-.ach_medal_box:hover img {
+.medal.ach_medal_box:hover img {
   opacity: 0.4;
 }
 
@@ -325,6 +339,7 @@ input:checked+.slider:before {
   scrollbar-color: #d9d9d9 #d9d9d9;
   scrollbar-width: thin;
   padding-right: 1rem;
+  font-size: 1.8rem;
 }
 
 .fr_history::-webkit-scrollbar {
@@ -341,7 +356,6 @@ input:checked+.slider:before {
   .details_down {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: 4rem;
   }
 
   .box {

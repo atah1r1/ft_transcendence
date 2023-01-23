@@ -110,19 +110,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.8rem;
-  line-height: 2.4rem;
+  font-size: 2rem;
+  line-height: 2.2rem;
   color: #fff;
-  font-family: "Phosphate";
+  font-family: "Pixeboy";
   border-radius: 2rem;
   position: absolute;
   text-align: center;
   width: 100%;
   height: 100%;
   background-color: rgba(255, 255, 255, 0.1);
-  opacity: 0;
   z-index: 1;
-  transform: scale(1.25);
+  transform: scale(1.1);
   padding: 0.8rem;
 }
 
@@ -136,15 +135,19 @@
   pointer-events: none;
 }
 
-.ach_medal_box:hover {
-  transform: translateY(-1.2rem);
+.medal .ach_goal{
+  opacity: 0;
 }
 
-.ach_medal_box:hover .ach_goal {
+.medal.ach_medal_box:hover {
+  transform: translateY(-0.6rem);
+}
+
+.medal.ach_medal_box:hover .ach_goal {
   opacity: 1;
 }
 
-.ach_medal_box:hover img {
+.medal.ach_medal_box:hover img {
   opacity: 0.4;
 }
 

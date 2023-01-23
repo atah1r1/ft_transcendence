@@ -7,23 +7,22 @@ import { useContext, useEffect, useState } from "react";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
-import { achievmentsContext, DataContext, ScoreContext } from "../_app";
+import { achievementsContext, DataContext } from "../_app";
 import cn from "classnames";
 import axios from "axios";
 
 const History = () => {
-  const [achievments, setAchievments] = useContext(achievmentsContext);
-  const [score, setScore] = useContext(ScoreContext);
+  const [{ achievements }, { setAchievments }] = useContext(achievementsContext);
   const [data, setData] = useContext(DataContext);
   const [menu, setMenu] = useState(false);
-  const [history, setHistory] = useState([]);
 
-  console.log('achievements: ', achievments);
+  // achievements
+  const [history, setHistory] = useState([]);
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
       { withCredentials: true })
       .then((res) => {
-        setHistory(res.data);
+        setHistory(res.data.reverse());
         console.log('history: ', res.data);
       })
       .catch((error) => {
@@ -31,6 +30,47 @@ const History = () => {
       })
   }, [data.id])
 
+  useEffect(() => {
+    setAchievments({
+      ach1: false,
+      ach2: false,
+      ach3: false,
+      ach4: false,
+    })
+    if (history.length) {
+      let winCount = 0;
+      let score = 100;
+      let points = 0;
+      setAchievments((prev: any) => ({ ...prev, ach1: true }));
+      history.map((ele: any, i: any, arr: any) => {
+        console.log(arr[arr.length - 1 - i].winnerScore, arr[arr.length - 1 - i].loserScore);
+        points = (arr[arr.length - 1 - i].winnerScore - arr[arr.length - 1 - i].loserScore) * 10;
+        if (arr[arr.length - 1 - i].winnerId === data.id) {
+          winCount += 1;
+          score += points;
+        }
+        else if (arr[arr.length - 1 - i].loserId === data.id) {
+          winCount = 0;
+          score -= points;
+        }
+        ele.score = score;
+        ele.points = points;
+        if (winCount === 3) {
+          setAchievments((prev: any) => ({ ...prev, ach3: true }));
+        }
+        if (score >= 350) {
+          setAchievments((prev: any) => ({ ...prev, ach2: true }));
+        }
+        if (score >= 1000) {
+          setAchievments((prev: any) => ({ ...prev, ach4: true }));
+        }
+      })
+    }
+  }, [history])
+
+  const winnerMaches = history.filter((ele: any) => ele.winnerId === data.id).length;
+  const loserMaches = history.filter((ele: any) => ele.loserId === data.id).length;
+  
   return (
     <>
       <MenuNav menu={menu} setMenu={setMenu} />
@@ -63,52 +103,56 @@ const History = () => {
               </div>
               <div className={styles.right}>
                 <p className={styles.title}>MATCH PLAYED</p>
-                <p className={styles.match_number}>50</p>
+                <p className={styles.match_number}>{history.length}</p>
                 <div className={styles.def_vic_box}>
                   <div className={styles.defeat_box}>
                     <p className={styles.defeat_text}>DEFEAT</p>
-                    <p className={styles.defeat_number}>20</p>
+                    <p className={styles.defeat_number}>{loserMaches}</p>
                   </div>
                   <div className={styles.victory_box}>
                     <p className={styles.victory_text}>VICTORY</p>
-                    <p className={styles.victory_number}>30</p>
+                    <p className={styles.victory_number}>{winnerMaches}</p>
                   </div>
                 </div>
               </div>
             </div>
             <div className={styles.part_two}>
-              <p className={styles.ach_text}>ACHIEVMENTS</p>
+              <p className={styles.ach_text}>ACHIEVEMENTS</p>
               <div className={styles.ach_medal}>
-                <div className={cn(styles.ach_medal_box, `${!achievments.ach1 && styles.non_medal}`)}>
+                <div className={cn(styles.ach_medal_box, `${achievements.ach1 && styles.medal}`)}>
                   <div className={styles.ach_goal}>First match</div>
                   <Image
+                    className={`${!achievements.ach1 && styles.non_medal}`}
                     src="/ach1.png"
                     alt="medal_img"
                     width="150%"
                     height="150%"
                   ></Image>
                 </div>
-                <div className={cn(styles.ach_medal_box, `${!achievments.ach2 && styles.non_medal}`)}>
+                <div className={cn(styles.ach_medal_box, `${achievements.ach2 && styles.medal}`)}>
                   <div className={styles.ach_goal}>Reaching 350 points</div>
                   <Image
+                    className={`${!achievements.ach2 && styles.non_medal}`}
                     src="/ach2.png"
                     alt="medal_img"
                     width="150%"
                     height="150%"
                   ></Image>
                 </div>
-                <div className={cn(styles.ach_medal_box, `${!achievments.ach3 && styles.non_medal}`)}>
+                <div className={cn(styles.ach_medal_box, `${achievements.ach3 && styles.medal}`)}>
                   <div className={styles.ach_goal}>Three consecutive wins</div>
                   <Image
+                    className={`${!achievements.ach3 && styles.non_medal}`}
                     src="/ach3.png"
                     alt="medal_img"
                     width="150%"
                     height="150%"
                   ></Image>
                 </div>
-                <div className={cn(styles.ach_medal_box, `${!achievments.ach4 && styles.non_medal}`)}>
+                <div className={cn(styles.ach_medal_box, `${achievements.ach4 && styles.medal}`)}>
                   <div className={styles.ach_goal}>1000 Points</div>
                   <Image
+                    className={`${!achievements.ach4 && styles.non_medal}`}
                     src="/ach4.png"
                     alt="medal_img"
                     width="150%"

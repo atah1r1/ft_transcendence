@@ -12,7 +12,7 @@ import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import { AlertCircleOutline, CameraOutline, CloseSharp } from "react-ionicons";
-import { achievmentsContext, DataContext, ScoreContext } from "../_app";
+import { achievementsContext, DataContext } from "../_app";
 import QRCode from "react-qr-code";
 import Modal from "../../components/modal_dialog";
 import { useRouter } from "next/router";
@@ -33,7 +33,7 @@ const Profile = () => {
   const router = useRouter();
   const [loader, setLoader] = useState(true);
   const [data, setData] = useContext(DataContext);
-  const [achievments, setAchievments] = useContext(achievmentsContext);
+  const [{ achievements }, { setAchievments }] = useContext(achievementsContext);
   const [s_witch, setSwitch] = useState(data.two_factor_auth);
   const [checkBox, setCheckBox] = useState(false);
   const [value, setValue] = useState({
@@ -140,6 +140,59 @@ const Profile = () => {
     setTwoFaUri(data.two_factor_auth_uri);
   }, [data])
 
+
+  // achievements
+  const [history, setHistory] = useState([]);
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
+      { withCredentials: true })
+      .then((res) => {
+        setHistory(res.data.reverse());
+        console.log('history: ', res.data);
+      })
+      .catch((error) => {
+        console.log('error: ', error);
+      })
+  }, [data.id])
+
+  useEffect(() => {
+    setAchievments({
+      ach1: false,
+      ach2: false,
+      ach3: false,
+      ach4: false,
+    })
+    if (history.length) {
+      let winCount = 0;
+      let score = 100;
+      let points = 0;
+      setAchievments((prev: any) => ({ ...prev, ach1: true }));
+      history.map((ele: any, i: any, arr: any) => {
+        console.log(arr[arr.length - 1 - i].winnerScore, arr[arr.length - 1 - i].loserScore);
+        points = (arr[arr.length - 1 - i].winnerScore - arr[arr.length - 1 - i].loserScore) * 10;
+        if (arr[arr.length - 1 - i].winnerId === data.id) {
+          winCount += 1;
+          score += points;
+        }
+        else if (arr[arr.length - 1 - i].loserId === data.id) {
+          winCount = 0;
+          score -= points;
+        }
+        ele.score = score;
+        ele.points = points;
+        if (winCount === 3) {
+          setAchievments((prev: any) => ({ ...prev, ach3: true }));
+        }
+        if (score >= 350) {
+          setAchievments((prev: any) => ({ ...prev, ach2: true }));
+        }
+        if (score >= 1000) {
+          setAchievments((prev: any) => ({ ...prev, ach4: true }));
+        }
+      })
+    }
+  }, [history])
+
   return (
     <div>
       <MenuNav menu={menu} setMenu={setMenu} />
@@ -241,7 +294,7 @@ const Profile = () => {
                   <p>{data.username}</p>
                 </div>
                 <div className={styles.details_medals}>
-                  <div className={`${!achievments.ach1 && styles_st.non_medal}`}>
+                  <div className={`${!achievements.ach1 && styles.non_medal}`}>
                     <Image
                       src="/ach1.png"
                       alt="medal_img"
@@ -249,7 +302,7 @@ const Profile = () => {
                       height="30px"
                     ></Image>
                   </div>
-                  <div className={`${!achievments.ach2 && styles_st.non_medal}`}>
+                  <div className={`${!achievements.ach2 && styles.non_medal}`}>
                     <Image
                       src="/ach2.png"
                       alt="medal_img"
@@ -257,7 +310,7 @@ const Profile = () => {
                       height="30px"
                     ></Image>
                   </div>
-                  <div className={`${!achievments.ach3 && styles_st.non_medal}`}>
+                  <div className={`${!achievements.ach3 && styles.non_medal}`}>
                     <Image
                       src="/ach3.png"
                       alt="medal_img"
@@ -265,7 +318,7 @@ const Profile = () => {
                       height="30px"
                     ></Image>
                   </div>
-                  <div className={`${!achievments.ach4 && styles_st.non_medal}`}>
+                  <div className={`${!achievements.ach4 && styles.non_medal}`}>
                     <Image
                       src="/ach4.png"
                       alt="medal_img"

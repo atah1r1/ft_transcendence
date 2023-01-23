@@ -15,14 +15,13 @@ import ErrorPage from 'next/error';
 import Loading from '../../components/Loading';
 import HistoryBox from "../../components/history_box";
 import { AddCircleOutline, ChatbubbleOutline, GameControllerOutline, PersonCircleOutline, RemoveCircleOutline } from "react-ionicons";
-import { achievmentsContext, GameSocketContext, LastBlockedContext, ScoreContext, SocketContext } from "../_app";
+import { achievementsContext, GameSocketContext, LastBlockedContext, SocketContext } from "../_app";
 
 const FriendProfile = () => {
   const socket = useContext(SocketContext);
   const gameSocket = useContext(GameSocketContext);
   const [lastBlockedId, setLastBlockedId] = useContext(LastBlockedContext);
-  const [achievments, setAchievments] = useContext(achievmentsContext);
-  const [score, setScore] = useContext(ScoreContext);
+  const [{ opAchievments }, { setOpAchievments }] = useContext(achievementsContext);
   const [friends, setFriends] = useState([]);
   const [profileFriend, setProfileFriend] = useState(
     {
@@ -64,7 +63,7 @@ const FriendProfile = () => {
     axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
       { withCredentials: true })
       .then((res) => {
-        setHistory(res.data);
+        setHistory(res.data.reverse());
         console.log('history: ', res.data);
       })
       .catch((error) => {
@@ -107,7 +106,6 @@ const FriendProfile = () => {
       console.log(err);
     });
   }, [lastBlockedId]);
-  console.log(profileFriend)
 
   if (loading) {
     return <Loading />
@@ -119,6 +117,8 @@ const FriendProfile = () => {
     )
   }
 
+  const winnerMaches = history.filter((ele: any) => ele.winnerId === data.id).length;
+  const loserMaches = history.filter((ele: any) => ele.loserId === data.id).length;
   return (
     <>
       <MenuNav menu={menu} setMenu={setMenu} />
@@ -194,42 +194,46 @@ const FriendProfile = () => {
               <div className={styles.details_down}>
                 <div className={styles.box}>
                   <div className={styles.fr_avatars}>
-                    <p className={styles.ach_text}>ACHIEVMENTS</p>
+                    <p className={styles.ach_text}>ACHIEVEMENTS</p>
                     <div className={styles.ach_medal}>
-                      <div className={cn(styles.ach_medal_box, `${!achievments.ach1 && styles_st.non_medal}`)}>
+                      <div className={cn(styles.ach_medal_box, `${opAchievments.ach1 && styles.medal}`)}>
                         <div className={styles.ach_goal}>First match</div>
                         <Image
+                          className={`${!opAchievments.ach1 && styles_st.non_medal}`}
                           src="/ach1.png"
                           alt="medal_img"
-                          width="100%"
-                          height="100%"
+                          width="90%"
+                          height="90%"
                         ></Image>
                       </div>
-                      <div className={cn(styles.ach_medal_box, `${!achievments.ach2 && styles_st.non_medal}`)}>
+                      <div className={cn(styles.ach_medal_box, `${opAchievments.ach2 && styles.medal}`)}>
                         <div className={styles.ach_goal}>Reaching 350 points</div>
                         <Image
+                          className={`${!opAchievments.ach2 && styles_st.non_medal}`}
                           src="/ach2.png"
                           alt="medal_img"
-                          width="100%"
-                          height="100%"
+                          width="90%"
+                          height="90%"
                         ></Image>
                       </div>
-                      <div className={cn(styles.ach_medal_box, `${!achievments.ach3 && styles_st.non_medal}`)}>
+                      <div className={cn(styles.ach_medal_box, `${opAchievments.ach3 && styles.medal}`)}>
                         <div className={styles.ach_goal}>Three consecutive wins</div>
                         <Image
+                          className={`${!opAchievments.ach3 && styles_st.non_medal}`}
                           src="/ach3.png"
                           alt="medal_img"
-                          width="100%"
-                          height="100%"
+                          width="90%"
+                          height="90%"
                         ></Image>
                       </div>
-                      <div className={cn(styles.ach_medal_box, `${!achievments.ach4 && styles_st.non_medal}`)}>
+                      <div className={cn(styles.ach_medal_box, `${opAchievments.ach4 && styles.medal}`)}>
                         <div className={styles.ach_goal}>1000 Points</div>
                         <Image
+                          className={`${!opAchievments.ach4 && styles_st.non_medal}`}
                           src="/ach4.png"
                           alt="medal_img"
-                          width="100%"
-                          height="100%"
+                          width="90%"
+                          height="90%"
                         ></Image>
                       </div>
                     </div>
@@ -237,22 +241,22 @@ const FriendProfile = () => {
                   <div className={styles.fr_statistic}>
                     <div className={styles_st.right}>
                       <p className={styles_st.title}>MATCH PLAYED</p>
-                      <p className={styles_st.match_number}>50</p>
+                      <p className={styles_st.match_number}>{history.length}</p>
                       <div className={styles_st.def_vic_box}>
                         <div className={styles_st.defeat_box}>
                           <p className={styles_st.defeat_text}>DEFEAT</p>
-                          <p className={styles_st.defeat_number}>20</p>
+                          <p className={styles_st.defeat_number}>{loserMaches}</p>
                         </div>
                         <div className={styles_st.victory_box}>
                           <p className={styles_st.victory_text}>VICTORY</p>
-                          <p className={styles_st.victory_number}>30</p>
+                          <p className={styles_st.victory_number}>{winnerMaches}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className={styles.fr_history}>
-                  <HistoryBox history={history.reverse()} id={id}></HistoryBox>
+                  <HistoryBox history={history} id={id}></HistoryBox>
                 </div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import paddle from "../paddle";
+import paddle from "../../../../components/paddle";
 import styled from "styled-components";
 import { io, Socket } from "socket.io-client";
 import styles_box from "../../../../styles/style_box.module.css";

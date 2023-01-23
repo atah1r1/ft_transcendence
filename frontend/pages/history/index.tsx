@@ -19,8 +19,7 @@ const History = () => {
     axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
       { withCredentials: true })
       .then((res) => {
-        setHistory(res.data);
-        console.log('history: ', res.data);
+        setHistory(res.data.reverse());
       })
       .catch((error) => {
         console.log('error: ', error);
@@ -35,7 +34,7 @@ const History = () => {
         <div className={styles_box.profile_details}>
           <Logout />
           <div className={styles_h.history}>
-            <HistoryBox history={history.reverse()} id={data.id}></HistoryBox>
+            <HistoryBox history={history} id={data.id}></HistoryBox>
           </div>
         </div>
       </div>
