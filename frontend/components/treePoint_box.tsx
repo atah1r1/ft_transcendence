@@ -8,91 +8,85 @@ import { VolumeMuteSharp } from 'react-ionicons'
 import { useContext } from "react";
 import { GameSocketContext, SocketContext } from "../pages/_app";
 
-const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) =>
-{
-  const userId = localStorage.getItem( 'userId' );
-  const friendId = members.find( ( member: any ) => member.id != userId )?.id;
-  const socket = useContext( SocketContext );
-  const gameSocket = useContext( GameSocketContext );
+const TreePointsBox = ({ members, group, roomId, roomUser, userStatus }: any) => {
+  const userId = localStorage.getItem('userId');
+  const friendId = members.find((member: any) => member.id != userId)?.id;
+  const socket = useContext(SocketContext);
+  const gameSocket = useContext(GameSocketContext);
   const router = useRouter();
 
   return !group.group_box ?
-    ( <div className={ styles.treepoints_box_conv }>
-      <div className={ styles.treepoints_box_row }
-        onClick={ () =>
-        {
-          router.push( `/profile/${ friendId }` );
-          group.setGroupBox( false );
-        } }>
+    (<div className={styles.treepoints_box_conv}>
+      <div className={styles.treepoints_box_row}
+        onClick={() => {
+          router.push(`/profile/${friendId}`);
+          group.setGroupBox(false);
+        }}>
         <p>view profile</p>
         <PersonSharp
-          color={ '#ffffff' }
+          color={'#ffffff'}
           height="30px"
           width="30px"
         />
       </div>
-      <div className={ styles.treepoints_box_row }
-        onClick={ () =>
-        {
-          gameSocket.emit( 'play_against', { userId: friendId } );
-          group.setGroupBox( false );
-        } }>
+      <div className={styles.treepoints_box_row}
+        onClick={() => {
+          gameSocket.emit('play_against', { userId: friendId });
+          group.setGroupBox(false);
+        }}>
         <p>invite player</p>
         <Image
           src="/invete_player.svg"
           alt="invete_player_icon"
-          width={ "30px" }
-          height={ "30px" }
+          width={"30px"}
+          height={"30px"}
         />
       </div>
-    </div> ) :
+    </div>) :
     (
-      <div className={ styles.treepoints_box_details }>
-        <div className={ styles.treepoints_box_row }
-          onClick={ () =>
-          {
-            router.push( `/profile/${ roomUser.userId }` );
-            group.setGroupBox( false );
-          } }>
+      <div className={styles.treepoints_box_details}>
+        <div className={styles.treepoints_box_row}
+          onClick={() => {
+            router.push(`/profile/${roomUser.userId}`);
+            group.setGroupBox(false);
+          }}>
           <p>view profile</p>
           <PersonSharp
-            color={ '#ffffff' }
+            color={'#ffffff'}
             height="30px"
             width="30px"
           />
         </div>
-        <div className={ styles.treepoints_box_row }
-          onClick={ () =>
-          {
-            gameSocket.emit( 'play_against', { userId: roomUser.userId } );
-            group.setGroupBox( false );
-          } }>
+        <div className={styles.treepoints_box_row}
+          onClick={() => {
+            gameSocket.emit('play_against', { userId: roomUser.userId });
+            group.setGroupBox(false);
+          }}>
           <p>invite player</p>
           <Image
             src="/invete_player.svg"
             alt="invete_player_icon"
-            width={ "30px" }
-            height={ "30px" }
+            width={"30px"}
+            height={"30px"}
           />
         </div>
         {
           group.group_box && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
-          <div className={ styles.treepoints_box_row }
-            onClick={ () =>
-            {
+          <div className={styles.treepoints_box_row}
+            onClick={() => {
               roomUser.status === 'MUTED' ?
-                socket?.emit( 'unmute_user', {
+                socket?.emit('unmute_user', {
                   targetUserId: roomUser.userId,
                   roomId: roomId,
-                } ) : socket?.emit( 'mute_user', {
+                }) : socket?.emit('mute_user', {
                   targetUserId: roomUser.userId,
                   roomId: roomId,
-                } )
-              group.setGroupBox( false );
-            } }>
-            { roomUser.status === 'MUTED' ? <p style={ { color: "#dc465e" } }>unmute user</p> : <p>mute user</p> }
+                })
+              group.setGroupBox(false);
+            }}>
+            {roomUser.status === 'MUTED' ? <p style={{ color: "#dc465e" }}>unmute user</p> : <p>mute user</p>}
             <VolumeMuteSharp
-              color={ roomUser.status === 'MUTED' ? '#dc465e' : '#ffffff' }
+              color={roomUser.status === 'MUTED' ? '#dc465e' : '#ffffff'}
               height="30px"
               width="30px"
             />
@@ -100,21 +94,20 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
         }
         {
           group.group_box && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
-          <div className={ styles.treepoints_box_row }
-            onClick={ () =>
-            {
-              roomUser.status === 'BANNED' ? socket?.emit( 'unban_user', {
+          <div className={styles.treepoints_box_row}
+            onClick={() => {
+              roomUser.status === 'BANNED' ? socket?.emit('unban_user', {
                 targetUserId: roomUser.userId,
                 roomId: roomId,
-              } ) : socket?.emit( 'ban_user', {
+              }) : socket?.emit('ban_user', {
                 targetUserId: roomUser.userId,
                 roomId: roomId,
-              } )
-              group.setGroupBox( false );
-            } }>
-            { roomUser.status === 'BANNED' ? <p style={ { color: "#dc465e" } }>unban user</p> : <p>ban user</p> }
+              })
+              group.setGroupBox(false);
+            }}>
+            {roomUser.status === 'BANNED' ? <p style={{ color: "#dc465e" }}>unban user</p> : <p>ban user</p>}
             <BanSharp
-              color={ roomUser.status === 'BANNED' ? '#dc465e' : '#ffffff' }
+              color={roomUser.status === 'BANNED' ? '#dc465e' : '#ffffff'}
               height="30px"
               width="30px"
             />
@@ -122,18 +115,17 @@ const TreePointsBox = ( { members, group, roomId, roomUser, userStatus }: any ) 
         }
         {
           group.group_box && userStatus === 'OWNER' && roomUser.role !== 'ADMIN' && roomUser.role !== 'OWNER' &&
-          <div className={ styles.treepoints_box_row }
-            onClick={ () =>
-            {
-              socket?.emit( 'make_admin', {
+          <div className={styles.treepoints_box_row}
+            onClick={() => {
+              socket?.emit('make_admin', {
                 targetUserId: roomUser.userId,
                 roomId: roomId,
-              } );
-              group.setGroupBox( false );
-            } }>
+              });
+              group.setGroupBox(false);
+            }}>
             <p>add Admin</p>
             <PersonAddSharp
-              color={ '#ffffff' }
+              color={'#ffffff'}
               height="30px"
               width="30px"
             />
