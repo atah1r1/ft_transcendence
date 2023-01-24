@@ -34,6 +34,7 @@ const Profile = () => {
   const [loader, setLoader] = useState(true);
   const [data, setData] = useContext(DataContext);
   const [{ achievements }, { setAchievments }] = useContext(AchievementsContext);
+  const [level, setLevel] = useState(0);
   const [s_witch, setSwitch] = useState(data.two_factor_auth);
   const [checkBox, setCheckBox] = useState(false);
   const [value, setValue] = useState({
@@ -190,6 +191,7 @@ const Profile = () => {
           setAchievments((prev: any) => ({ ...prev, ach4: true }));
         }
       })
+      setLevel(Math.floor(score / 150));
     }
   }, [history])
 
@@ -252,7 +254,7 @@ const Profile = () => {
               <div className={styles.details_up}>
                 <div className={styles.details_level}>
                   <p>LEVEL</p>
-                  <span>2</span>
+                  <span>{level > 0 ? (level >= 26 ? 26 : level) : 0}</span>
                 </div>
                 <div className={styles.details_avatar}>
                   <form>

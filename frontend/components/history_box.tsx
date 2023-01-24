@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { AchievementsContext } from "../pages/_app";
 
-const HistoryBox = ({ history, id }: any) => {
+const HistoryBox = ({ history, id, setLevel }: any) => {
   const [empty, setEmpty] = useState(false);
   const [{ Opachievements }, { setOpAchievments }] = useContext(AchievementsContext);
 
@@ -51,6 +51,8 @@ const HistoryBox = ({ history, id }: any) => {
           setOpAchievments((prev: any) => ({ ...prev, ach4: true }));
         }
       })
+      localStorage.getItem("userId") !== id &&
+        setLevel(Math.floor(score / 150));
     }
   }, [history])
 

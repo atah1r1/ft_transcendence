@@ -22,6 +22,7 @@ const FriendProfile = () => {
   const gameSocket = useContext(GameSocketContext);
   const [lastBlockedId, setLastBlockedId] = useContext(LastBlockedContext);
   const [{ opAchievments }, { setOpAchievments }] = useContext(AchievementsContext);
+  const [level, setLevel] = useState(0);
   const [friends, setFriends] = useState([]);
   const [profileFriend, setProfileFriend] = useState(
     {
@@ -132,7 +133,7 @@ const FriendProfile = () => {
               <div className={styles.details_up}>
                 <div className={styles.details_level}>
                   <p>LEVEL</p>
-                  <span> 2</span>
+                    <span>{level > 0 ? (level >= 26 ? 26 : level) : 0}</span>
                 </div>
                 <div className={styles.details_avatar}>
                   <div className={styles.profile_box}>
@@ -256,7 +257,7 @@ const FriendProfile = () => {
                   </div>
                 </div>
                 <div className={styles.fr_history}>
-                  <HistoryBox history={history} id={id}></HistoryBox>
+                  <HistoryBox history={history} id={id} setLevel={setLevel}></HistoryBox>
                 </div>
               </div>
             </div>

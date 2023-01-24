@@ -15,6 +15,7 @@ const History = () => {
   const [{ achievements }, { setAchievments }] = useContext(AchievementsContext);
   const [data, setData] = useContext(DataContext);
   const [menu, setMenu] = useState(false);
+  const [level, setLevel] = useState(0);
 
   // achievements
   const [history, setHistory] = useState([]);
@@ -65,6 +66,7 @@ const History = () => {
           setAchievments((prev: any) => ({ ...prev, ach4: true }));
         }
       })
+      setLevel(Math.floor(score / 150));
     }
   }, [history])
 
@@ -93,10 +95,16 @@ const History = () => {
                 <div>
                   <p className={styles.user_name}>{data.username}</p>
                   <div className={styles.level_box}>
-                    <div className={styles.level_line}></div>
+                    <div className={cn(styles.level_line,
+                      level >= 4 && styles.level_line_one,
+                      level >= 8 && styles.level_line_two,
+                      level >= 12 && styles.level_line_tree,
+                      level >= 15 && styles.level_line_four,
+                      level >= 18 && styles.level_line_five,
+                      level >= 21 && styles.level_line_six,
+                      level >= 26 && styles.level_line_eight)}></div>
                     <div className={styles.level_number_box}>
-                      <p>LEVEL 2</p>
-                      <p>LEVEL 3</p>
+                      <p>level <span>{level > 0 ? (level >= 26 ? 26 : level) : 0}</span></p>
                     </div>
                   </div>
                 </div>

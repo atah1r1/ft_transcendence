@@ -26,7 +26,7 @@
 }
 
 .level_line {
-  width: 22rem;
+  width: 26rem;
   height: 1.2rem;
   background-color: #d9d9d9;
   border-radius: 1rem;
@@ -34,21 +34,67 @@
   position: relative;
 }
 
-.level_line::after {
+.level_line_one::after,
+.level_line_two::after,
+.level_line_tree::after,
+.level_line_four::after,
+.level_line_five::after,
+.level_line_six::after,
+.level_line_seven::after,
+.level_line_eight::after {
   position: absolute;
   content: "";
   top: 0;
   left: 0;
   background-color: #dc465e;
-  width: 15rem;
   height: 1.2rem;
   border-radius: 1rem;
 }
 
+.level_line_one::after {
+  width: 4rem;
+}
+
+.level_line_two::after {
+  width: 8rem;
+}
+
+.level_line_tree::after {
+  width: 12rem;
+}
+
+.level_line_four::after {
+  width: 15rem;
+}
+
+.level_line_five::after {
+  width: 18rem;
+}
+
+.level_line_six::after {
+  width: 21rem;
+}
+
+.level_line_seven::after {
+  width: 24rem;
+}
+
+.level_line_eight::after {
+  width: 26rem;
+}
+
 .level_number_box {
   display: flex;
-  justify-content: space-between;
-  font-size: 1.3rem;
+  justify-content: right;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  font-family: "Phosphate";
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.level_number_box span {
+  color: #fff;
+  font-size: 2.6rem;
 }
 
 .defeat_text {
@@ -80,7 +126,7 @@
 
 .user_name {
   font-family: "Phosphate";
-  font-size: 3rem;
+  font-size: 2.6rem;
   margin-bottom: 1rem;
 }
 
@@ -135,7 +181,7 @@
   pointer-events: none;
 }
 
-.medal .ach_goal{
+.medal .ach_goal {
   opacity: 0;
 }
 

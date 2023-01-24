@@ -63,7 +63,7 @@ function Game() {
 
   const getOpponentId = (gameData: any): string => {
     const userId = localStorage.getItem("userId");
-    const opId = gameData?.players.find(
+    const opId = gameData?.players?.find(
       (playerId: string) => playerId !== userId
     );
     return opId;
@@ -71,7 +71,7 @@ function Game() {
 
   const getMyId = (gameData: any): string => {
     const userId = localStorage.getItem("userId");
-    const myId = gameData?.players.find(
+    const myId = gameData?.players?.find(
       (playerId: string) => playerId === userId
     );
     return myId;
@@ -131,8 +131,9 @@ function Game() {
   useEffect(() => {
     setWaitingPopup(true);
 
-    if (!game) {
+    if (!game || !game.players) {
       router.replace("/game");
+      // router.back();
       return;
       // show error, and redirect to home
     }
@@ -231,33 +232,34 @@ function Game() {
                 <div className={styles_r_w.part_up}>
                   <div className={styles_r_w.text}>Game Result</div>
                 </div>
-                <div className={styles_r_w.leave_room_box}>
-                  <div className={styles_r_w.leave_room}>
-                    {game.score[game.players[0]] > game.score[game.players[1]]
-                      ? `You Lost The Game: ${game.score[game.players[0]]
-                      } - ${game.score[game.players[0]]}`
-                      : `You Won The Game: ${game.score[game.players[1]]} - ${game.score[game.players[1]]
-                      }`}
-                  </div>
-                  <div className={styles_r_w.game_avatars}>
-                    <div>
-                      <Imag
-                        src={game.avatars[game.players[0]]}
-                        alt="avatar"
-                        width="100"
-                        height="100"
-                      ></Imag>
+                {game?.players &&
+                  <div className={styles_r_w.leave_room_box}>
+                    <div className={styles_r_w.leave_room}>
+                      {game.score[game.players[0]] > game.score[game.players[1]]
+                        ? `You Lost The Game: ${game.score[game.players[0]]
+                        } - ${game.score[game.players[0]]}`
+                        : `You Won The Game: ${game.score[game.players[1]]} - ${game.score[game.players[1]]
+                        }`}
                     </div>
-                    <div>
-                      <Imag
-                        src={game.avatars[game.players[1]]}
-                        alt="avatar"
-                        width="100"
-                        height="100"
-                      ></Imag>
+                    <div className={styles_r_w.game_avatars}>
+                      <div>
+                        <Imag
+                          src={game.avatars[game.players[0]]}
+                          alt="avatar"
+                          width="100"
+                          height="100"
+                        ></Imag>
+                      </div>
+                      <div>
+                        <Imag
+                          src={game.avatars[game.players[1]]}
+                          alt="avatar"
+                          width="100"
+                          height="100"
+                        ></Imag>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </div>}
                 <div className={styles_r_w.part_down}>
                   <button
                     className={styles_r_w.create}
@@ -321,12 +323,15 @@ function Game() {
                 width="1280"
                 height="720"
               ></GameContainer>
-              <Score
-                score1={game?.score[game.players[0]] ?? 0}
-                score2={game?.score[game.players[1]] ?? 0}
-                username1={game?.usernames[game.players[0]] ?? "Player 1"}
-                username2={game?.usernames[game.players[1]] ?? "Player 2"}
-              />
+              {
+                game?.players &&
+                <Score
+                  score1={game?.score[game.players[0]] ?? 0}
+                  score2={game?.score[game.players[1]] ?? 0}
+                  username1={game?.usernames[game.players[0]] ?? "Player 1"}
+                  username2={game?.usernames[game.players[1]] ?? "Player 2"}
+                />
+              }
             </Container>
           </div>
         </div>
