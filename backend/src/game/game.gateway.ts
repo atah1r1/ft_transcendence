@@ -378,7 +378,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.gameService.makeMove(client.data.id, payload.gameId, payload);
     } catch (err) {
       throw new WsException({
-        error: EV_START_GAME,
+        error: EV_GAME_MOVE,
         message: err.message,
       });
     }

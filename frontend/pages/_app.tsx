@@ -56,7 +56,11 @@ export const CurrentConvContext = React.createContext<any[]>([{}, () => { }]);
 export const LastBlockedContext = React.createContext<any[]>([null, () => { }]);
 export const NewRoomContext = React.createContext<any[]>([null, () => { }]);
 export const UserStatusContext = React.createContext<any[]>([null, () => { }]);
-export const achievementsContext = React.createContext<any[]>([null, () => { }]);
+// { achievements, opAchievments }, { setAchievments, setOpAchievments }
+export const AchievementsContext = React.createContext<any[]>([
+  { achievements: null, opAchievments: null },
+  { setAchievments: () => { }, setOpAchievments: () => { } }
+]);
 export const NewMemberAddedContext = React.createContext<any[]>([
   null,
   () => { },
@@ -267,7 +271,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
     gameSocket.on("exception", (exception) => {
       console.log("exception: ", socket.id);
-      toast.error(`Error: ${exception.message}`, toastOptions);
+      toast.error(`Error:${exception.error} ${exception.message}`, toastOptions);
     });
 
     gameSocket.on("emit_play_against_request", (user: any) => {
@@ -352,7 +356,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 
   return (
-    <achievementsContext.Provider value={[{ achievements, opAchievments }, { setAchievments, setOpAchievments }]}>
+    <AchievementsContext.Provider value={[{ achievements, opAchievments }, { setAchievments, setOpAchievments }]}>
       <LiveGamesContext.Provider value={[liveGames, setLiveGames]}>
         <GamesCountContext.Provider value={[gamesCount, setGamesCount]}>
           <GameRequestUserContext.Provider
@@ -400,7 +404,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                     styles_r_w.leave_room
                                                   }
                                                 >
-                                                   <span>{gameRequestUser.username}</span> has
+                                                  <span>{gameRequestUser.username}</span> has
                                                   invited you to play a pong game.
                                                 </div>
                                                 <Image
@@ -519,7 +523,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                     styles_r_w.leave_room, styles_r_w.dot_box)
                                                   }
                                                 >
-                                                  Waiting Response <span className={styles_r_w.dot_pulse}></span> 
+                                                  Waiting Response <span className={styles_r_w.dot_pulse}></span>
                                                 </div>
                                               </div>
                                               <div
@@ -544,18 +548,18 @@ function MyApp({ Component, pageProps }: AppProps) {
                                           }
                                         />
                                       )}
-                                      <div
-                                        className={
-                                          (gameRequestUser ||
-                                            gameRequestUserId ||
-                                            (game &&
-                                              game.status ===
-                                              GameStatus.QUEUED)) &&
-                                          styles_r_w.room
-                                        }
-                                      >
-                                        <Component {...pageProps} />
-                                      </div>
+                                    </div>
+                                    <div
+                                      className={
+                                        (gameRequestUser ||
+                                          gameRequestUserId ||
+                                          (game &&
+                                            game.status ===
+                                            GameStatus.QUEUED)) &&
+                                        styles_r_w.room
+                                      }
+                                    >
+                                      <Component {...pageProps} />
                                     </div>
                                     <ToastContainer
                                       style={{ fontSize: "1.2rem" }}
@@ -575,7 +579,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </GameRequestUserContext.Provider>
         </GamesCountContext.Provider>
       </LiveGamesContext.Provider>
-    </achievementsContext.Provider>
+    </AchievementsContext.Provider >
   );
 }
 

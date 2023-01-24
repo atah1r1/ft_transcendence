@@ -3,11 +3,11 @@ import styles_p from "../styles/profile.module.css";
 import styles_f from "../styles/friends.module.css";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
-import { achievementsContext } from "../pages/_app";
+import { AchievementsContext } from "../pages/_app";
 
 const HistoryBox = ({ history, id }: any) => {
   const [empty, setEmpty] = useState(false);
-  const [{ Opachievements }, { setOpAchievments }] = useContext(achievementsContext);
+  const [{ Opachievements }, { setOpAchievments }] = useContext(AchievementsContext);
 
   useEffect(() => {
     setTimeout(() => {

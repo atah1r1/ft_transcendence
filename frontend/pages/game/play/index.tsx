@@ -45,6 +45,12 @@ const GameContainer = styled.canvas`
   padding: 0.4rem;
 `;
 
+let rightPaddle = {};
+let leftPaddle = {};
+let ball = {};
+let status: GameStatus = GameStatus.ACCEPTED;
+let animationId: number = -1;
+
 function Game() {
   const router = useRouter();
   const { isPlaying } = router.query;
@@ -52,10 +58,6 @@ function Game() {
   const [game, setGame] = useContext(GameDataContext);
   const [menu, setMenu] = useState(false);
   const [waitingPopup, setWaitingPopup] = useState(false);
-  let rightPaddle = {};
-  let leftPaddle = {};
-  let ball = {};
-  let status: GameStatus = GameStatus.ACCEPTED;
 
   let canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -113,11 +115,16 @@ function Game() {
   };
 
   const render = () => {
+    // if (animationId !== -1 && getGameStatus() !== GameStatus.STARTED) {
+    //   console.log("STOPPING ANIMATION");
+    //   // cancelAnimationFrame(animationId);
+    // }
     renderCanvas();
     renderPaddle(leftPaddle, rightPaddle);
     renderBall(ball);
     canvasRef.current?.focus();
-    requestAnimationFrame(render);
+    animationId = requestAnimationFrame(render);
+    // stop animation when game is finished
   };
 
   // Listening on socket events
@@ -125,9 +132,11 @@ function Game() {
     setWaitingPopup(true);
 
     if (!game) {
+      router.replace("/game");
       return;
       // show error, and redirect to home
     }
+    console.log("GAME ID: ", game.id);
 
     if (isPlaying === "true" && game.status === GameStatus.ACCEPTED) {
       socket.emit("start_game", { userId: getOpponentId(game) });
@@ -148,6 +157,7 @@ function Game() {
       rightPaddle = data.paddle[data.players[1]];
       ball = data.ball;
       status = data.status;
+      console.log("STATUS __ __: ", status, data.status);
     });
 
     socket.off("emit_game_finish").on("emit_game_finish", (data: any) => {
@@ -156,9 +166,11 @@ function Game() {
         return { ...prev, score: data.score, status: data.status };
       });
       status = data.status;
+      // router.back();
     });
 
     return () => {
+      cancelAnimationFrame(animationId);
       if (getGameStatus() === GameStatus.FINISHED) {
         setGame(null);
         return;
@@ -179,6 +191,7 @@ function Game() {
   // Emitting events
   const keyboardevent = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (!isPlaying || isPlaying === "false") return;
+    if (getGameStatus() !== GameStatus.STARTED) return;
     if (e.key === "ArrowUp") {
       socket.emit("game_move", { gameId: game.id, move: "UP" });
     } else if (e.key === "ArrowDown") {
@@ -210,55 +223,57 @@ function Game() {
 
   return (
     <div>
-      {game && game?.status === GameStatus.FINISHED && (
-        <Modal
-          content={
-            <>
-              <div className={styles_r_w.part_up}>
-                <div className={styles_r_w.text}>Game Result</div>
-              </div>
-              <div className={styles_r_w.leave_room_box}>
-                <div className={styles_r_w.leave_room}>
-                  {game.score[getOpponentId(game)] > game.score[getMyId(game)]
-                    ? `You Lost The Game: ${game.score[getOpponentId(game)]
-                    } - ${game.score[getMyId(game)]}`
-                    : `You Won The Game: ${game.score[getMyId(game)]} - ${game.score[getOpponentId(game)]
-                    }`}
+      <div>
+        {game && game?.status === GameStatus.FINISHED && (
+          <Modal
+            content={
+              <>
+                <div className={styles_r_w.part_up}>
+                  <div className={styles_r_w.text}>Game Result</div>
                 </div>
-                <div className={styles_r_w.game_avatars}>
-                  <div>
-                    <Imag
-                      src={myData.avatar}
-                      alt="avatar"
-                      width="100"
-                      height="100"
-                    ></Imag>
+                <div className={styles_r_w.leave_room_box}>
+                  <div className={styles_r_w.leave_room}>
+                    {game.score[game.players[0]] > game.score[game.players[1]]
+                      ? `You Lost The Game: ${game.score[game.players[0]]
+                      } - ${game.score[game.players[0]]}`
+                      : `You Won The Game: ${game.score[game.players[1]]} - ${game.score[game.players[1]]
+                      }`}
                   </div>
-                  <div>
-                    <Imag
-                      src={opData.avatar}
-                      alt="avatar"
-                      width="100"
-                      height="100"
-                    ></Imag>
+                  <div className={styles_r_w.game_avatars}>
+                    <div>
+                      <Imag
+                        src={game.avatars[game.players[0]]}
+                        alt="avatar"
+                        width="100"
+                        height="100"
+                      ></Imag>
+                    </div>
+                    <div>
+                      <Imag
+                        src={game.avatars[game.players[1]]}
+                        alt="avatar"
+                        width="100"
+                        height="100"
+                      ></Imag>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className={styles_r_w.part_down}>
-                <button
-                  className={styles_r_w.create}
-                  type="submit"
-                  onClick={() => {
-                    router.back();
-                  }}
-                >
-                  HOME
-                </button>
-              </div>
-            </>
-          }
-        />
-      )}
+                <div className={styles_r_w.part_down}>
+                  <button
+                    className={styles_r_w.create}
+                    type="submit"
+                    onClick={() => {
+                      router.back();
+                    }}
+                  >
+                    HOME
+                  </button>
+                </div>
+              </>
+            }
+          />
+        )}
+      </div>
       {!game && (
         <Modal
           content={

@@ -7,12 +7,12 @@ import { useContext, useEffect, useState } from "react";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
-import { achievementsContext, DataContext } from "../_app";
+import { AchievementsContext, DataContext } from "../_app";
 import cn from "classnames";
 import axios from "axios";
 
 const History = () => {
-  const [{ achievements }, { setAchievments }] = useContext(achievementsContext);
+  const [{ achievements }, { setAchievments }] = useContext(AchievementsContext);
   const [data, setData] = useContext(DataContext);
   const [menu, setMenu] = useState(false);
 
@@ -70,7 +70,7 @@ const History = () => {
 
   const winnerMaches = history.filter((ele: any) => ele.winnerId === data.id).length;
   const loserMaches = history.filter((ele: any) => ele.loserId === data.id).length;
-  
+
   return (
     <>
       <MenuNav menu={menu} setMenu={setMenu} />

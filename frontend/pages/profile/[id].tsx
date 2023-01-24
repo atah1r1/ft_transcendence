@@ -15,13 +15,13 @@ import ErrorPage from 'next/error';
 import Loading from '../../components/Loading';
 import HistoryBox from "../../components/history_box";
 import { AddCircleOutline, ChatbubbleOutline, GameControllerOutline, PersonCircleOutline, RemoveCircleOutline } from "react-ionicons";
-import { achievementsContext, GameSocketContext, LastBlockedContext, SocketContext } from "../_app";
+import { AchievementsContext, GameSocketContext, LastBlockedContext, SocketContext } from "../_app";
 
 const FriendProfile = () => {
   const socket = useContext(SocketContext);
   const gameSocket = useContext(GameSocketContext);
   const [lastBlockedId, setLastBlockedId] = useContext(LastBlockedContext);
-  const [{ opAchievments }, { setOpAchievments }] = useContext(achievementsContext);
+  const [{ opAchievments }, { setOpAchievments }] = useContext(AchievementsContext);
   const [friends, setFriends] = useState([]);
   const [profileFriend, setProfileFriend] = useState(
     {

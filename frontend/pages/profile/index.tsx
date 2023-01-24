@@ -12,7 +12,7 @@ import requireAuthentication from "../../hooks/requiredAuthentication";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import { AlertCircleOutline, CameraOutline, CloseSharp } from "react-ionicons";
-import { achievementsContext, DataContext } from "../_app";
+import { AchievementsContext, DataContext } from "../_app";
 import QRCode from "react-qr-code";
 import Modal from "../../components/modal_dialog";
 import { useRouter } from "next/router";
@@ -33,7 +33,7 @@ const Profile = () => {
   const router = useRouter();
   const [loader, setLoader] = useState(true);
   const [data, setData] = useContext(DataContext);
-  const [{ achievements }, { setAchievments }] = useContext(achievementsContext);
+  const [{ achievements }, { setAchievments }] = useContext(AchievementsContext);
   const [s_witch, setSwitch] = useState(data.two_factor_auth);
   const [checkBox, setCheckBox] = useState(false);
   const [value, setValue] = useState({
