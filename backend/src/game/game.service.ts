@@ -496,7 +496,7 @@ export class GameService {
       const updatedGame = this.updateGame(game, server);
       if (updatedGame.status === GameStatus.FINISHED) return;
       this.sendGameUpdateToClients(updatedGame);
-    }, 1000 / 30);
+    }, 1000 / 60);
     // Save interval timer to game object to cancel it later
     this.sendLiveGamesUpdatedToAll(server);
     game.timer = timer;

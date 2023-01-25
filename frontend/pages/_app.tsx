@@ -10,7 +10,7 @@ import axios from "axios";
 import Modal from "../components/modal_dialog";
 import styles_r_w from "../styles/chatroom_window.module.css";
 import Image from "next/image";
-import cn from 'classnames';
+import cn from "classnames";
 
 export enum GameStatus {
   ACCEPTED,
@@ -46,32 +46,32 @@ const gameSocket = io(`http://localhost:9000/game`, {
 
 export const SocketContext = React.createContext<Socket>(socket);
 export const GameSocketContext = React.createContext<Socket>(gameSocket);
-export const GameDataContext = React.createContext<any[]>([null, () => { }]);
-export const GamesCountContext = React.createContext<any[]>([0, () => { }]);
-export const LiveGamesContext = React.createContext<any[]>([[], () => { }]);
-export const DataContext = React.createContext<any[]>([{}, () => { }]);
-export const ChatContext = React.createContext<any[]>([[], () => { }]);
-export const OnlineFriendsContext = React.createContext<any[]>([[], () => { }]);
-export const CurrentConvContext = React.createContext<any[]>([{}, () => { }]);
-export const LastBlockedContext = React.createContext<any[]>([null, () => { }]);
-export const NewRoomContext = React.createContext<any[]>([null, () => { }]);
-export const UserStatusContext = React.createContext<any[]>([null, () => { }]);
+export const GameDataContext = React.createContext<any[]>([null, () => {}]);
+export const GamesCountContext = React.createContext<any[]>([0, () => {}]);
+export const LiveGamesContext = React.createContext<any[]>([[], () => {}]);
+export const DataContext = React.createContext<any[]>([{}, () => {}]);
+export const ChatContext = React.createContext<any[]>([[], () => {}]);
+export const OnlineFriendsContext = React.createContext<any[]>([[], () => {}]);
+export const CurrentConvContext = React.createContext<any[]>([{}, () => {}]);
+export const LastBlockedContext = React.createContext<any[]>([null, () => {}]);
+export const NewRoomContext = React.createContext<any[]>([null, () => {}]);
+export const UserStatusContext = React.createContext<any[]>([null, () => {}]);
 // { achievements, opAchievments }, { setAchievments, setOpAchievments }
 export const AchievementsContext = React.createContext<any[]>([
   { achievements: null, opAchievments: null },
-  { setAchievments: () => { }, setOpAchievments: () => { } }
+  { setAchievments: () => {}, setOpAchievments: () => {} },
 ]);
 export const NewMemberAddedContext = React.createContext<any[]>([
   null,
-  () => { },
+  () => {},
 ]);
 export const MessagesContext = React.createContext<any[]>([
   new Map(),
-  () => { },
+  () => {},
 ]);
 export const GameRequestUserContext = React.createContext<any[]>([
   null,
-  () => { },
+  () => {},
 ]);
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -81,16 +81,16 @@ function MyApp({ Component, pageProps }: AppProps) {
     two_factor_auth_uri: "",
   });
   const [achievements, setAchievments] = useState({
-    'ach1': false,
-    'ach2': false,
-    'ach3': false,
-    'ach4': false,
+    ach1: false,
+    ach2: false,
+    ach3: false,
+    ach4: false,
   });
   const [opAchievments, setOpAchievments] = useState({
-    'ach1': false,
-    'ach2': false,
-    'ach3': false,
-    'ach4': false,
+    ach1: false,
+    ach2: false,
+    ach3: false,
+    ach4: false,
   });
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState(new Map<string, any[]>());
@@ -117,38 +117,44 @@ function MyApp({ Component, pageProps }: AppProps) {
     theme: "light",
   };
 
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////// CHAT SOCKET /////////////////////////
+  ///////////////////////////////////////////////////////////////
   useEffect(() => {
+    ///////////////////////////////////////////////////////////////
+    ///////////////////////// CHAT SOCKET /////////////////////////
+    ///////////////////////////////////////////////////////////////
     socket.on("connect", () => {
-      console.log("CONNECT: ", socket.id);
+      // // console.log("CONNECT: ", socket.id);
     });
 
     socket.on("disconnect", () => {
-      console.log("DISCONNECT: ", socket.id);
+      // // console.log("DISCONNECT: ", socket.id);
     });
 
     socket.on("connect_error", () => {
-      console.log("connect_error: ", socket.id);
+      // // console.log("connect_error: ", socket.id);
       toast.error("Failed to connect, retrying...", toastOptions);
       socket.connect();
     });
 
     socket.on("exception", (exception) => {
-      console.log("exception: ", socket.id);
+      // // console.log("exception: ", socket.id);
       toast.error(`Error: ${exception.message}`, toastOptions);
     });
 
     socket.on("chat_list", (data: any) => {
-      console.log("chat_list: ", socket.id);
+      // // console.log("chat_list: ", socket.id);
       setChats(data);
     });
 
     socket.on("online_friends", (data: any) => {
-      console.log("online_friends: ", socket.id);
+      // // console.log("online_friends: ", socket.id);
       setOnlineFriends(data);
     });
 
     socket.on("room_created", (data: any) => {
-      console.log("room_created: ", socket.id);
+      // // console.log("room_created: ", socket.id);
       if (data?.existing === false) {
         toast.info(
           `A new ${data?.isDm === true ? "DM" : "Room"} has been created`,
@@ -160,17 +166,21 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     socket.on("new_friendship", (data: any) => {
-      console.log("new_friendship: ", socket.id);
-      toast.info(`${data?.username} added you as a friend`, toastOptions);
+      if (!data?.existingChat) {
+        toast.info(
+          `${data?.user?.username} added you as a friend`,
+          toastOptions
+        );
+      }
     });
 
     socket.on("room_created_notif", (data: any) => {
-      console.log("room_created_notif: ", socket.id);
+      // // console.log("room_created_notif: ", socket.id);
       setNewRoom(data);
     });
 
     socket.on("room_joined", (data: any) => {
-      console.log("room_joined: ", socket.id);
+      // // console.log("room_joined: ", socket.id);
       const userId = localStorage.getItem("userId");
       if (userId !== data.roomUser.userId) {
         toast.info(
@@ -189,7 +199,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     socket.on("room_left", (data: any) => {
-      console.log("room_left: ", socket.id);
+      // // console.log("room_left: ", socket.id);
       const userId = localStorage.getItem("userId");
       if (userId === data.userId) {
         setCurrentConv({});
@@ -198,8 +208,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     socket.on("room_protected", (data: any) => {
-      console.log("room_protected: ", socket.id);
-      console.log("data: ", data);
+      // // console.log("room_protected: ", socket.id);
+      // // console.log("data: ", data);
       const userId = localStorage.getItem("userId");
       toast.info(
         `You have successfully protected this room: ${data.name}`,
@@ -209,13 +219,13 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     socket.on("member_added", (data: any) => {
-      console.log("member_added: ", socket.id);
+      // // console.log("member_added: ", socket.id);
       toast.info(`User has been added successfully`, toastOptions);
       setNewMemberAdded(data);
     });
 
     socket.on("admin_made", (data: any) => {
-      console.log("admin_made: ", socket.id);
+      // // console.log("admin_made: ", socket.id);
       const userId = localStorage.getItem("userId");
       if (userId === data.userId)
         toast.info(`You have been made an admin`, toastOptions);
@@ -223,7 +233,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     socket.on("member_status_changed", (data: any) => {
-      console.log("member_status_changed: ", socket.id);
+      // // console.log("member_status_changed: ", socket.id);
       const userId = localStorage.getItem("userId");
       if (userId === data.userId && data.status === "BANNED") {
         setCurrentConv((prev: any) => {
@@ -237,11 +247,12 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     socket.on("message", (data: any) => {
-      console.log("message: ", socket.id);
+      // // console.log("message: ", socket.id);
       const userId = localStorage.getItem("userId");
       if (userId !== data.user?.id) {
         toast.info(
-          `You have a new ${data?.roomName ? "Message" : "DM"} from ${data?.user ? data?.user.username : "N/A"
+          `You have a new ${data?.roomName ? "Message" : "DM"} from ${
+            data?.user ? data?.user.username : "N/A"
           }`,
           toastOptions
         );
@@ -257,7 +268,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     socket.on("user_blocked", (data: any) => {
-      console.log("user_blocked: ", socket.id);
+      // // console.log("user_blocked: ", socket.id);
       const userId = localStorage.getItem("userId");
       if (data) {
         setLastBlockedId(data);
@@ -268,14 +279,28 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
       }
     });
+  }, []);
 
+  ///////////////////////////////////////////////////////////////
+  ///////////////////////// GAME SOCKET /////////////////////////
+  ///////////////////////////////////////////////////////////////
+  useEffect(() => {
+    ///////////////////////////////////////////////////////////////
+    ///////////////////////// GAME SOCKET /////////////////////////
+    ///////////////////////////////////////////////////////////////
     gameSocket.on("exception", (exception) => {
-      console.log("exception: ", socket.id);
-      toast.error(`Error:${exception.error} ${exception.message}`, toastOptions);
+      // // console.log("exception: ", socket.id);
+      toast.error(
+        `Error:${exception.error} ${exception.message}`,
+        toastOptions
+      );
     });
 
     gameSocket.on("emit_play_against_request", (user: any) => {
-      console.log('user: ', user);
+      setGame(null);
+      if (location.pathname === "/game/play") {
+        router.replace("/game");
+      }
       setGameRequestUser(user);
     });
 
@@ -284,12 +309,9 @@ function MyApp({ Component, pageProps }: AppProps) {
     });
 
     gameSocket.on("emit_play_queue", (data: any) => {
-      // when you send req for queue, you receieve this one back.
-      // it will have either status: ACCPTED or QUEUED.
-      console.log("emit_play_queue: ", data);
       if (data.status === GameStatus.ACCEPTED) {
         setGame(data);
-        router.push({ pathname: `/game/play`, query: { isPlaying: true } });
+        router.push(`/game/play`);
       } else if (data.status === GameStatus.QUEUED) {
         setGame(data);
       }
@@ -300,7 +322,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       setGameRequestUserId(null);
       if (gameData.status === GameStatus.ACCEPTED) {
         setGame(gameData);
-        router.push({ pathname: `/game/play`, query: { isPlaying: true } });
+        router.push("/game/play");
       } else if (gameData.status === GameStatus.CANCELLED) {
         setGame(null);
         toast.info(
@@ -313,32 +335,34 @@ function MyApp({ Component, pageProps }: AppProps) {
     gameSocket.on("emit_play_against_decline", (data: any) => {
       setGameRequestUser(null);
       setGameRequestUserId(null);
-      toast.info(`You request was denied by the other user.`, toastOptions);
+      toast.warn(`You request was denied by the other user.`, toastOptions);
     });
 
     gameSocket.on("emit_play_against_cancel", (data: any) => {
-      //if you cancelled request, you will receive this.
-      // data = Game(status: "CANCELLED",... )
-      // the waiting popup will be closed.
+      setGame(null);
       setGameRequestUser(null);
       setGameRequestUserId(null);
     });
 
     gameSocket.on("emit_spectate_game", (gameData: any) => {
       setGame(gameData);
-      router.push(`/game/play`, { query: { isPlaying: false } });
+      router.push(`/game/play`);
     });
 
     gameSocket.on("emit_leave_queue", (data: any) => {
-      // TODO: hide waiting popup.
+      setGame(null);
+      setGameRequestUser(null);
+      setGameRequestUserId(null);
     });
 
     gameSocket.on("emit_live_games_updated", (data: any) => {
-      console.log("live_games_updated: ", data);
       setGamesCount(data ?? 0);
     });
   }, []);
 
+  ///////////////////////////////////////////////////////////////
+  /////////////////////////// ME DATA ///////////////////////////
+  ///////////////////////////////////////////////////////////////
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`, {
@@ -350,13 +374,17 @@ function MyApp({ Component, pageProps }: AppProps) {
         localStorage.setItem("userId", response.data?.id);
       })
       .catch((err) => {
-        console.log("error1: ", err);
+        // // console.log("error1: ", err);
       });
   }, []);
 
-
   return (
-    <AchievementsContext.Provider value={[{ achievements, opAchievments }, { setAchievments, setOpAchievments }]}>
+    <AchievementsContext.Provider
+      value={[
+        { achievements, opAchievments },
+        { setAchievments, setOpAchievments },
+      ]}
+    >
       <LiveGamesContext.Provider value={[liveGames, setLiveGames]}>
         <GamesCountContext.Provider value={[gamesCount, setGamesCount]}>
           <GameRequestUserContext.Provider
@@ -389,8 +417,12 @@ function MyApp({ Component, pageProps }: AppProps) {
                                         <Modal
                                           content={
                                             <>
-                                              <div className={styles_r_w.part_up}>
-                                                <div className={styles_r_w.text}>
+                                              <div
+                                                className={styles_r_w.part_up}
+                                              >
+                                                <div
+                                                  className={styles_r_w.text}
+                                                >
                                                   game invitaion
                                                 </div>
                                               </div>
@@ -404,8 +436,11 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                     styles_r_w.leave_room
                                                   }
                                                 >
-                                                  <span>{gameRequestUser.username}</span> has
-                                                  invited you to play a pong game.
+                                                  <span>
+                                                    {gameRequestUser.username}
+                                                  </span>{" "}
+                                                  has invited you to play a pong
+                                                  game.
                                                 </div>
                                                 <Image
                                                   src={gameRequestUser.avatar}
@@ -476,17 +511,27 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                 >
                                                   <div
                                                     className={cn(
-                                                      styles_r_w.leave_room, styles_r_w.dot_box)
-                                                    }
+                                                      styles_r_w.leave_room,
+                                                      styles_r_w.dot_box
+                                                    )}
                                                   >
-                                                    You are in queue. Waiting <span className={styles_r_w.dot_pulse}></span>
+                                                    You are in queue. Waiting{" "}
+                                                    <span
+                                                      className={
+                                                        styles_r_w.dot_pulse
+                                                      }
+                                                    ></span>
                                                   </div>
                                                 </div>
                                                 <div
-                                                  className={styles_r_w.part_down}
+                                                  className={
+                                                    styles_r_w.part_down
+                                                  }
                                                 >
                                                   <div
-                                                    className={styles_r_w.cancel}
+                                                    className={
+                                                      styles_r_w.cancel
+                                                    }
                                                     onClick={() => {
                                                       gameSocket.emit(
                                                         "leave_queue",
@@ -508,8 +553,12 @@ function MyApp({ Component, pageProps }: AppProps) {
                                         <Modal
                                           content={
                                             <>
-                                              <div className={styles_r_w.part_up}>
-                                                <div className={styles_r_w.text}>
+                                              <div
+                                                className={styles_r_w.part_up}
+                                              >
+                                                <div
+                                                  className={styles_r_w.text}
+                                                >
                                                   Game Request Sent
                                                 </div>
                                               </div>
@@ -520,10 +569,16 @@ function MyApp({ Component, pageProps }: AppProps) {
                                               >
                                                 <div
                                                   className={cn(
-                                                    styles_r_w.leave_room, styles_r_w.dot_box)
-                                                  }
+                                                    styles_r_w.leave_room,
+                                                    styles_r_w.dot_box
+                                                  )}
                                                 >
-                                                  Waiting Response <span className={styles_r_w.dot_pulse}></span>
+                                                  Waiting Response{" "}
+                                                  <span
+                                                    className={
+                                                      styles_r_w.dot_pulse
+                                                    }
+                                                  ></span>
                                                 </div>
                                               </div>
                                               <div
@@ -535,7 +590,8 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                     gameSocket.emit(
                                                       "play_against_cancel",
                                                       {
-                                                        userId: gameRequestUserId,
+                                                        userId:
+                                                          gameRequestUserId,
                                                       }
                                                     );
                                                     setGameRequestUserId(null);
@@ -555,7 +611,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                                           gameRequestUserId ||
                                           (game &&
                                             game.status ===
-                                            GameStatus.QUEUED)) &&
+                                              GameStatus.QUEUED)) &&
                                         styles_r_w.room
                                       }
                                     >
@@ -579,7 +635,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </GameRequestUserContext.Provider>
         </GamesCountContext.Provider>
       </LiveGamesContext.Provider>
-    </AchievementsContext.Provider >
+    </AchievementsContext.Provider>
   );
 }
 

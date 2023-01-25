@@ -26,11 +26,11 @@ const LoginPage = () => {
         withCredentials: true,
       })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         router.push("/profile");
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   };
 

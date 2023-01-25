@@ -1,17 +1,15 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import paddle from "../../../components/paddle";
-import { JoinRoom } from "../../../components/Joinroom";
 import Score from "../../../components/score";
 import styled from "styled-components";
-import { io, Socket } from "socket.io-client";
 import styles_box from "../../../styles/style_box.module.css";
 import requireAuthentication from "../../../hooks/requiredAuthentication";
 import { GameDataContext, GameSocketContext, GameStatus } from "../../_app";
 import { useRouter } from "next/router";
 import Modal from "../../../components/modal_dialog";
 import styles_r_w from "../../../styles/chatroom_window.module.css";
-import axios from "axios";
 import Imag from "next/image";
+import cn from "classnames";
 
 const Container = styled.div`
   background-image: linear-gradient(
@@ -48,18 +46,24 @@ const GameContainer = styled.canvas`
 let rightPaddle = {};
 let leftPaddle = {};
 let ball = {};
+let waitingPopup = false;
 let status: GameStatus = GameStatus.ACCEPTED;
 let animationId: number = -1;
+let intervalId: any;
 
 function Game() {
   const router = useRouter();
-  const { isPlaying } = router.query;
   const socket = useContext(GameSocketContext);
   const [game, setGame] = useContext(GameDataContext);
   const [menu, setMenu] = useState(false);
-  const [waitingPopup, setWaitingPopup] = useState(false);
+  //const [waitingPopup, setWaitingPopup] = useState(false);
 
   let canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const isPlaying = (gameData: any): boolean => {
+    const userId = localStorage.getItem("userId");
+    return gameData?.players && gameData?.players?.includes(userId);
+  };
 
   const getOpponentId = (gameData: any): string => {
     const userId = localStorage.getItem("userId");
@@ -78,7 +82,6 @@ function Game() {
   };
 
   const getGameStatus = () => {
-    console.log("STATUS: ", status);
     return status;
   };
 
@@ -115,31 +118,23 @@ function Game() {
   };
 
   const render = () => {
-    // if (animationId !== -1 && getGameStatus() !== GameStatus.STARTED) {
-    //   console.log("STOPPING ANIMATION");
-    //   // cancelAnimationFrame(animationId);
-    // }
     renderCanvas();
     renderPaddle(leftPaddle, rightPaddle);
     renderBall(ball);
     canvasRef.current?.focus();
-    animationId = requestAnimationFrame(render);
-    // stop animation when game is finished
   };
 
   // Listening on socket events
   useEffect(() => {
-    setWaitingPopup(true);
+    // setWaitingPopup(true);
+    waitingPopup = true;
 
     if (!game || !game.players) {
       router.replace("/game");
-      // router.back();
       return;
-      // show error, and redirect to home
     }
-    console.log("GAME ID: ", game.id);
 
-    if (isPlaying === "true" && game.status === GameStatus.ACCEPTED) {
+    if (isPlaying(game) && game.status === GameStatus.ACCEPTED) {
       socket.emit("start_game", { userId: getOpponentId(game) });
     }
 
@@ -148,35 +143,33 @@ function Game() {
         return { ...prev, score: data.score, status: data.status };
       });
       if (!data || data.status !== GameStatus.STARTED) {
-        // show game finished popup with result
-        // router.back();
         return;
       }
-      if (waitingPopup) setWaitingPopup(false);
+      if (waitingPopup) waitingPopup = false; //setWaitingPopup(false);
       // data has started, update game object
       leftPaddle = data.paddle[data.players[0]];
       rightPaddle = data.paddle[data.players[1]];
       ball = data.ball;
       status = data.status;
-      console.log("STATUS __ __: ", status, data.status);
     });
 
     socket.off("emit_game_finish").on("emit_game_finish", (data: any) => {
-      console.log("GAME FINISHED", data.status);
       setGame((prev: any) => {
         return { ...prev, score: data.score, status: data.status };
       });
       status = data.status;
-      // router.back();
+      cancelAnimationFrame(animationId);
+      clearInterval(intervalId);
     });
 
     return () => {
       cancelAnimationFrame(animationId);
+      clearInterval(intervalId);
       if (getGameStatus() === GameStatus.FINISHED) {
         setGame(null);
         return;
       }
-      if (isPlaying === "true")
+      if (isPlaying(game))
         socket.emit("leave_game", { userId: getOpponentId(game) });
       else socket.emit("stop_spectate_game", { gameId: game.id });
       setGame(null);
@@ -186,12 +179,14 @@ function Game() {
   // Rendering
   useEffect(() => {
     canvasRef.current?.focus();
-    render();
+    intervalId = setInterval(() => {
+      animationId = requestAnimationFrame(render);
+    }, 1000 / 80);
   }, []);
 
   // Emitting events
   const keyboardevent = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
-    if (!isPlaying || isPlaying === "false") return;
+    if (!isPlaying(game)) return;
     if (getGameStatus() !== GameStatus.STARTED) return;
     if (e.key === "ArrowUp") {
       socket.emit("game_move", { gameId: game.id, move: "UP" });
@@ -200,48 +195,19 @@ function Game() {
     }
   };
 
-  const [myData, setMyData] = useState<any>(null);
-  const [opData, setOpData] = useState<any>(null);
-  useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/${getMyId(game)}`, {
-      withCredentials: true,
-    }).then((res) => {
-      setMyData(res.data);
-    }).catch((err) => {
-      console.log(err);
-    });
-  }, [game && game?.status === GameStatus.FINISHED]);
-
-  useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/${getOpponentId(game)}`, {
-      withCredentials: true,
-    }).then((res) => {
-      setOpData(res.data);
-    }).catch((err) => {
-      console.log(err);
-    });
-  }, [game && game?.status === GameStatus.FINISHED]);
-
-  return (
+  const getResultPopup = () => (
     <div>
-      <div>
-        {game && game?.status === GameStatus.FINISHED && (
-          <Modal
-            content={
-              <>
-                <div className={styles_r_w.part_up}>
-                  <div className={styles_r_w.text}>Game Result</div>
-                </div>
-                {game?.players &&
-                  <div className={styles_r_w.leave_room_box}>
-                    <div className={styles_r_w.leave_room}>
-                      {game.score[game.players[0]] > game.score[game.players[1]]
-                        ? `You Lost The Game: ${game.score[game.players[0]]
-                        } - ${game.score[game.players[0]]}`
-                        : `You Won The Game: ${game.score[game.players[1]]} - ${game.score[game.players[1]]
-                        }`}
-                    </div>
-                    <div className={styles_r_w.game_avatars}>
+      {game && game?.status === GameStatus.FINISHED && (
+        <Modal
+          content={
+            <>
+              <div className={styles_r_w.part_up}>
+                <div className={styles_r_w.text}>Game Result</div>
+              </div>
+              {game?.players && (
+                <div className={styles_r_w.leave_room_box}>
+                  <div className={styles_r_w.game_avatars}>
+                    <div className={styles_r_w.avatar_b}>
                       <div>
                         <Imag
                           src={game.avatars[game.players[0]]}
@@ -250,6 +216,14 @@ function Game() {
                           height="100"
                         ></Imag>
                       </div>
+                      {game.usernames[game.players[0]]}
+                    </div>
+                    <div className={styles_r_w.game_result}>
+                      {`${game.score[game.players[0]]} - ${
+                        game.score[game.players[1]]
+                      }`}
+                    </div>
+                    <div className={styles_r_w.avatar_b}>
                       <div>
                         <Imag
                           src={game.avatars[game.players[1]]}
@@ -258,25 +232,32 @@ function Game() {
                           height="100"
                         ></Imag>
                       </div>
+                      {game.usernames[game.players[1]]}
                     </div>
-                  </div>}
-                <div className={styles_r_w.part_down}>
-                  <button
-                    className={styles_r_w.create}
-                    type="submit"
-                    onClick={() => {
-                      router.back();
-                    }}
-                  >
-                    HOME
-                  </button>
+                  </div>
                 </div>
-              </>
-            }
-          />
-        )}
-      </div>
-      {!game && (
+              )}
+              <div className={styles_r_w.part_down}>
+                <button
+                  className={styles_r_w.create}
+                  type="submit"
+                  onClick={() => {
+                    router.back();
+                  }}
+                >
+                  HOME
+                </button>
+              </div>
+            </>
+          }
+        />
+      )}
+    </div>
+  );
+
+  const getGameFinishedPopup = () => {
+    return (
+      !game && (
         <Modal
           content={
             <>
@@ -302,7 +283,42 @@ function Game() {
             </>
           }
         />
-      )}
+      )
+    );
+  };
+
+  const getWaitingPopup = () => {
+    return (
+      <div>
+        {waitingPopup && (
+          <Modal
+            content={
+              <>
+                <div className={styles_r_w.part_up}>
+                  <div className={styles_r_w.text}>Starting game</div>
+                </div>
+                <div className={styles_r_w.leave_room_box}>
+                  <div
+                    className={cn(styles_r_w.leave_room, styles_r_w.dot_box)}
+                  >
+                    Waiting for other player to join
+                    <span className={styles_r_w.dot_pulse}></span>
+                  </div>
+                </div>
+                <div className={styles_r_w.part_down}></div>
+              </>
+            }
+          />
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {getWaitingPopup()}
+      {getResultPopup()}
+      {getGameFinishedPopup()}
       <div
         className={
           ((game && game?.status === GameStatus.FINISHED) || !game) &&
@@ -323,15 +339,14 @@ function Game() {
                 width="1280"
                 height="720"
               ></GameContainer>
-              {
-                game?.players &&
+              {game?.players && (
                 <Score
                   score1={game?.score[game.players[0]] ?? 0}
                   score2={game?.score[game.players[1]] ?? 0}
                   username1={game?.usernames[game.players[0]] ?? "Player 1"}
                   username2={game?.usernames[game.players[1]] ?? "Player 2"}
                 />
-              }
+              )}
             </Container>
           </div>
         </div>

@@ -139,6 +139,10 @@ let leftPaddle: any = {
   points: 1,
 };
 
+let ball = {};
+let animationId: number = -1;
+let intervalId: any;
+
 function Bot_game() {
   const [menu, setMenu] = useState(false);
 
@@ -146,7 +150,7 @@ function Bot_game() {
   const [p1Score, setP1Score] = React.useState(0);
   const [p2Score, setP2Score] = React.useState(0);
 
-  let animation_id: any;
+  //let animation_id: any;
   // let gameOn: boolean = false;;
   // const audio = new Audio('touch.wav');
 
@@ -248,18 +252,25 @@ function Bot_game() {
     aiIQ100();
     if (!canvasRef.current) return;
     canvasRef.current.focus();
-    animation_id = requestAnimationFrame(render);
+    //animation_id = requestAnimationFrame(render);
   };
 
   useEffect(() => {
     canvasRef.current?.focus();
-    render();
+    intervalId = setInterval(() => {
+      animationId = requestAnimationFrame(render);
+    }, 1000 / 60);
+
+    return () => {
+      clearInterval(intervalId);
+      cancelAnimationFrame(animationId);
+    };
   }, []);
 
   const keyboardevent = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (e.key === "ArrowUp" && leftPaddle.y > 0) {
       leftPaddle.y -= 40;
-      console.log(leftPaddle.y);
+      // console.log(leftPaddle.y);
     } else if (e.key === "ArrowDown" && leftPaddle.y < 620) {
       leftPaddle.y += 40;
     }

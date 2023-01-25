@@ -9,56 +9,52 @@ import { LastBlockedContext } from "../_app";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 
-const History = () =>
-{
+const History = () => {
+  const [menu, setMenu] = useState(false);
+  const [inputForm, setInputForm] = useState("");
+  const [lastBlockedId, setLastBlockedId] = useContext(LastBlockedContext);
+  const [friends, setFriends] = useState([]);
 
-  const [ menu, setMenu ] = useState( false );
-  const [ inputForm, setInputForm ] = useState( "" );
-  const [ lastBlockedId, setLastBlockedId ] = useContext( LastBlockedContext );
-  const [ friends, setFriends ] = useState( [] );
-
-  useEffect( () =>
-  {
-    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/all`, {
-      withCredentials: true,
-    } ).then( ( res ) =>
-    {
-      setFriends( res.data );
-    } ).catch( ( err ) =>
-    {
-      console.log( err );
-    } );
-  }, [ lastBlockedId ] );
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/all`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setFriends(res.data);
+      })
+      .catch((err) => {
+        // console.log( err );
+      });
+  }, [lastBlockedId]);
 
   return (
     <>
-      <MenuNav menu={ menu } setMenu={ setMenu } />
-      <div className={ styles_box.container }>
-        <SettingsNav selected={ "friends" } menu={ menu } />
-        <div className={ styles_box.profile_details }>
+      <MenuNav menu={menu} setMenu={setMenu} />
+      <div className={styles_box.container}>
+        <SettingsNav selected={"friends"} menu={menu} />
+        <div className={styles_box.profile_details}>
           <Logout />
           <form
-            className={ styles.search }
-            onSubmit={ ( e ) =>
-            {
+            className={styles.search}
+            onSubmit={(e) => {
               e.preventDefault();
-            } }
+            }}
           >
             <input
               type="search"
               placeholder="Search..."
-              onChange={ ( e ) =>
-              {
-                setInputForm( e.target.value.trim() );
-              } }
-              value={ inputForm }
-              maxLength={ 16 }
+              onChange={(e) => {
+                setInputForm(e.target.value.trim());
+              }}
+              value={inputForm}
+              maxLength={16}
             ></input>
           </form>
-          <div className={ styles.friends }>
+          <div className={styles.friends}>
             <Friends_box
-              friends={ friends.length > 0 ? friends : [] }
-              inputForm={ inputForm }
+              friends={friends.length > 0 ? friends : []}
+              inputForm={inputForm}
             ></Friends_box>
           </div>
         </div>
@@ -69,10 +65,8 @@ const History = () =>
 
 export default History;
 
-export const getServerSideProps = requireAuthentication( async () =>
-{
+export const getServerSideProps = requireAuthentication(async () => {
   return {
-    props: {
-    }, // will be passed to the page component as props
-  }
-} )
+    props: {}, // will be passed to the page component as props
+  };
+});

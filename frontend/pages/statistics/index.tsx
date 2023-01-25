@@ -12,7 +12,8 @@ import cn from "classnames";
 import axios from "axios";
 
 const History = () => {
-  const [{ achievements }, { setAchievments }] = useContext(AchievementsContext);
+  const [{ achievements }, { setAchievments }] =
+    useContext(AchievementsContext);
   const [data, setData] = useContext(DataContext);
   const [menu, setMenu] = useState(false);
   const [level, setLevel] = useState(0);
@@ -20,16 +21,18 @@ const History = () => {
   // achievements
   const [history, setHistory] = useState([]);
   useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
-      { withCredentials: true })
+    axios
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`, {
+        withCredentials: true,
+      })
       .then((res) => {
         setHistory(res.data.reverse());
-        console.log('history: ', res.data);
+        // console.log('history: ', res.data);
       })
       .catch((error) => {
-        console.log('error: ', error);
-      })
-  }, [data.id])
+        // console.log('error: ', error);
+      });
+  }, [data.id]);
 
   useEffect(() => {
     setAchievments({
@@ -37,20 +40,22 @@ const History = () => {
       ach2: false,
       ach3: false,
       ach4: false,
-    })
+    });
     if (history.length) {
       let winCount = 0;
       let score = 100;
       let points = 0;
       setAchievments((prev: any) => ({ ...prev, ach1: true }));
       history.map((ele: any, i: any, arr: any) => {
-        console.log(arr[arr.length - 1 - i].winnerScore, arr[arr.length - 1 - i].loserScore);
-        points = (arr[arr.length - 1 - i].winnerScore - arr[arr.length - 1 - i].loserScore) * 10;
+        // console.log(arr[arr.length - 1 - i].winnerScore, arr[arr.length - 1 - i].loserScore);
+        points =
+          (arr[arr.length - 1 - i].winnerScore -
+            arr[arr.length - 1 - i].loserScore) *
+          10;
         if (arr[arr.length - 1 - i].winnerId === data.id) {
           winCount += 1;
           score += points;
-        }
-        else if (arr[arr.length - 1 - i].loserId === data.id) {
+        } else if (arr[arr.length - 1 - i].loserId === data.id) {
           winCount = 0;
           score -= points;
         }
@@ -65,13 +70,17 @@ const History = () => {
         if (score >= 1000) {
           setAchievments((prev: any) => ({ ...prev, ach4: true }));
         }
-      })
+      });
       setLevel(Math.floor(score / 150));
     }
-  }, [history])
+  }, [history]);
 
-  const winnerMaches = history.filter((ele: any) => ele.winnerId === data.id).length;
-  const loserMaches = history.filter((ele: any) => ele.loserId === data.id).length;
+  const winnerMaches = history.filter(
+    (ele: any) => ele.winnerId === data.id
+  ).length;
+  const loserMaches = history.filter(
+    (ele: any) => ele.loserId === data.id
+  ).length;
 
   return (
     <>
@@ -95,16 +104,25 @@ const History = () => {
                 <div>
                   <p className={styles.user_name}>{data.username}</p>
                   <div className={styles.level_box}>
-                    <div className={cn(styles.level_line,
-                      level >= 4 && styles.level_line_one,
-                      level >= 8 && styles.level_line_two,
-                      level >= 12 && styles.level_line_tree,
-                      level >= 15 && styles.level_line_four,
-                      level >= 18 && styles.level_line_five,
-                      level >= 21 && styles.level_line_six,
-                      level >= 26 && styles.level_line_eight)}></div>
+                    <div
+                      className={cn(
+                        styles.level_line,
+                        level >= 4 && styles.level_line_one,
+                        level >= 8 && styles.level_line_two,
+                        level >= 12 && styles.level_line_tree,
+                        level >= 15 && styles.level_line_four,
+                        level >= 18 && styles.level_line_five,
+                        level >= 21 && styles.level_line_six,
+                        level >= 26 && styles.level_line_eight
+                      )}
+                    ></div>
                     <div className={styles.level_number_box}>
-                      <p>level <span>{level > 0 ? (level >= 26 ? 26 : level) : 0}</span></p>
+                      <p>
+                        level{" "}
+                        <span>
+                          {level > 0 ? (level >= 26 ? 26 : level) : 0}
+                        </span>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -127,7 +145,12 @@ const History = () => {
             <div className={styles.part_two}>
               <p className={styles.ach_text}>ACHIEVEMENTS</p>
               <div className={styles.ach_medal}>
-                <div className={cn(styles.ach_medal_box, `${achievements.ach1 && styles.medal}`)}>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach1 && styles.medal}`
+                  )}
+                >
                   <div className={styles.ach_goal}>First match</div>
                   <Image
                     className={`${!achievements.ach1 && styles.non_medal}`}
@@ -137,7 +160,12 @@ const History = () => {
                     height="150%"
                   ></Image>
                 </div>
-                <div className={cn(styles.ach_medal_box, `${achievements.ach2 && styles.medal}`)}>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach2 && styles.medal}`
+                  )}
+                >
                   <div className={styles.ach_goal}>Reaching 350 points</div>
                   <Image
                     className={`${!achievements.ach2 && styles.non_medal}`}
@@ -147,7 +175,12 @@ const History = () => {
                     height="150%"
                   ></Image>
                 </div>
-                <div className={cn(styles.ach_medal_box, `${achievements.ach3 && styles.medal}`)}>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach3 && styles.medal}`
+                  )}
+                >
                   <div className={styles.ach_goal}>Three consecutive wins</div>
                   <Image
                     className={`${!achievements.ach3 && styles.non_medal}`}
@@ -157,7 +190,12 @@ const History = () => {
                     height="150%"
                   ></Image>
                 </div>
-                <div className={cn(styles.ach_medal_box, `${achievements.ach4 && styles.medal}`)}>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach4 && styles.medal}`
+                  )}
+                >
                   <div className={styles.ach_goal}>1000 Points</div>
                   <Image
                     className={`${!achievements.ach4 && styles.non_medal}`}
@@ -180,7 +218,6 @@ export default History;
 
 export const getServerSideProps = requireAuthentication(async () => {
   return {
-    props: {
-    }, // will be passed to the page component as props
-  }
-})
+    props: {}, // will be passed to the page component as props
+  };
+});

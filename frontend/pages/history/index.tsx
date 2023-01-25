@@ -16,15 +16,17 @@ const History = () => {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`,
-      { withCredentials: true })
+    axios
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`, {
+        withCredentials: true,
+      })
       .then((res) => {
         setHistory(res.data.reverse());
       })
       .catch((error) => {
-        console.log('error: ', error);
-      })
-  }, [data.id])
+        // console.log('error: ', error);
+      });
+  }, [data.id]);
 
   return (
     <>
@@ -46,7 +48,6 @@ export default History;
 
 export const getServerSideProps = requireAuthentication(async () => {
   return {
-    props: {
-    }, // will be passed to the page component as props
-  }
-})
+    props: {}, // will be passed to the page component as props
+  };
+});

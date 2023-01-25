@@ -156,6 +156,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.sendNewFriendshipToClient(
         payload.otherUserId,
         chat.members.find((m: User) => m.id !== payload.otherUserId) ?? {},
+        chat.existing,
       );
     } catch (err) {
       throw new WsException({
@@ -623,11 +624,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!chat.isDm) this.server.emit(EV_EMIT_NEW_ROOM, chat);
   }
 
-  private async sendNewFriendshipToClient(userId: string, user: User) {
+  private async sendNewFriendshipToClient(
+    userId: string,
+    user: User,
+    existingChat: boolean,
+  ) {
     const sockets = this.chatService.getConnectedUserById(userId);
     if (!sockets || sockets.length === 0) return;
     sockets.forEach((s) => {
-      this.server.to(s.id).emit(EV_EMIT_NEW_FRIENDSHIP, user);
+      this.server.to(s.id).emit(EV_EMIT_NEW_FRIENDSHIP, { user, existingChat });
     });
   }
 

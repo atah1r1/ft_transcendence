@@ -44,7 +44,7 @@ function Home() {
         setLiveGames(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   }, [gamesCount]);
 

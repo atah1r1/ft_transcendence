@@ -12,6 +12,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
+import ChatRepository from './chat.repository';
 
 @Injectable()
 export class ChatService {
@@ -20,16 +21,13 @@ export class ChatService {
     private userService: UserService,
   ) {}
 
-  // NOTE: userId -> [socketId]
-  connectedUsers: Map<string, Socket[]> = new Map();
-
   // Connected Users
   /**
    * return list of currently connected users ids from connectedUsers map
    * @returns list of string ids or empty list
    */
   getConnectedUsersIds(): string[] {
-    return [...this.connectedUsers.keys()];
+    return [...ChatRepository.getInstance().connectedUsers.keys()];
   }
 
   /**
@@ -41,7 +39,7 @@ export class ChatService {
     const friends = await this.userService.getFriends(userId);
     if (!friends) return [];
     const connectedUsers = friends.filter((friend) =>
-      this.connectedUsers.has(friend.id),
+      ChatRepository.getInstance().connectedUsers.has(friend.id),
     );
     return connectedUsers;
   }
@@ -52,7 +50,7 @@ export class ChatService {
    * @returns list of Socket objects or empty list
    */
   getConnectedUserById(userId: string): Socket[] {
-    return this.connectedUsers.get(userId) ?? [];
+    return ChatRepository.getInstance().connectedUsers.get(userId) ?? [];
   }
 
   /**
@@ -61,11 +59,11 @@ export class ChatService {
    * @param socket newly connected socket
    */
   addConnectedUser(userId: string, socket: Socket) {
-    const sockets = this.connectedUsers.get(userId);
+    const sockets = ChatRepository.getInstance().connectedUsers.get(userId);
     if (sockets) {
       sockets.push(socket);
     } else {
-      this.connectedUsers.set(userId, [socket]);
+      ChatRepository.getInstance().connectedUsers.set(userId, [socket]);
     }
   }
 
@@ -76,13 +74,13 @@ export class ChatService {
    * @param socket socket to remove when disconneted
    */
   removeConnectedUser(userId: string, socket: Socket) {
-    const sockets = this.connectedUsers.get(userId);
+    const sockets = ChatRepository.getInstance().connectedUsers.get(userId);
     if (!sockets) return;
     const newSockets = sockets.filter((s) => s.id !== socket.id);
     if (newSockets.length === 0) {
-      this.connectedUsers.delete(userId);
+      ChatRepository.getInstance().connectedUsers.delete(userId);
     } else {
-      this.connectedUsers.set(userId, newSockets);
+      ChatRepository.getInstance().connectedUsers.set(userId, newSockets);
     }
   }
 
