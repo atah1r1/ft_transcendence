@@ -107,6 +107,9 @@ const History = () => {
                     <div
                       className={cn(
                         styles.level_line,
+                        level >= 1 && styles.level_line_one_one,
+                        level >= 2 && styles.level_line_one_two,
+                        level >= 3 && styles.level_line_one_tree,
                         level >= 4 && styles.level_line_one,
                         level >= 8 && styles.level_line_two,
                         level >= 12 && styles.level_line_tree,

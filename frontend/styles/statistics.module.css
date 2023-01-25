@@ -34,6 +34,9 @@
   position: relative;
 }
 
+.level_line_one_one::after,
+.level_line_one_two::after,
+.level_line_one_tree::after,
 .level_line_one::after,
 .level_line_two::after,
 .level_line_tree::after,
@@ -51,6 +54,15 @@
   border-radius: 1rem;
 }
 
+.level_line_one_one::after {
+  width: 1rem;
+}
+.level_line_one_two::after {
+  width: 2rem;
+}
+.level_line_one_tree::after {
+  width: 3rem;
+}
 .level_line_one::after {
   width: 4rem;
 }
