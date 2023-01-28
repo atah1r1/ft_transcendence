@@ -11,6 +11,7 @@ import Modal from "../components/modal_dialog";
 import styles_r_w from "../styles/chatroom_window.module.css";
 import Image from "next/image";
 import cn from "classnames";
+import Head from "next/head";
 
 export enum GameStatus {
   ACCEPTED,
@@ -46,32 +47,32 @@ const gameSocket = io(`http://localhost:9000/game`, {
 
 export const SocketContext = React.createContext<Socket>(socket);
 export const GameSocketContext = React.createContext<Socket>(gameSocket);
-export const GameDataContext = React.createContext<any[]>([null, () => {}]);
-export const GamesCountContext = React.createContext<any[]>([0, () => {}]);
-export const LiveGamesContext = React.createContext<any[]>([[], () => {}]);
-export const DataContext = React.createContext<any[]>([{}, () => {}]);
-export const ChatContext = React.createContext<any[]>([[], () => {}]);
-export const OnlineFriendsContext = React.createContext<any[]>([[], () => {}]);
-export const CurrentConvContext = React.createContext<any[]>([{}, () => {}]);
-export const LastBlockedContext = React.createContext<any[]>([null, () => {}]);
-export const NewRoomContext = React.createContext<any[]>([null, () => {}]);
-export const UserStatusContext = React.createContext<any[]>([null, () => {}]);
+export const GameDataContext = React.createContext<any[]>([null, () => { }]);
+export const GamesCountContext = React.createContext<any[]>([0, () => { }]);
+export const LiveGamesContext = React.createContext<any[]>([[], () => { }]);
+export const DataContext = React.createContext<any[]>([{}, () => { }]);
+export const ChatContext = React.createContext<any[]>([[], () => { }]);
+export const OnlineFriendsContext = React.createContext<any[]>([[], () => { }]);
+export const CurrentConvContext = React.createContext<any[]>([{}, () => { }]);
+export const LastBlockedContext = React.createContext<any[]>([null, () => { }]);
+export const NewRoomContext = React.createContext<any[]>([null, () => { }]);
+export const UserStatusContext = React.createContext<any[]>([null, () => { }]);
 // { achievements, opAchievments }, { setAchievments, setOpAchievments }
 export const AchievementsContext = React.createContext<any[]>([
   { achievements: null, opAchievments: null },
-  { setAchievments: () => {}, setOpAchievments: () => {} },
+  { setAchievments: () => { }, setOpAchievments: () => { } },
 ]);
 export const NewMemberAddedContext = React.createContext<any[]>([
   null,
-  () => {},
+  () => { },
 ]);
 export const MessagesContext = React.createContext<any[]>([
   new Map(),
-  () => {},
+  () => { },
 ]);
 export const GameRequestUserContext = React.createContext<any[]>([
   null,
-  () => {},
+  () => { },
 ]);
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -251,8 +252,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       const userId = localStorage.getItem("userId");
       if (userId !== data.user?.id) {
         toast.info(
-          `You have a new ${data?.roomName ? "Message" : "DM"} from ${
-            data?.user ? data?.user.username : "N/A"
+          `You have a new ${data?.roomName ? "Message" : "DM"} from ${data?.user ? data?.user.username : "N/A"
           }`,
           toastOptions
         );
@@ -379,119 +379,42 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <AchievementsContext.Provider
-      value={[
-        { achievements, opAchievments },
-        { setAchievments, setOpAchievments },
-      ]}
-    >
-      <LiveGamesContext.Provider value={[liveGames, setLiveGames]}>
-        <GamesCountContext.Provider value={[gamesCount, setGamesCount]}>
-          <GameRequestUserContext.Provider
-            value={[gameRequestUser, setGameRequestUser]}
-          >
-            <UserStatusContext.Provider value={[status, setStatus]}>
-              <NewMemberAddedContext.Provider
-                value={[newMemberAdded, setNewMemberAdded]}
-              >
-                <NewRoomContext.Provider value={[newRoom, setNewRoom]}>
-                  <LastBlockedContext.Provider
-                    value={[lastBlockedId, setLastBlockedId]}
-                  >
-                    <CurrentConvContext.Provider
-                      value={[currentConv, setCurrentConv]}
+    <>
+      <AchievementsContext.Provider
+        value={[
+          { achievements, opAchievments },
+          { setAchievments, setOpAchievments },
+        ]}
+      >
+        <LiveGamesContext.Provider value={[liveGames, setLiveGames]}>
+          <GamesCountContext.Provider value={[gamesCount, setGamesCount]}>
+            <GameRequestUserContext.Provider
+              value={[gameRequestUser, setGameRequestUser]}
+            >
+              <UserStatusContext.Provider value={[status, setStatus]}>
+                <NewMemberAddedContext.Provider
+                  value={[newMemberAdded, setNewMemberAdded]}
+                >
+                  <NewRoomContext.Provider value={[newRoom, setNewRoom]}>
+                    <LastBlockedContext.Provider
+                      value={[lastBlockedId, setLastBlockedId]}
                     >
-                      <OnlineFriendsContext.Provider
-                        value={[onlineFriends, setOnlineFriends]}
+                      <CurrentConvContext.Provider
+                        value={[currentConv, setCurrentConv]}
                       >
-                        <ChatContext.Provider value={[chats, setChats]}>
-                          <MessagesContext.Provider
-                            value={[messages, setMessages]}
-                          >
-                            <GameDataContext.Provider value={[game, setGame]}>
-                              <GameSocketContext.Provider value={gameSocket}>
-                                <SocketContext.Provider value={socket}>
-                                  <DataContext.Provider value={[data, setData]}>
-                                    <div>
-                                      {gameRequestUser && (
-                                        <Modal
-                                          content={
-                                            <>
-                                              <div
-                                                className={styles_r_w.part_up}
-                                              >
-                                                <div
-                                                  className={styles_r_w.text}
-                                                >
-                                                  game invitaion
-                                                </div>
-                                              </div>
-                                              <div
-                                                className={
-                                                  styles_r_w.leave_room_box
-                                                }
-                                              >
-                                                <div
-                                                  className={
-                                                    styles_r_w.leave_room
-                                                  }
-                                                >
-                                                  <span>
-                                                    {gameRequestUser.username}
-                                                  </span>{" "}
-                                                  has invited you to play a pong
-                                                  game.
-                                                </div>
-                                                <Image
-                                                  src={gameRequestUser.avatar}
-                                                  alt="spinner"
-                                                  width="180px"
-                                                  height="180px"
-                                                ></Image>
-                                              </div>
-                                              <div
-                                                className={styles_r_w.part_down}
-                                              >
-                                                <div
-                                                  className={styles_r_w.cancel}
-                                                  onClick={() => {
-                                                    gameSocket.emit(
-                                                      "play_against_decline",
-                                                      {
-                                                        userId:
-                                                          gameRequestUser.id,
-                                                      }
-                                                    );
-                                                    setGameRequestUser(null);
-                                                  }}
-                                                >
-                                                  DENY
-                                                </div>
-                                                <button
-                                                  className={styles_r_w.create}
-                                                  type="submit"
-                                                  onClick={() => {
-                                                    gameSocket.emit(
-                                                      "play_against_accept",
-                                                      {
-                                                        userId:
-                                                          gameRequestUser.id,
-                                                      }
-                                                    );
-                                                    setGameRequestUser(null);
-                                                  }}
-                                                >
-                                                  ACCEPT
-                                                </button>
-                                              </div>
-                                            </>
-                                          }
-                                        />
-                                      )}
-                                    </div>
-                                    <div>
-                                      {game &&
-                                        game.status === GameStatus.QUEUED && (
+                        <OnlineFriendsContext.Provider
+                          value={[onlineFriends, setOnlineFriends]}
+                        >
+                          <ChatContext.Provider value={[chats, setChats]}>
+                            <MessagesContext.Provider
+                              value={[messages, setMessages]}
+                            >
+                              <GameDataContext.Provider value={[game, setGame]}>
+                                <GameSocketContext.Provider value={gameSocket}>
+                                  <SocketContext.Provider value={socket}>
+                                    <DataContext.Provider value={[data, setData]}>
+                                      <div>
+                                        {gameRequestUser && (
                                           <Modal
                                             content={
                                               <>
@@ -501,7 +424,143 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                   <div
                                                     className={styles_r_w.text}
                                                   >
-                                                    Queue
+                                                    game invitaion
+                                                  </div>
+                                                </div>
+                                                <div
+                                                  className={
+                                                    styles_r_w.leave_room_box
+                                                  }
+                                                >
+                                                  <div
+                                                    className={
+                                                      styles_r_w.leave_room
+                                                    }
+                                                  >
+                                                    <span>
+                                                      {gameRequestUser.username}
+                                                    </span>{" "}
+                                                    has invited you to play a pong
+                                                    game.
+                                                  </div>
+                                                  <Image
+                                                    src={gameRequestUser.avatar}
+                                                    alt="spinner"
+                                                    width="180px"
+                                                    height="180px"
+                                                  ></Image>
+                                                </div>
+                                                <div
+                                                  className={styles_r_w.part_down}
+                                                >
+                                                  <div
+                                                    className={styles_r_w.cancel}
+                                                    onClick={() => {
+                                                      gameSocket.emit(
+                                                        "play_against_decline",
+                                                        {
+                                                          userId:
+                                                            gameRequestUser.id,
+                                                        }
+                                                      );
+                                                      setGameRequestUser(null);
+                                                    }}
+                                                  >
+                                                    DENY
+                                                  </div>
+                                                  <button
+                                                    className={styles_r_w.create}
+                                                    type="submit"
+                                                    onClick={() => {
+                                                      gameSocket.emit(
+                                                        "play_against_accept",
+                                                        {
+                                                          userId:
+                                                            gameRequestUser.id,
+                                                        }
+                                                      );
+                                                      setGameRequestUser(null);
+                                                    }}
+                                                  >
+                                                    ACCEPT
+                                                  </button>
+                                                </div>
+                                              </>
+                                            }
+                                          />
+                                        )}
+                                      </div>
+                                      <div>
+                                        {game &&
+                                          game.status === GameStatus.QUEUED && (
+                                            <Modal
+                                              content={
+                                                <>
+                                                  <div
+                                                    className={styles_r_w.part_up}
+                                                  >
+                                                    <div
+                                                      className={styles_r_w.text}
+                                                    >
+                                                      Queue
+                                                    </div>
+                                                  </div>
+                                                  <div
+                                                    className={
+                                                      styles_r_w.leave_room_box
+                                                    }
+                                                  >
+                                                    <div
+                                                      className={cn(
+                                                        styles_r_w.leave_room,
+                                                        styles_r_w.dot_box
+                                                      )}
+                                                    >
+                                                      You are in queue. Waiting{" "}
+                                                      <span
+                                                        className={
+                                                          styles_r_w.dot_pulse
+                                                        }
+                                                      ></span>
+                                                    </div>
+                                                  </div>
+                                                  <div
+                                                    className={
+                                                      styles_r_w.part_down
+                                                    }
+                                                  >
+                                                    <div
+                                                      className={
+                                                        styles_r_w.cancel
+                                                      }
+                                                      onClick={() => {
+                                                        gameSocket.emit(
+                                                          "leave_queue",
+                                                          {}
+                                                        );
+                                                        setGame(null);
+                                                      }}
+                                                    >
+                                                      LEAVE
+                                                    </div>
+                                                  </div>
+                                                </>
+                                              }
+                                            />
+                                          )}
+                                      </div>
+                                      <div>
+                                        {gameRequestUserId && (
+                                          <Modal
+                                            content={
+                                              <>
+                                                <div
+                                                  className={styles_r_w.part_up}
+                                                >
+                                                  <div
+                                                    className={styles_r_w.text}
+                                                  >
+                                                    Game Request Sent
                                                   </div>
                                                 </div>
                                                 <div
@@ -515,7 +574,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                       styles_r_w.dot_box
                                                     )}
                                                   >
-                                                    You are in queue. Waiting{" "}
+                                                    Waiting Response{" "}
                                                     <span
                                                       className={
                                                         styles_r_w.dot_pulse
@@ -524,118 +583,62 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                   </div>
                                                 </div>
                                                 <div
-                                                  className={
-                                                    styles_r_w.part_down
-                                                  }
+                                                  className={styles_r_w.part_down}
                                                 >
                                                   <div
-                                                    className={
-                                                      styles_r_w.cancel
-                                                    }
+                                                    className={styles_r_w.cancel}
                                                     onClick={() => {
                                                       gameSocket.emit(
-                                                        "leave_queue",
-                                                        {}
+                                                        "play_against_cancel",
+                                                        {
+                                                          userId:
+                                                            gameRequestUserId,
+                                                        }
                                                       );
-                                                      setGame(null);
+                                                      setGameRequestUserId(null);
                                                     }}
                                                   >
-                                                    LEAVE
+                                                    CANCEL
                                                   </div>
                                                 </div>
                                               </>
                                             }
                                           />
                                         )}
-                                    </div>
-                                    <div>
-                                      {gameRequestUserId && (
-                                        <Modal
-                                          content={
-                                            <>
-                                              <div
-                                                className={styles_r_w.part_up}
-                                              >
-                                                <div
-                                                  className={styles_r_w.text}
-                                                >
-                                                  Game Request Sent
-                                                </div>
-                                              </div>
-                                              <div
-                                                className={
-                                                  styles_r_w.leave_room_box
-                                                }
-                                              >
-                                                <div
-                                                  className={cn(
-                                                    styles_r_w.leave_room,
-                                                    styles_r_w.dot_box
-                                                  )}
-                                                >
-                                                  Waiting Response{" "}
-                                                  <span
-                                                    className={
-                                                      styles_r_w.dot_pulse
-                                                    }
-                                                  ></span>
-                                                </div>
-                                              </div>
-                                              <div
-                                                className={styles_r_w.part_down}
-                                              >
-                                                <div
-                                                  className={styles_r_w.cancel}
-                                                  onClick={() => {
-                                                    gameSocket.emit(
-                                                      "play_against_cancel",
-                                                      {
-                                                        userId:
-                                                          gameRequestUserId,
-                                                      }
-                                                    );
-                                                    setGameRequestUserId(null);
-                                                  }}
-                                                >
-                                                  CANCEL
-                                                </div>
-                                              </div>
-                                            </>
-                                          }
-                                        />
-                                      )}
-                                    </div>
-                                    <div
-                                      className={
-                                        (gameRequestUser ||
-                                          gameRequestUserId ||
-                                          (game &&
-                                            game.status ===
+                                      </div>
+                                      <div
+                                        className={
+                                          (gameRequestUser ||
+                                            gameRequestUserId ||
+                                            (game &&
+                                              game.status ===
                                               GameStatus.QUEUED)) &&
-                                        styles_r_w.room
-                                      }
-                                    >
-                                      <Component {...pageProps} />
-                                    </div>
-                                    <ToastContainer
-                                      style={{ fontSize: "1.2rem" }}
-                                    />
-                                  </DataContext.Provider>
-                                </SocketContext.Provider>
-                              </GameSocketContext.Provider>
-                            </GameDataContext.Provider>
-                          </MessagesContext.Provider>
-                        </ChatContext.Provider>
-                      </OnlineFriendsContext.Provider>
-                    </CurrentConvContext.Provider>
-                  </LastBlockedContext.Provider>
-                </NewRoomContext.Provider>
-              </NewMemberAddedContext.Provider>
-            </UserStatusContext.Provider>
-          </GameRequestUserContext.Provider>
-        </GamesCountContext.Provider>
-      </LiveGamesContext.Provider>
-    </AchievementsContext.Provider>
+                                          styles_r_w.room
+                                        }
+                                      >
+                                        <Component {...pageProps} />
+                                      </div>
+                                      <ToastContainer
+                                        style={{ fontSize: "1.2rem" }}
+                                      />
+                                    </DataContext.Provider>
+                                  </SocketContext.Provider>
+                                </GameSocketContext.Provider>
+                              </GameDataContext.Provider>
+                            </MessagesContext.Provider>
+                          </ChatContext.Provider>
+                        </OnlineFriendsContext.Provider>
+                      </CurrentConvContext.Provider>
+                    </LastBlockedContext.Provider>
+                  </NewRoomContext.Provider>
+                </NewMemberAddedContext.Provider>
+              </UserStatusContext.Provider>
+            </GameRequestUserContext.Provider>
+          </GamesCountContext.Provider>
+        </LiveGamesContext.Provider>
+      </AchievementsContext.Provider>
+
+    </>
   );
 }
 

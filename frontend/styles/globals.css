@@ -2,12 +2,12 @@
 
 @font-face {
   font-family: Pixeboy;
-  src: url("../public/Pixeboy.ttf");
+  src: url("/Pixeboy.ttf");
 }
 
 @font-face {
   font-family: Phosphate;
-  src: url("../public/PhosphateRRSolid.ttf");
+  src: url("/PhosphateRRSolid.ttf");
 }
 
 html,
@@ -20,7 +20,7 @@ body {
 
 body {
   background-size: cover;
-  background-image: url("../public/Background_Layout.png");
+  background-image: url("/Background_Layout.png");
   background-color: rgba(0, 0, 0, 0.5);
   background-attachment: fixed;
 }
