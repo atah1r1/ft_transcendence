@@ -24,8 +24,6 @@ services:
             - 9000:9000
         depends_on:
             - db
-        env_file:
-            - ./deployments/backend/config.env
         networks:
             - front-network
             - back-network
