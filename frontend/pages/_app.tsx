@@ -447,6 +447,9 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                   alt="spinner"
                                                   width="180px"
                                                   height="180px"
+                                                  style={{
+                                                    borderRadius: "50%",
+                                                  }}
                                                 ></Image>
                                               </div>
                                               <div
