@@ -2,7 +2,7 @@ import Image from "next/image";
 import cn from "classnames";
 import styles from "../styles/treeProints.module.css";
 import { useRouter } from "next/router";
-import { BanSharp, PersonAddSharp } from 'react-ionicons'
+import { BanSharp, HammerOutline, PersonAddSharp } from 'react-ionicons'
 import { PersonSharp } from 'react-ionicons'
 import { VolumeMuteSharp } from 'react-ionicons'
 import { useContext } from "react";
@@ -92,6 +92,30 @@ const TreePointsBox = ({ members, group, roomId, roomUser, userStatus }: any) =>
             />
           </div>
         }
+        {/* added code here */}
+        {
+          group.group_box && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
+          <div className={styles.treepoints_box_row}
+            onClick={() => {
+              // roomUser.status === 'MUTED' ?
+              //   socket?.emit('unmute_user', {
+              //     targetUserId: roomUser.userId,
+              //     roomId: roomId,
+              //   }) : socket?.emit('mute_user', {
+              //     targetUserId: roomUser.userId,
+              //     roomId: roomId,
+              //   })
+              group.setGroupBox(false);
+            }}>
+            {<p>kick user</p>}
+            <HammerOutline
+              color={roomUser.status === 'KICKED' ? '#dc465e' : '#ffffff'}
+              height="30px"
+              width="30px"
+            />
+          </div>
+        }
+        {/* added code here */}
         {
           group.group_box && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
           <div className={styles.treepoints_box_row}
