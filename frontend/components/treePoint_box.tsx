@@ -97,19 +97,12 @@ const TreePointsBox = ({ members, group, roomId, roomUser, userStatus }: any) =>
           group.group_box && userStatus !== 'MEMBER' && roomUser.role !== 'OWNER' &&
           <div className={styles.treepoints_box_row}
             onClick={() => {
-              // roomUser.status === 'MUTED' ?
-              //   socket?.emit('unmute_user', {
-              //     targetUserId: roomUser.userId,
-              //     roomId: roomId,
-              //   }) : socket?.emit('mute_user', {
-              //     targetUserId: roomUser.userId,
-              //     roomId: roomId,
-              //   })
+              socket.emit("kick_user", { "targetUserId": roomUser.userId, "roomId": roomId });
               group.setGroupBox(false);
             }}>
             {<p>kick user</p>}
             <HammerOutline
-              color={roomUser.status === 'KICKED' ? '#dc465e' : '#ffffff'}
+              color={'#ffffff'}
               height="30px"
               width="30px"
             />

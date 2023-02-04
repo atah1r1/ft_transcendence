@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GameHistory } from '@prisma/client';
+import { GameHistory, User } from '@prisma/client';
 import { Socket, Server } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
@@ -324,8 +324,11 @@ export class GameService {
       if (blockedUsersIds.includes(pId))
         throw new Error('You cannot spectate this game.');
     });
+    const spectatingUser: User = await this.userService.getUserById(userId, userId);
     this.addSpectator(userId, socket);
     game.spectators.push(userId);
+    game.usernames.set(userId, spectatingUser.username);
+    game.avatars.set(userId, spectatingUser.avatar);
     return game;
   }
 
@@ -337,6 +340,8 @@ export class GameService {
     if (!game) throw new Error('Game does not exist.');
     this.removeSpectator(userId);
     game.spectators = game.spectators.filter((pId) => pId !== userId);
+    game.usernames.delete(userId);
+    game.avatars.delete(userId);
     return game;
   }
 
@@ -778,6 +783,15 @@ export class GameService {
       if (game.status !== GameStatus.STARTED) return;
       if (game.players.some((player) => blockedUsersIds.includes(player)))
         return;
+      let spectators = [];
+      for(let i = 0; i < game.spectators.length; i++) {
+        if(blockedUsersIds.includes(game.spectators[i])) continue;
+        spectators.push({
+          id: game.spectators[i],
+          username: game.usernames.get(game.spectators[i]),
+          avatar: game.avatars.get(game.spectators[i]),
+        });
+      }
       liveGames.push({
         id: game.id,
         players: [
@@ -794,6 +808,7 @@ export class GameService {
             avatar: game.avatars.get(game.players[1]),
           },
         ],
+        spectators: spectators,
         numberOfSpectators:
           game.spectators.length > 0
             ? `${game.spectators.length} users are watching`
