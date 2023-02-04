@@ -90,11 +90,8 @@ export class ChatService {
 
     const membersUserIds = members?.map((m) => m.userId);
 
-    console.table(membersUserIds);
-
     const friendsNotInRoom = friends?.filter((friend) => {
       const res = !membersUserIds.includes(friend.id);
-      //console.log('ID: ', friend.id, ', ', res);
       return res;
     });
     return friendsNotInRoom ?? [];
@@ -111,8 +108,10 @@ export class ChatService {
     const _existingDm = await this.getDmByUserIds(userId, otherUserId, true);
     if (_existingDm) return await this.formatChat(userId, _existingDm, true);
 
+    if (userId === otherUserId)
+      throw new Error('Cannot apply this action on yourself');
+
     const otherUser = await this.userService.getUserById(userId, otherUserId);
-    // console.log('OTHER USER: ', otherUser);
     if (!otherUser) throw new Error('User does not exist or blocked');
 
     const _room = await this.prisma.room.create({
@@ -153,6 +152,10 @@ export class ChatService {
     const _existingRoom = await this.getRoomByName(name);
     if (_existingRoom) throw new Error('Room with same name already exists');
 
+    if (privacy === RoomPrivacy.PROTECTED && (!password || password === '')) {
+      throw new Error('Password cannot be empty for private rooms');
+    }
+
     if (privacy === RoomPrivacy.PROTECTED) {
       _hashed = await this.encryptRoomPassword(password);
     }
@@ -180,7 +183,6 @@ export class ChatService {
 
   /**
    * Utility: Deletes DM, when a user blocks a friend user,
-   * Only called from inside not accessible in API or Gateway.
    * @param roomId dm id to be deleted
    */
   async deleteDm(roomId: string) {
@@ -337,7 +339,7 @@ export class ChatService {
 
     if (_existingRoomUser) {
       if (_existingRoomUser.status !== RoomUserStatus.LEFT)
-        throw new Error('User already in room');
+        throw new Error('User already in room or is banned');
       const _roomUser = await this.prisma.roomUser.update({
         where: { id: _existingRoomUser.id },
         data: {
@@ -406,13 +408,16 @@ export class ChatService {
     if (_adminRoomUser.role === RoomRole.MEMBER)
       throw new Error('You are not an admin or owner');
 
+    if (adminId === userToAddId)
+      throw new Error('Cannot apply this action on yourself');
+
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
       userToAddId,
       roomId,
     );
     if (_existingRoomUser) {
       if (_existingRoomUser.status !== RoomUserStatus.LEFT)
-        throw new Error('User already in room');
+        throw new Error('User already in room or banned');
       const _roomUser = await this.prisma.roomUser.update({
         where: { id: _existingRoomUser.id },
         data: {
@@ -459,7 +464,9 @@ export class ChatService {
     if (_existingRoomUser.role === RoomRole.OWNER)
       throw new Error('Cannot leave room as owner');
 
-    // NEW METHOD: set status as left
+    if (_existingRoomUser.status !== RoomUserStatus.NORMAL)
+      throw new Error('Cannot leave room while banned/muted');
+
     const _leftRu = await this.prisma.roomUser.update({
       where: {
         id: _existingRoomUser.id,
@@ -469,69 +476,6 @@ export class ChatService {
       },
     });
     return _leftRu;
-    // OLD METHOD: Delete room user
-    // NEED TO DELETE ALL MESSAGES FROM USER IN ROOM
-    // await this.deleteAllMessagesOfRoomUser(_existingRoomUser.id);
-    // const _deletedRu = await this.prisma.roomUser.delete({
-    //   where: {
-    //     id: _existingRoomUser.id,
-    //   },
-    // });
-    // return _deletedRu;
-  }
-
-  /**
-   * Removes user from Room by an OWNER/ADMIN, by updating RoomUser status to LEFT,
-   * @param adminId User excuting the action | owner/admin user id
-   * @param userToRemoveId user to be removed from room
-   * @param roomId room id
-   * @returns true if user removed, false if not or throws error
-   */
-  async removeUserFromRoomByAdmin(
-    adminId: string,
-    userToRemoveId: string,
-    roomId: string,
-  ): Promise<boolean> {
-    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
-    if (!_room) throw new Error('Room does not exist');
-    if (_room.isDm) throw new Error('Cannot leave DM');
-
-    const _adminRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      adminId,
-      roomId,
-    );
-    if (!_adminRoomUser || _adminRoomUser.status === RoomUserStatus.LEFT)
-      throw new Error('User not in room');
-    if (_adminRoomUser.role === RoomRole.MEMBER)
-      throw new Error('You are not an admin or owner');
-
-    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      userToRemoveId,
-      roomId,
-    );
-    if (!_existingRoomUser || _existingRoomUser.status === RoomUserStatus.LEFT)
-      throw new Error('User not in room');
-    if (_existingRoomUser.role === RoomRole.OWNER)
-      throw new Error('Cannot remove owner');
-
-    // NEW METHOD: set status as left
-    const _leftRu = await this.prisma.roomUser.update({
-      where: {
-        id: _existingRoomUser.id,
-      },
-      data: {
-        status: RoomUserStatus.LEFT,
-      },
-    });
-    return _leftRu ? true : false;
-    // OLD METHOD: Delete room user and messages
-    // await this.deleteAllMessagesOfRoomUser(_existingRoomUser.id);
-    // const _deletedRu = await this.prisma.roomUser.delete({
-    //   where: {
-    //     id: _existingRoomUser.id,
-    //   },
-    // });
-    // return _deletedRu ? true : false;
   }
 
   /**
@@ -552,16 +496,16 @@ export class ChatService {
   }
 
   /**
-   * Mute/Ban/Kick or Unmute/Unban/Unkick a user from room by an OWNER/ADMIN,
+   * Mute/Ban/Kick or Unmute/Unban a user from room by an OWNER/ADMIN,
    * @param adminId User excuting the action | owner/admin user id
-   * @param subjectedUserId user being affected by action
+   * @param targetUserId user being affected by action
    * @param roomId room id
    * @param newStatus one of (NORMAL, MUTED, BANNED, LEFT)
    * @returns RoomUser object or throws error
    */
   async updateUserStatusByAdmin(
     adminId: string,
-    subjectedUserId: string,
+    targetUserId: string,
     roomId: string,
     newStatus: RoomUserStatus,
   ): Promise<RoomUser> {
@@ -577,8 +521,11 @@ export class ChatService {
     if (_adminRoomUser.role === RoomRole.MEMBER)
       throw new Error('You are not an admin or owner');
 
+    if (adminId === targetUserId)
+      throw new Error('Cannot apply this action on yourself');
+
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      subjectedUserId,
+      targetUserId,
       roomId,
     );
     if (!_existingRoomUser || _existingRoomUser.status === RoomUserStatus.LEFT)
@@ -603,13 +550,13 @@ export class ChatService {
   /**
    * Makes a member an admin of room by an OWNER.
    * @param ownerId User excuting the action | owner/admin user id
-   * @param subjectedUserId user being affected by action
+   * @param targetUserId user being affected by action
    * @param roomId room id
    * @returns RoomUser object or throws error
    */
   async makeUserAdmin(
     ownerId: string,
-    subjectedUserId: string,
+    targetUserId: string,
     roomId: string,
   ): Promise<RoomUser> {
     const _room = await this.getRoomById(roomId);
@@ -624,8 +571,11 @@ export class ChatService {
     if (_ownerRoomUser.role !== RoomRole.OWNER)
       throw new Error('You are not an owner');
 
+    if (ownerId === targetUserId)
+      throw new Error('Cannot apply this action on yourself');
+
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      subjectedUserId,
+      targetUserId,
       roomId,
     );
     if (!_existingRoomUser || _existingRoomUser.status === RoomUserStatus.LEFT)
@@ -825,14 +775,14 @@ export class ChatService {
   }
 
   async makeRoomProtected(
-    userId: string,
+    ownerId: string,
     roomId: string,
     password: string,
   ): Promise<any> {
     const room: Room = await this.getRoomById(roomId);
     if (!room) throw new Error('Room does not exist');
     const ru: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      userId,
+      ownerId,
       roomId,
     );
     if (!ru || ru.status === RoomUserStatus.LEFT)
@@ -864,7 +814,7 @@ export class ChatService {
       },
     });
 
-    return await this.formatChat(userId, r, true);
+    return await this.formatChat(ownerId, r, true);
   }
 
   /**
