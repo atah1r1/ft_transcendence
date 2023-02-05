@@ -293,7 +293,7 @@ function Bot_game() {
             ></GameContainer>
             <ScoreContainer>
               <ScoreContainerP1>
-                <p> SENKO </p>
+                <p> YOU </p>
                 <h2> {p1Score}</h2>
               </ScoreContainerP1>
 

@@ -1,25 +1,55 @@
-###################
-# BUILD FOR LOCAL DEVELOPMENT
-###################
-
-FROM node:18-alpine As development
+FROM node:16.15.0
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app/BACK
 
-# Copy application dependency manifests to the container image.
-# A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
-# Copying this first prevents re-running npm install on every code change.
-COPY --chown=node:node ./backend/package*.json ./
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# COPY ./BACK/package*.json ./
+# COPY ./BACK/prisma ./prisma/
 
-# Install app dependencies using the `npm ci` command instead of `npm install`
-RUN npm ci
+COPY ./backend .
+COPY ./deployments/backend/config.env .env
 
-# Bundle app source
-COPY --chown=node:node ./backend .
 
-# Generate Prisma database client code
-RUN npm run prisma:generate
+# Install app dependencies
+RUN npm install
 
-# Use the node user from the image (instead of the root user)
-USER node
+RUN npm run build
+
+RUN npm uninstall bcrypt
+RUN npm i bcrypt
+RUN npm uninstall prisma
+RUN npm i prisma
+RUN npx prisma generate
+
+EXPOSE 9000
+CMD ["npm", "run", "start:migrate:prod"]
+#CMD [ "npm", "run", "start:migrate:prod" ]
+# FROM node:16.15.0 AS builder
+
+# # Create app directory
+# WORKDIR /app/
+
+# # A wildcard is used to ensure both package.json AND package-lock.json are copied
+# COPY ./backend/package*.json ./
+# COPY ./backend/prisma ./prisma/
+# COPY ./deployments/backend/config.env .env
+
+
+# # Install app dependencies
+# RUN npm install
+# # Generate prisma client, leave out if generating in `postinstall` script
+# RUN npx prisma generate
+
+# COPY ./backend .
+
+# RUN npm run build
+
+# FROM node:16.15.0
+
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/package*.json ./
+# COPY --from=builder /app/dist ./dist
+
+# EXPOSE 9000
+# CMD ["npm", "run", "start:migrate:prod"]

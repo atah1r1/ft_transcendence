@@ -2,12 +2,12 @@
 
 @font-face {
   font-family: Pixeboy;
-  src: url("../public/Pixeboy.ttf");
+  src: url("/Pixeboy.ttf");
 }
 
 @font-face {
   font-family: Phosphate;
-  src: url("../public/PhosphateRRSolid.ttf");
+  src: url("/PhosphateRRSolid.ttf");
 }
 
 html,
