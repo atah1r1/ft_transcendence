@@ -26,8 +26,8 @@ export enum PlayerStatus {
   PENDING,
   READY,
 }
-
-const socket = io(`http://localhost:9000/chat`, {
+// from localhost to 10.11.5.2
+const socket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL_SOCK}/chat`, {
   auth: (cb) => {
     cb({
       token:
@@ -36,7 +36,7 @@ const socket = io(`http://localhost:9000/chat`, {
   },
 });
 
-const gameSocket = io(`http://localhost:9000/game`, {
+const gameSocket = io(`${process.env.NEXT_PUBLIC_BACKEND_URL_SOCK}/game`, {
   auth: (cb) => {
     cb({
       token:

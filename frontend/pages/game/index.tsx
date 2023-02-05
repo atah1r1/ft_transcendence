@@ -83,6 +83,7 @@ function Home() {
                             }`
                           }
                           width="40"
+                          height="40"
                         ></img>
                         <h1>{game?.players[0].username ?? "Player 1"}</h1>
                         <div className={styles.score}>
@@ -98,6 +99,7 @@ function Home() {
                             }`
                           }
                           width="40"
+                          height="40"
                         ></img>
                         <h1>{game?.players[1].username ?? "Player 2"}</h1>
                         <div className={styles.score}>

@@ -744,6 +744,11 @@ export class ChatService {
    * @returns list of Room objects or empty list
    */
   async getRooms(userId: string): Promise<Room[]> {
+    // get blocked users
+    const _blockedUsersIds = (
+      await this.userService.getBlockedUsers(userId)
+    ).map((user) => user.id);
+
     const _rooms = await this.prisma.room.findMany({
       where: {
         isDm: false,
@@ -770,8 +775,18 @@ export class ChatService {
           },
         ],
       },
+      include: {
+        members: {
+          where: {
+            role: RoomRole.OWNER,
+          },
+        },
+      },
     });
-    return _rooms;
+    const _roomsFiltered = _rooms.filter((room) => {
+      return !_blockedUsersIds.includes(room.members[0].userId);
+    });
+    return _roomsFiltered;
   }
 
   async makeRoomProtected(
