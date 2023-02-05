@@ -69,6 +69,9 @@ export default class Game {
         [this.players[0]]: this.usernames.get(this.players[0]),
         [this.players[1]]: this.usernames.get(this.players[1]),
       };
+      // for (let spId of this.spectators) {
+      //   usernames[spId] = this.usernames.get(spId) ?? "Spectator";
+      // }
     }
     let avatars = {};
     if (this.avatars) {
@@ -76,6 +79,9 @@ export default class Game {
         [this.players[0]]: this.avatars.get(this.players[0]),
         [this.players[1]]: this.avatars.get(this.players[1]),
       };
+      // for (let spId of this.spectators) {
+      //   avatars[spId] = this.avatars.get(spId);
+      // }
     }
 
     return {

@@ -11,7 +11,7 @@
     border-radius: 2.2rem;
 }
 
-.games_header{
+.games_header {
     font-size: 30px;
     font-family: 'Pixeboy';
     font-weight: 400;
@@ -66,7 +66,7 @@
     justify-content: center;
     font-weight: 600;
     font-size: 10px;
-    bottom: 20px;
+    bottom: 36px;
     left: 50%;
     transform: translate(-50%, 50%);
     width: 60px;
@@ -90,6 +90,7 @@
         opacity: 1;
     }
 }
+
 .cardContainer:hover {
     background-color: #dc465f;
 }
@@ -131,7 +132,7 @@
     gap: 20px;
 }
 
-.gameBtns button{
+.gameBtns button {
     background-color: #690759;
     color: white;
     padding: 30px 30px;
@@ -145,6 +146,23 @@
     width: 200px;
 }
 
-.gameBtns button:hover{
+.gameBtns button:hover {
     background-color: #500243;
+}
+
+
+.watchers {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+    margin-top: 20px;
+}
+
+.watcher_image {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid white;
+    background-color: white;
+    cursor: pointer;
 }

@@ -42,6 +42,7 @@ function Home() {
       })
       .then((res) => {
         setLiveGames(res.data);
+        console.log(res.data);
       })
       .catch((err) => {
         // console.log(err);
@@ -78,8 +79,7 @@ function Home() {
                         <img
                           src={
                             game?.players[0].avatar ??
-                            `https://api.dicebear.com/5.x/bottts/svg?seed=${
-                              game?.players[0].username ?? "Player 1"
+                            `https://api.dicebear.com/5.x/bottts/svg?seed=${game?.players[0].username ?? "Player 1"
                             }`
                           }
                           width="40"
@@ -94,8 +94,7 @@ function Home() {
                         <img
                           src={
                             game?.players[1].avatar ??
-                            `https://api.dicebear.com/5.x/bottts/svg?seed=${
-                              game?.players[1].username ?? "Player 2"
+                            `https://api.dicebear.com/5.x/bottts/svg?seed=${game?.players[1].username ?? "Player 2"
                             }`
                           }
                           width="40"
@@ -105,6 +104,15 @@ function Home() {
                           {game?.players[1].score}
                         </div>
                       </div>
+                    </div>
+                    <div className={styles.watchers}>
+                      {game.spectators.map((spect: any) => {
+                        return (
+                          <a href={`/profile/${spect.id}`}>
+                            <img className={styles.watcher_image} key={spect.id} src={spect.avatar}></img>
+                          </a>
+                        )
+                      })}
                     </div>
                   </div>
                 );

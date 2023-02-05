@@ -443,12 +443,15 @@ function MyApp({ Component, pageProps }: AppProps) {
                                                     has invited you to play a pong
                                                     game.
                                                   </div>
-                                                  <Image
-                                                    src={gameRequestUser.avatar}
-                                                    alt="spinner"
-                                                    width="180px"
-                                                    height="180px"
-                                                  ></Image>
+                                                <Image
+                                                  src={gameRequestUser.avatar}
+                                                  alt="spinner"
+                                                  width="180px"
+                                                  height="180px"
+                                                  style={{
+                                                    borderRadius: "50%",
+                                                  }}
+                                                ></Image>
                                                 </div>
                                                 <div
                                                   className={styles_r_w.part_down}

@@ -23,6 +23,7 @@ const EV_BAN_USER = 'ban_user';
 const EV_MUTE_USER = 'mute_user';
 const EV_UNBAN_USER = 'unban_user';
 const EV_UNMUTE_USER = 'unmute_user';
+const EV_KICK_USER = 'kick_user';
 const EV_ROOM_MEMEBERS = 'room_members';
 const EV_ADD_MEMBER = 'add_member';
 const EV_MAKE_ADMIN = 'make_admin';
@@ -299,6 +300,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (err) {
       throw new WsException({
         error: EV_UNBAN_USER,
+        message: err.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(EV_KICK_USER)
+  async kickMember(client: Socket, payload: any) {
+    this.validateUserStatus(payload, EV_BAN_USER);
+    try {
+      const ru = await this.chatService.updateUserStatusByAdmin(
+        client.data.id,
+        payload.targetUserId,
+        payload.roomId,
+        RoomUserStatus.LEFT,
+      );
+
+      if (!ru) {
+        throw new WsException({
+          error: EV_KICK_USER,
+          message: 'Failed to kick user',
+        });
+      }
+      await this.leaveIORoom(payload.targetUserId, payload.roomId);
+      await this.sendChatsToUser(client.data.id);
+      await this.sendChatsToUser(ru.userId);
+      await this.sendRoomLeftToClients(client.data.id, payload.roomId, ru);
+    } catch (err) {
+      throw new WsException({
+        error: EV_BAN_USER,
         message: err.message,
       });
     }
