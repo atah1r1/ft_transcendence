@@ -169,10 +169,15 @@ function Game() {
         setGame(null);
         return;
       }
-      if (isPlaying(game))
+      if (isPlaying(game)) {
         socket.emit("leave_game", { userId: getOpponentId(game) });
-      else socket.emit("stop_spectate_game", { gameId: game.id });
-      setGame(null);
+        setGame(null);
+      }
+      else {
+        socket.emit("stop_spectate_game", { gameId: game.id });
+        console.log("stop spectating");
+        setGame(null);
+      }
     };
   }, []);
 
@@ -219,9 +224,8 @@ function Game() {
                       {game.usernames[game.players[0]]}
                     </div>
                     <div className={styles_r_w.game_result}>
-                      {`${game.score[game.players[0]]} - ${
-                        game.score[game.players[1]]
-                      }`}
+                      {`${game.score[game.players[0]]} - ${game.score[game.players[1]]
+                        }`}
                     </div>
                     <div className={styles_r_w.avatar_b}>
                       <div>
@@ -266,7 +270,7 @@ function Game() {
               </div>
               <div className={styles_r_w.leave_room_box}>
                 <div className={styles_r_w.leave_room}>
-                  The Game has finished.
+                  You disconnected from the game.
                 </div>
               </div>
               <div className={styles_r_w.part_down}>

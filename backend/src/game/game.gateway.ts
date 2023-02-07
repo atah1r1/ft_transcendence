@@ -334,7 +334,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.sendQueueLeftToClient(client, left ?? false);
     } catch (err) {
       throw new WsException({
-        error: EV_LEAVE_GAME,
+        error: EV_LEAVE_QUEUE,
         message: err.message,
       });
     }
@@ -352,7 +352,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.sendGameToSpectator(client, game);
     } catch (err) {
       throw new WsException({
-        error: EV_LEAVE_GAME,
+        error: EV_SPECTATE_GAME,
         message: err.message,
       });
     }
@@ -365,7 +365,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.gameService.stopSpectatingGame(client.data.id, payload.gameId);
     } catch (err) {
       throw new WsException({
-        error: EV_LEAVE_GAME,
+        error: EV_STOP_SPECTATE_GAME,
         message: err.message,
       });
     }

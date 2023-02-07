@@ -20,7 +20,7 @@ export class GameService {
   constructor(
     private userService: UserService,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   getConnectedUsersIds(): string[] {
     return [...GameRepository.getInstance().connectedUsers.keys()];
@@ -186,7 +186,7 @@ export class GameService {
 
   // Get list of friends (User) that are playing a game
   async getPlayingFriends(userId: string): Promise<any[]> {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     if (!friends) return [];
     const players = friends.filter((friend) =>
       GameRepository.getInstance().players.has(friend.id),
@@ -196,7 +196,7 @@ export class GameService {
 
   // Get list of friends (User) that are spectating a game
   async getSpectatingFriends(userId: string): Promise<any[]> {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     if (!friends) return [];
     const players = friends.filter((friend) =>
       GameRepository.getInstance().spectators.has(friend.id),
@@ -217,9 +217,11 @@ export class GameService {
     });
     // in case there are spectators
     spectators.forEach((sp) => {
-      const s = this.getSpectatorById(sp);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToMinifyedJSON());
+      const sock = this.getSpectatorById(sp);
+      if (sock) {
+        sock.volatile.emit(EV_EMIT_GAME_DATA, game.convertToMinifyedJSON());
+      } else {
+        game.spectators = game.spectators.filter((s) => s !== sp);
       }
     });
   }
@@ -235,9 +237,11 @@ export class GameService {
     });
     // in case there are spectators
     spectators.forEach((sp) => {
-      const s = this.getSpectatorById(sp);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      const sock = this.getSpectatorById(sp);
+      if (sock) {
+        sock.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      } else {
+        game.spectators = game.spectators.filter((s) => s !== sp);
       }
     });
   }
@@ -360,17 +364,6 @@ export class GameService {
       return true;
     }
     return false;
-
-    // if (
-    //   paddle.x + paddle.width > objGame.ball.x &&
-    //   paddle.x < objGame.ball.x + objGame.ball.rad &&
-    //   paddle.y + paddle.height > objGame.ball.y &&
-    //   paddle.y < objGame.ball.dy + objGame.ball.rad
-    // ) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
   }
 
   // Checks if any player has disconnected
@@ -536,11 +529,11 @@ export class GameService {
   // Move paddle and do other stuff
   // The payload should contain the move data
   private moveGame(userId: string, game: Game, payload: any): Game {
-    if (payload.move === 'DOWN' && game.paddle.get(userId).y < 620)
-      game.paddle.get(userId).y += 40;
+    if (payload.move === 'DOWN' && (game.paddle.get(userId).y) < 620)
+      game.paddle.get(userId).y += ((game.paddle.get(userId).y + 40) > 620 ? (620 - game.paddle.get(userId).y) : 40);
 
     if (payload.move === 'UP' && game.paddle.get(userId).y > 0)
-      game.paddle.get(userId).y -= 40;
+      game.paddle.get(userId).y -= ((game.paddle.get(userId).y - 40) < 0 ? (game.paddle.get(userId).y) : 40);
 
     return game;
   }
@@ -784,8 +777,8 @@ export class GameService {
       if (game.players.some((player) => blockedUsersIds.includes(player)))
         return;
       let spectators = [];
-      for(let i = 0; i < game.spectators.length; i++) {
-        if(blockedUsersIds.includes(game.spectators[i])) continue;
+      for (let i = 0; i < game.spectators.length; i++) {
+        if (blockedUsersIds.includes(game.spectators[i])) continue;
         spectators.push({
           id: game.spectators[i],
           username: game.usernames.get(game.spectators[i]),

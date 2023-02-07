@@ -36,7 +36,7 @@ export class ChatService {
    * @returns list of User objects or empty list
    */
   async getConnectedFriends(userId: string): Promise<any[]> {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     if (!friends) return [];
     const connectedUsers = friends.filter((friend) =>
       ChatRepository.getInstance().connectedUsers.has(friend.id),
@@ -85,7 +85,7 @@ export class ChatService {
   }
 
   async getFriendsForRoom(userId: string, roomId: string) {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     const members = await this.getRoomMembersByRoomId(userId, roomId);
 
     const membersUserIds = members?.map((m) => m.userId);

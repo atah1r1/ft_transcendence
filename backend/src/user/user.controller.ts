@@ -117,7 +117,7 @@ export class UserController {
   @Get('friends')
   async getFriends(@Req() req: any): Promise<User[]> {
     try {
-      const friends = await this.userService.getFriends(req.user.id);
+      const friends = await this.userService.getFriends(req.user.id, req.user.id);
       if (friends) {
         return friends;
       }

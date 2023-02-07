@@ -10,40 +10,33 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { FtAuthGuard } from './guards/fortyTwo.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private AuthService: AuthService) { }
-  @UseGuards(AuthGuard('42'))
+  @UseGuards(FtAuthGuard)
   @Get('login')
   async fortyTwoAuth(@Req() req: any) { }
 
   @Get('redirect')
-  @UseGuards(AuthGuard('42'))
+  @UseGuards(FtAuthGuard)
   async fortyTwoAuthRedirect(
     @Req() req: any,
     @Res({ passthrough: true }) res: any,
   ) {
     //console.log(req.user['_json'].image?.link);
+    if (!req.user) return res.redirect(`${process.env.HOST_FRONT}/`);
     const { username, name, _json } = req.user;
     const image = _json?.image?.link;
-    const jwt = await this.AuthService.Login(username, name, image);
+    const jwt = await this.AuthService.login(username, name, image);
+    console.log("JWT: ", jwt);
     res.cookie('jwt', jwt);
     return res.redirect(`${process.env.HOST_FRONT}/profile`);
   }
 
-  @Get('temp')
-  async temp(@Res({ passthrough: true }) res: any) {
-    const jwt = await this.AuthService.LoginTemp();
-    res.cookie('jwt', jwt);
-    // return res.redirect('http://localhost:3000/profile');
-    return { jwt };
-  }
-
   @Get('logout')
-  // @UseGuards(AuthGuard('jwt'))
   async logout(@Req() req: any, @Res({ passthrough: true }) res: any) {
-    // await this.AuthService.logoutService(req.user);
     res.clearCookie('jwt');
     return res.redirect(process.env.HOST_FRONT);
   }

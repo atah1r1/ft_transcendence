@@ -72,19 +72,20 @@ function Home() {
                   <div
                     className={styles.cardContainer}
                     key={game.id}
-                    onClick={() => spectateGame(game.id)}
                   >
                     <div className={styles.players}>
                       <div className={styles.player}>
-                        <img
-                          src={
-                            game?.players[0].avatar ??
-                            `https://api.dicebear.com/5.x/bottts/svg?seed=${game?.players[0].username ?? "Player 1"
-                            }`
-                          }
-                          width="40"
-                          height="40"
-                        ></img>
+                        <a href={`/profile/${game?.players[0].id}`}>
+                          <img
+                            src={
+                              game?.players[0].avatar ??
+                              `https://api.dicebear.com/5.x/bottts/svg?seed=${game?.players[0].username ?? "Player 1"
+                              }`
+                            }
+                            width="40"
+                            height="40"
+                          ></img>
+                        </a>
                         <h1>{game?.players[0].username ?? "Player 1"}</h1>
                         <div className={styles.score}>
                           {game?.players[0].score}
@@ -92,25 +93,31 @@ function Home() {
                       </div>
                       <div className={styles.vs}>VS</div>
                       <div className={styles.player}>
-                        <img
-                          src={
-                            game?.players[1].avatar ??
-                            `https://api.dicebear.com/5.x/bottts/svg?seed=${game?.players[1].username ?? "Player 2"
-                            }`
-                          }
-                          width="40"
-                          height="40"
-                        ></img>
+                        <a href={`/profile/${game?.players[1].id}`}>
+                          <img
+                            src={
+                              game?.players[1].avatar ??
+                              `https://api.dicebear.com/5.x/bottts/svg?seed=${game?.players[1].username ?? "Player 2"
+                              }`
+                            }
+                            width="40"
+                            height="40"
+                          ></img>
+                        </a>
                         <h1>{game?.players[1].username ?? "Player 2"}</h1>
                         <div className={styles.score}>
                           {game?.players[1].score}
                         </div>
                       </div>
                     </div>
+                    <div className={styles.watch_btn_cont}>
+                      <button className={styles.watch_btn} type="button"
+                        onClick={() => spectateGame(game.id)}>WATCH</button>
+                    </div>
                     <div className={styles.watchers}>
                       {game.spectators.map((spect: any) => {
                         return (
-                          <a href={`/profile/${spect.id}`}>
+                          <a href={localStorage.getItem('userId') === spect.id ? '/profile' : `/profile/${spect.id}`}>
                             <img className={styles.watcher_image} key={spect.id} src={spect.avatar}></img>
                           </a>
                         )

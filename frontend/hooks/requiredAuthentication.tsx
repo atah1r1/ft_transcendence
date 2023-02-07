@@ -6,7 +6,7 @@ export default function requireAuthentication(gssp: any) {
         const { jwt } = cookie.parse(req.headers.cookie || '');
         let data: any;
         try {
-            const res = await fetch(`http://backend:9000/api/user/me`, {
+            const res = await fetch(`http://localhost:9000/api/user/me`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Cookie': `jwt=${jwt};`

@@ -46,7 +46,6 @@
     background-color: #dc465fab;
     border-radius: 20px;
     padding: 10px;
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -58,7 +57,7 @@
 
 
 
-.cardContainer::after {
+/* .cardContainer::after {
     content: "• LIVE";
     position: absolute;
     display: flex;
@@ -75,7 +74,7 @@
     background-color: red;
     font-family: "Arial", sans-serif;
     animation: infinite 1s live;
-}
+} */
 
 @keyframes live {
     0% {
@@ -89,6 +88,26 @@
     100% {
         opacity: 1;
     }
+}
+
+.watch_btn_cont  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+.watch_btn {
+    border-radius: 5px;
+    padding: 6px 12px;
+    width: fit-content;
+    font-weight: 600;
+    border: unset;
+    font-size: 14px;
+    background-color: red;
+    cursor: pointer;
+    color: white;
+    font-family: "Pixeboy", sans-serif;
+    animation: infinite 1s live;
 }
 
 .cardContainer:hover {
