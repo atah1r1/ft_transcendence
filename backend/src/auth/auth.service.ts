@@ -14,7 +14,7 @@ export class AuthService {
     const userTwofaActivated = await this.prisma.user.findUnique({
       where: { intra_name: username },
     });
-    if (userTwofaActivated && userTwofaActivated.two_factor_auth) {
+    if (userTwofaActivated && userTwofaActivated?.two_factor_auth) {
       await this.prisma.user.update({
         where: { intra_name: username },
         data: {

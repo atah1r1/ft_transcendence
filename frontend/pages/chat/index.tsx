@@ -373,7 +373,7 @@ const Chat = () => {
                   return (
                     <div key={i} className={styles.online}>
                       <Image
-                        src={friend?.avatar ?? "https://picsum.photos/300/300"}
+                        src={friend?.avatar ?? `https://api.dicebear.com/5.x/bottts/svg?seed=${friend?.username ?? "User"}`}
                         alt="online_friend_img"
                         width={"34px"}
                         height={"34px"}
@@ -637,7 +637,7 @@ const Chat = () => {
                                             <Image
                                               src={
                                                 member.user?.avatar ??
-                                                "https://picsum.photos/300/300"
+                                                `https://api.dicebear.com/5.x/bottts/svg?seed=${member.user?.username ?? "User"}`
                                               }
                                               alt="friend_avatar"
                                               width={"40px"}
@@ -713,7 +713,7 @@ const Chat = () => {
                                           <Image
                                             src={
                                               friend?.avatar ??
-                                              "https://picsum.photos/300/300"
+                                              `https://api.dicebear.com/5.x/bottts/svg?seed=${friend?.username ?? "User"}`
                                             }
                                             alt="friend_avatar"
                                             width={"40px"}

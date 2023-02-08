@@ -383,9 +383,11 @@
 .message_text {
   padding: 1rem 1.2rem;
   align-self: flex-start;
+  overflow-wrap: break-word;
   border-radius: 20px 20px 20px 0px;
   background: rgba(0, 0, 0, 0.1);
   margin-bottom: 0.6rem;
+  inline-size: 80%;
   max-width: 80%;
   width: fit-content;
   color: #333;

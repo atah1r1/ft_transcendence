@@ -37,8 +37,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       where: { id: payload.id },
     });
     if (
-      user.two_factor_auth &&
-      !user.code_verified &&
+      user?.two_factor_auth &&
+      !user?.code_verified &&
       request.url !== '/api/user/2fa/verify' &&
       request.url !== '/api/auth/logout'
     ) {

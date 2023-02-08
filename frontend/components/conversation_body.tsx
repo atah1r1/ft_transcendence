@@ -98,7 +98,7 @@ export default function ConversationBody() {
                 <div className={styles.message_avatar}>
                   <Image
                     src={
-                      message.user?.avatar ?? "https://picsum.photos/300/300"
+                      message.user?.avatar ?? `https://api.dicebear.com/5.x/bottts/svg?seed=${message.user?.username ?? "User"}`
                     }
                     alt="message_avatar"
                     width={"42px"}
@@ -137,6 +137,7 @@ export default function ConversationBody() {
                   placeholder="Type a message here ..."
                   onChange={(e) => setMessageInput(e.target.value)}
                   value={messageInput}
+                  maxLength={300}
                 ></input>
               ) : (
                 <div className={styles.input_disabled}>

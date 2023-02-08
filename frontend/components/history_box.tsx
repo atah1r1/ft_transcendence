@@ -72,8 +72,8 @@ const HistoryBox = ({ history, id, setLevel }: any) => {
               <Image
                 src={
                   id === ele.loserId
-                    ? ele.winner.avatar ?? "https://picsum.photos/300/300"
-                    : ele.loser.avatar ?? "https://picsum.photos/301/301"
+                    ? ele.winner.avatar ?? `https://api.dicebear.com/5.x/bottts/svg?seed=${ele?.winner?.username ?? "User"}`
+                    : ele.loser.avatar ?? `https://api.dicebear.com/5.x/bottts/svg?seed=${ele?.loser?.username ?? "User"}`
                 }
                 alt={"avatar"}
                 width={54}

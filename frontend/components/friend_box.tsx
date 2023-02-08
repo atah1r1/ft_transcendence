@@ -28,7 +28,7 @@ const Friends_box = ({ friends, inputForm }: any) => {
           <div className={styles.friends_box} key={i}>
             <div className={styles.friends_avatar}>
               <Image
-                src={ele?.avatar ?? "https://picsum.photos/300/300"}
+                src={ele?.avatar ?? `https://api.dicebear.com/5.x/bottts/svg?seed=${ele?.username ?? "User"}`}
                 alt="avatar"
                 width="68"
                 height="68"
@@ -36,10 +36,10 @@ const Friends_box = ({ friends, inputForm }: any) => {
               />
             </div>
             <div className={styles.friends_userName}>
-              <p>{ele.username}</p>
+              <p>{ele?.username}</p>
             </div>
             <div className={styles.friends_fullName}>
-              <p>{`${ele.first_name} ${ele.last_name}`}</p>
+              <p>{`${ele?.first_name} ${ele?.last_name}`}</p>
             </div>
             <div className={styles.friends_options}>
               <div

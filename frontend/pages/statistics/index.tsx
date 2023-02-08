@@ -91,7 +91,7 @@ const History = () => {
               <div className={styles.left}>
                 <div className={styles.avatar}>
                   <Image
-                    src={data?.avatar ?? "https://picsum.photos/300/300"}
+                    src={data?.avatar ?? `https://api.dicebear.com/5.x/bottts/svg?seed=${data?.username ?? "User"}`}
                     alt="user_img"
                     width={"100px"}
                     height={"100px"}

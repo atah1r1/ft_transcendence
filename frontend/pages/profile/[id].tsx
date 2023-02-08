@@ -152,7 +152,7 @@ const FriendProfile = () => {
                 <div className={styles.details_avatar}>
                   <div className={styles.profile_box}>
                     <Image
-                      src={data?.avatar || "https://picsum.photos/300/300"}
+                      src={data?.avatar || `https://api.dicebear.com/5.x/bottts/svg?seed=${data?.username ?? "User"}`}
                       alt="avatar"
                       width="180px"
                       height="180px"
