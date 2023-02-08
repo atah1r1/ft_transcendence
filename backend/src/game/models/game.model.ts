@@ -38,6 +38,8 @@ export default class Game {
   timer: NodeJS.Timer;
   ball: Ball;
   paddle: Map<string, Paddle>;
+  usernames: Map<string, string>;
+  avatars: Map<string, string>;
 
   convertToJSON() {
     let score = {};
@@ -61,6 +63,26 @@ export default class Game {
         [this.players[1]]: this.paddle.get(this.players[1]),
       };
     }
+    let usernames = {};
+    if (this.usernames) {
+      usernames = {
+        [this.players[0]]: this.usernames.get(this.players[0]),
+        [this.players[1]]: this.usernames.get(this.players[1]),
+      };
+      // for (let spId of this.spectators) {
+      //   usernames[spId] = this.usernames.get(spId) ?? "Spectator";
+      // }
+    }
+    let avatars = {};
+    if (this.avatars) {
+      avatars = {
+        [this.players[0]]: this.avatars.get(this.players[0]),
+        [this.players[1]]: this.avatars.get(this.players[1]),
+      };
+      // for (let spId of this.spectators) {
+      //   avatars[spId] = this.avatars.get(spId);
+      // }
+    }
 
     return {
       id: this.id,
@@ -68,8 +90,44 @@ export default class Game {
       spectators: this.spectators,
       status: this.status,
       ball: this.ball,
+      usernames: usernames,
+      avatars: avatars,
       score: score,
       playerStatus: playerStatus,
+      paddle: paddle,
+    };
+  }
+
+  convertToMinifyedJSON() {
+    let score = {};
+    if (this.score) {
+      score = {
+        [this.players[0]]: this.score.get(this.players[0]),
+        [this.players[1]]: this.score.get(this.players[1]),
+      };
+    }
+    let paddle = {};
+    if (this.paddle) {
+      paddle = {
+        [this.players[0]]: this.paddle.get(this.players[0]),
+        [this.players[1]]: this.paddle.get(this.players[1]),
+      };
+    }
+    let usernames = {};
+    if (this.usernames) {
+      usernames = {
+        [this.players[0]]: this.usernames.get(this.players[0]),
+        [this.players[1]]: this.usernames.get(this.players[1]),
+      };
+    }
+
+    return {
+      id: this.id,
+      players: this.players,
+      status: this.status,
+      ball: this.ball,
+      usernames: usernames,
+      score: score,
       paddle: paddle,
     };
   }

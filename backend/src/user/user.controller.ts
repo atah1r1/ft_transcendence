@@ -79,7 +79,6 @@ export class UserController {
   ) {
     try {
       const { secure_url } = await this.cloudinary.uploadImage(file);
-      //console.log('secure_url', secure_url);
       const user = await this.prisma.user.update({
         where: { id: req.user.id },
         data: { avatar: secure_url },
@@ -117,7 +116,7 @@ export class UserController {
   @Get('friends')
   async getFriends(@Req() req: any): Promise<User[]> {
     try {
-      const friends = await this.userService.getFriends(req.user.id);
+      const friends = await this.userService.getFriends(req.user.id, req.user.id);
       if (friends) {
         return friends;
       }

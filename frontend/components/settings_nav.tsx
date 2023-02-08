@@ -22,7 +22,7 @@ const SettingsNav = ( { selected, menu }: any ) =>
             src={
               data?.avatar
                 ? data.avatar
-                : "https://picsum.photos/300/300"
+                : `https://api.dicebear.com/5.x/bottts/svg?seed=${data?.username ?? "User"}`
             }
             alt="avatar"
             width="100px"

@@ -9,56 +9,49 @@ import { NewRoomContext } from "../_app";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
 
-const History = () =>
-{
-  const [ menu, setMenu ] = useState( false );
-  const [ inputForm, setInputForm ] = useState( "" );
-  const [ rooms, setRooms ] = useState( [] );
-  const [ newRoom, setNewRoom ] = useContext( NewRoomContext );
+const History = () => {
+  const [menu, setMenu] = useState(false);
+  const [inputForm, setInputForm] = useState("");
+  const [rooms, setRooms] = useState([]);
+  const [newRoom, setNewRoom] = useContext(NewRoomContext);
 
-  useEffect( () =>
-  {
-    axios.get( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/chat/rooms`, {
-      withCredentials: true,
-    } ).then( ( res ) =>
-    {
-      setRooms( res.data );
-    } ).catch( ( err ) =>
-    {
-      console.log( err )
-    } )
-  }, [ newRoom ] )
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/rooms`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setRooms(res.data);
+      })
+      .catch((err) => {
+      });
+  }, [newRoom]);
 
   return (
     <>
-      <MenuNav menu={ menu } setMenu={ setMenu } />
-      <div className={ styles_box.container }>
-        <SettingsNav selected={ "rooms" } menu={ menu } />
-        <div className={ styles_box.profile_details }>
+      <MenuNav menu={menu} setMenu={setMenu} />
+      <div className={styles_box.container}>
+        <SettingsNav selected={"rooms"} menu={menu} />
+        <div className={styles_box.profile_details}>
           <Logout />
           <form
-            className={ styles.search }
-            onSubmit={ ( e ) =>
-            {
+            className={styles.search}
+            onSubmit={(e) => {
               e.preventDefault();
-            } }
+            }}
           >
             <input
               type="search"
               placeholder="Search..."
-              onChange={ ( e ) =>
-              {
-                setInputForm( e.target.value.trim() );
-              } }
-              value={ inputForm }
-              maxLength={ 16 }
+              onChange={(e) => {
+                setInputForm(e.target.value.trim());
+              }}
+              value={inputForm}
+              maxLength={16}
             ></input>
           </form>
-          <div className={ styles.friends }>
-            <Rooms_box
-              rooms={ rooms }
-              inputForm={ inputForm }>
-            </Rooms_box>
+          <div className={styles.friends}>
+            <Rooms_box rooms={rooms} inputForm={inputForm}></Rooms_box>
           </div>
         </div>
       </div>
@@ -68,10 +61,8 @@ const History = () =>
 
 export default History;
 
-export const getServerSideProps = requireAuthentication( async () =>
-{
+export const getServerSideProps = requireAuthentication(async () => {
   return {
-    props: {
-    }, // will be passed to the page component as props
-  }
-} )
+    props: {}, // will be passed to the page component as props
+  };
+});

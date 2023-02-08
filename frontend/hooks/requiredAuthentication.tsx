@@ -1,22 +1,22 @@
 import cookie from 'cookie';
 
-export default function requireAuthentication ( gssp: any )
-{
-    return async ( ctx: any ) =>
-    {
+export default function requireAuthentication(gssp: any) {
+    return async (ctx: any) => {
         const { req } = ctx;
-        const { jwt } = cookie.parse( req.headers.cookie || '' );
+        const { jwt } = cookie.parse(req.headers.cookie || '');
+        let data: any;
+        try {
+            const res = await fetch(`http://backend:9000/api/user/me`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': `jwt=${jwt};`
+                }
+            })
+            data = await res.json()
+        } catch (e) {
+        }
 
-        const res = await fetch( `${ process.env.NEXT_PUBLIC_BACKEND_URL }/user/me`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': `jwt=${ jwt };`
-            }
-        } )
-        const data = await res.json()
-
-        if ( data.statusCode === 477 )
-        {
+        if (data.statusCode === 477) {
             return {
                 redirect: {
                     permanent: false,
@@ -24,8 +24,7 @@ export default function requireAuthentication ( gssp: any )
                 },
             };
         }
-        if ( data.statusCode === 401 || data.statusCode === 500 )
-        {
+        if (data.statusCode === 401 || data.statusCode === 500) {
             return {
                 redirect: {
                     permanent: false,
@@ -33,6 +32,6 @@ export default function requireAuthentication ( gssp: any )
                 },
             };
         }
-        return await gssp( ctx );
+        return await gssp(ctx);
     };
 }

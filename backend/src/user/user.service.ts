@@ -15,12 +15,10 @@ export class UserService {
       process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME,
       user.two_factor_auth_key,
     );
-    // console.log(otpauthUrl);
     const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: { two_factor_auth: true, two_factor_auth_uri: otpauthUrl },
     });
-    // console.log(otpauthUrl);
     return {
       two_factor_auth_uri: otpauthUrl,
       two_factor_auth: updated.two_factor_auth,
@@ -62,7 +60,6 @@ export class UserService {
     const user = await this.prisma.user.findUnique({
       where: { username },
     });
-    //console.log(user);
     if (user) {
       return true;
     }
@@ -72,7 +69,6 @@ export class UserService {
   async updateProfile(user: any, body: any) {
     const currentUser = await this.getUserById(user.id, user.id);
     const { first_name, last_name, username } = body;
-    //console.log('body body', body);
     const data: any = {};
     if (first_name) data.first_name = first_name;
     if (last_name) data.last_name = last_name;
@@ -108,7 +104,15 @@ export class UserService {
     throw new Error('User not found');
   }
 
-  async getFriends(id: string) {
+  async getFriends(userId: string, id: string) {
+    const blockedUsersIds = (await this.getBlockedUsers(userId)).map(
+      (user) => user.id,
+    );
+
+    if (blockedUsersIds.includes(id)) {
+      throw new Error('User is blocked');
+    }
+
     const friends = await this.prisma.user
       .findUnique({
         where: { id },
@@ -123,7 +127,7 @@ export class UserService {
         }
         return fs;
       });
-    return friends;
+    return friends ?? [];
   }
 
   async getBlockedUsers(id: string) {
@@ -141,17 +145,17 @@ export class UserService {
         }
         return bUsers;
       });
-    return blockedUser;
+    return blockedUser ?? [];
   }
 
   async addFriend(userId: string, friendId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    const friend = await this.prisma.user.findUnique({
-      where: { id: friendId },
-    });
+    const user = await this.getUserById(userId, userId);
+    const friend = await this.getUserById(userId, friendId);
+
+    if (userId === friendId) throw new Error('You cannot remove yourself');
 
     if (user && friend) {
-      const isFriend = await this.getFriends(userId).then((friends) => {
+      const isFriend = await this.getFriends(userId, userId).then((friends) => {
         return friends.some((friend) => friend.id === friendId);
       });
       if (isFriend) throw new Error('User is already your friend');
@@ -183,13 +187,13 @@ export class UserService {
   }
 
   async removeFriend(userId: string, friendId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    const friend = await this.prisma.user.findUnique({
-      where: { id: friendId },
-    });
+    const user = await this.getUserById(userId, userId);
+    const friend = await this.getUserById(userId, friendId);
+
+    if (userId === friendId) throw new Error('You cannot remove yourself');
 
     if (user && friend) {
-      const isFriend = await this.getFriends(userId).then((friends) => {
+      const isFriend = await this.getFriends(userId, userId).then((friends) => {
         return friends.some((friend) => friend.id === friendId);
       });
       if (!isFriend) throw new Error('User is not your friend');
@@ -221,10 +225,10 @@ export class UserService {
   }
 
   async blockUser(userId: string, blockedUserId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    const blockedUser = await this.prisma.user.findUnique({
-      where: { id: blockedUserId },
-    });
+    const user = await this.getUserById(userId, userId);
+    const blockedUser = await this.getUserById(userId, blockedUserId);
+
+    if (userId === blockedUserId) throw new Error('You cannot block yourself');
 
     if (user && blockedUser) {
       const isBlocked = await this.getBlockedUsers(userId).then((bUsers) => {
@@ -232,7 +236,7 @@ export class UserService {
       });
       if (isBlocked) throw new Error('User is already blocked');
 
-      const isFriend = await this.getFriends(userId).then((friends) => {
+      const isFriend = await this.getFriends(userId, userId).then((friends) => {
         return friends.some((friend) => friend.id === blockedUserId);
       });
       if (isFriend) {
@@ -295,15 +299,15 @@ export class UserService {
         ],
       },
     });
-    return users;
+    return users ?? [];
   }
 
   // Get all users, except the current user, blocked users.
-  async getAllUsers(id: string) {
-    const blockedUsersIds = (await this.getBlockedUsers(id)).map((bu) => bu.id);
+  async getAllUsers(userId: string) {
+    const blockedUsersIds = (await this.getBlockedUsers(userId)).map((bu) => bu.id);
     // Add the user itself to this list so he doesn't see himself in the list
-    blockedUsersIds.push(id);
-    const friendsIds = (await this.getFriends(id)).map((f) => f.id);
+    blockedUsersIds.push(userId);
+    const friendsIds = (await this.getFriends(userId, userId)).map((f) => f.id);
     const users = await this.prisma.user.findMany({
       where: {
         id: {
@@ -311,19 +315,18 @@ export class UserService {
         },
       },
     });
-    const usersList = users.map((user) => {
+    const usersList = users?.map((user) => {
       delete user.two_factor_auth_key;
       return {
         ...user,
         isFriend: friendsIds.includes(user.id),
       };
     });
-    // sort the list to show friends first.
-    usersList.sort((a, b) => {
+    usersList?.sort((a, b) => {
       if (a.isFriend && !b.isFriend) return -1;
       if (!a.isFriend && b.isFriend) return 1;
       return 0;
     });
-    return usersList;
+    return usersList ?? [];
   }
 }

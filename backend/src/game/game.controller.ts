@@ -27,4 +27,14 @@ export class GameController {
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
+
+  @Get('live')
+  async getLiveGames(@Req() req: any) {
+    try {
+      const liveGames = await this.gameService.getLiveGames(req.user.id);
+      return liveGames;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    }
+  }
 }

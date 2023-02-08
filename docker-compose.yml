@@ -1,13 +1,42 @@
 version: '2'
 
 services:
-    backendDB:
+    frontend:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./deployments/frontend/Dockerfile
+        ports:
+            - 3000:3000
+        depends_on:
+            - backend
+        links:
+            - backend
+        networks:
+            - front-network
+
+    backend:
+        container_name: nest-api
+        build:
+            context: .
+            dockerfile: ./deployments/backend/Dockerfile
+        ports:
+            - 9000:9000
+        depends_on:
+            - db
+        links:
+            - db
+        networks:
+            - front-network
+            - back-network
+    db:
+        container_name: db
         restart: unless-stopped
         image: postgres:12.10
         volumes:
             - database:/var/lib/postgresql/data
-        # env_file:
-                # - ./deployments/config.env              # <--- you have to change in this file.
+            # env_file:
+            # - ./deployments/config.env              # <--- you have to change in this file.
         environment:
             - POSTGRES_DB=ft_transcendence
             - POSTGRES_USER=admin
@@ -16,26 +45,10 @@ services:
             - 5555:5432
         networks:
             - back-network
-    # api:
-    #     build:
-    #         context: .
-    #         dockerfile: ./deployments/backend/Dockerfile
-    #         target: development
-    #     depends_on:
-    #         - backendDB
-    #     volumes:
-    #         - .:/app
-    #     env_file:
-    #         - ./backend/.env
-    #     command: npm run start:dev
-    #     ports:
-    #         - 9000:9000
-    #     networks:
-    #         - back-network
 
 volumes:
     database: {}
 
 networks:
-#     front-network:
+    front-network:
     back-network:

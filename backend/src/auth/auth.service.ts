@@ -10,11 +10,11 @@ config();
 export class AuthService {
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  async Login(username: string, name: object, photos: string): Promise<any> {
+  async login(username: string, name: object, photos: string): Promise<any> {
     const userTwofaActivated = await this.prisma.user.findUnique({
       where: { intra_name: username },
     });
-    if (userTwofaActivated.two_factor_auth) {
+    if (userTwofaActivated && userTwofaActivated?.two_factor_auth) {
       await this.prisma.user.update({
         where: { intra_name: username },
         data: {
@@ -26,7 +26,7 @@ export class AuthService {
       where: { intra_name: username },
     });
     if (user?.intra_name === username) {
-      return this.SignToken(user.id);
+      return this.signToken(user.id);
     }
     const user_created = await this.prisma.user.create({
       data: {
@@ -38,26 +38,10 @@ export class AuthService {
         two_factor_auth_key: authenticator.generateSecret(),
       },
     });
-    return this.SignToken(user_created.id);
+    return this.signToken(user_created.id);
   }
 
-  async LoginTemp(): Promise<any> {
-    const userNumber = await this.prisma.user.count();
-
-    const user = await this.prisma.user.create({
-      data: {
-        intra_name: 'USER' + userNumber,
-        username: 'USER' + userNumber,
-        first_name: 'USER ' + userNumber,
-        last_name: 'USER ' + userNumber,
-        avatar: null,
-        two_factor_auth_key: authenticator.generateSecret(),
-      },
-    });
-    return this.SignToken(user.id);
-  }
-
-  async SignToken(id: string): Promise<string> {
+  async signToken(id: string): Promise<string> {
     const payload = { id: id };
     return this.jwt.signAsync(payload, {
       expiresIn: '3d',

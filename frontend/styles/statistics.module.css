@@ -26,7 +26,7 @@
 }
 
 .level_line {
-  width: 22rem;
+  width: 26rem;
   height: 1.2rem;
   background-color: #d9d9d9;
   border-radius: 1rem;
@@ -34,21 +34,79 @@
   position: relative;
 }
 
-.level_line::after {
+.level_line_one_one::after,
+.level_line_one_two::after,
+.level_line_one_tree::after,
+.level_line_one::after,
+.level_line_two::after,
+.level_line_tree::after,
+.level_line_four::after,
+.level_line_five::after,
+.level_line_six::after,
+.level_line_seven::after,
+.level_line_eight::after {
   position: absolute;
   content: "";
   top: 0;
   left: 0;
   background-color: #dc465e;
-  width: 15rem;
   height: 1.2rem;
   border-radius: 1rem;
 }
 
+.level_line_one_one::after {
+  width: 1rem;
+}
+.level_line_one_two::after {
+  width: 2rem;
+}
+.level_line_one_tree::after {
+  width: 3rem;
+}
+.level_line_one::after {
+  width: 4rem;
+}
+
+.level_line_two::after {
+  width: 8rem;
+}
+
+.level_line_tree::after {
+  width: 12rem;
+}
+
+.level_line_four::after {
+  width: 15rem;
+}
+
+.level_line_five::after {
+  width: 18rem;
+}
+
+.level_line_six::after {
+  width: 21rem;
+}
+
+.level_line_seven::after {
+  width: 24rem;
+}
+
+.level_line_eight::after {
+  width: 26rem;
+}
+
 .level_number_box {
   display: flex;
-  justify-content: space-between;
-  font-size: 1.3rem;
+  justify-content: right;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  font-family: "Phosphate";
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.level_number_box span {
+  color: #fff;
+  font-size: 2.6rem;
 }
 
 .defeat_text {
@@ -80,7 +138,7 @@
 
 .user_name {
   font-family: "Phosphate";
-  font-size: 3rem;
+  font-size: 2.6rem;
   margin-bottom: 1rem;
 }
 
@@ -90,8 +148,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
   padding: 6rem 0;
+  margin-top: 4rem;
   gap: 8rem;
 }
 
@@ -102,23 +161,26 @@
 
 .ach_medal {
   display: flex;
-  gap: 6.4rem;
+  gap: 8rem;
 }
 
 .ach_goal {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.4rem;
+  font-size: 2rem;
+  line-height: 2.2rem;
   color: #fff;
   font-family: "Pixeboy";
-  border-radius: 1rem;
+  border-radius: 2rem;
   position: absolute;
+  text-align: center;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.26);
-  opacity: 0;
+  background-color: rgba(255, 255, 255, 0.1);
   z-index: 1;
+  transform: scale(1.1);
+  padding: 0.8rem;
 }
 
 .ach_medal_box {
@@ -126,15 +188,24 @@
   transition: all 1s;
 }
 
-.ach_medal_box:hover {
-  transform: translateY(-1.2rem);
+.non_medal {
+  opacity: 0.2;
+  pointer-events: none;
 }
 
-.ach_medal_box:hover .ach_goal {
+.medal .ach_goal {
+  opacity: 0;
+}
+
+.medal.ach_medal_box:hover {
+  transform: translateY(-0.6rem);
+}
+
+.medal.ach_medal_box:hover .ach_goal {
   opacity: 1;
 }
 
-.ach_medal_box:hover img {
+.medal.ach_medal_box:hover img {
   opacity: 0.4;
 }
 
@@ -149,6 +220,7 @@
     display: flex;
     flex-direction: row;
   }
+
   .part_one {
     /* width: 50%; */
     height: 100%;
@@ -173,26 +245,23 @@
     padding-left: 2.8rem;
     gap: 4rem;
   }
+
   .ach_medal {
     flex-direction: column;
     gap: 4rem;
-    overflow-y: scroll;
     scrollbar-color: #d9d9d9 #d9d9d9;
     scrollbar-width: thin;
     padding: 1.6rem;
     margin: auto;
   }
-  .ach_medal::-webkit-scrollbar {
-    width: 8px;
-  }
-  /* Handle */
-  .ach_medal::-webkit-scrollbar-thumb {
-    background-color: #d9d9d9;
-  }
-}
 
-@media (max-width: 700px) {
   .ach_goal {
-    font-size: 3rem;
+    font-size: 1.4rem;
+    line-height: 1.8rem;
+  }
+
+  .ach_medal_box {
+    width: 12rem;
+    height: 12rem;
   }
 }

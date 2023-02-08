@@ -43,10 +43,6 @@
   color: #333;
 }
 
-.friends_options {
-  display: flex;
-}
-
 .friends_avatar {
   width: 6.8rem;
   height: 6.8rem;
@@ -80,6 +76,10 @@
   display: flex;
   justify-content: space-between;
   cursor: pointer;
+}
+
+.left {
+  margin-left: auto;
 }
 
 .friends_options div {

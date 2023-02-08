@@ -26,11 +26,9 @@ const LoginPage = () => {
         withCredentials: true,
       })
       .then((res) => {
-        console.log(res);
         router.push("/profile");
       })
       .catch((err) => {
-        console.log(err);
       });
   };
 
@@ -42,11 +40,9 @@ const LoginPage = () => {
       <p className={styles.welcom}>WELCOME TO</p>
       <p className={styles.pongify}>PONGIFY</p>
       <div>
-        {/* <Link href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/temp`}> */}
-        <button className={styles.loginBtn} onClick={handleLogin}>
-          Login with
-        </button>
-        {/* </Link> */}
+        <Link href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`}>
+          <button className={styles.loginBtn}>Login with</button>
+        </Link>
       </div>
     </div>
   );

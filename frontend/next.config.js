@@ -8,6 +8,8 @@ module.exports = nextConfig;
 
 module.exports = {
   images: {
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: "https",
@@ -19,20 +21,23 @@ module.exports = {
       },
       {
         protocol: "https",
-        hostname: "picsum.photos",
-      },
-      {
-        protocol: "https",
         hostname: "res.cloudinary.com",
       },
       {
         protocol: "https",
         hostname: "avatars.dicebear.com",
       },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
     ],
   },
   compiler: {
     // Enables the styled-components SWC transform
     styledComponents: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };

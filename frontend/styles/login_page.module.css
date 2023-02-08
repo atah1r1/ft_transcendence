@@ -46,7 +46,7 @@
 }
 
 .loginBtn::after {
-  content: url(../public/42.svg);
+  content: url("/42.svg");
   position: absolute;
   top: 55%;
   right: 30%;

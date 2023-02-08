@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { GameHistory } from '@prisma/client';
-import { Socket } from 'socket.io';
+import { GameHistory, User } from '@prisma/client';
+import { Socket, Server } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
-import Queue from 'src/utils/queue';
-import { json } from 'stream/consumers';
+import GameRepository from './game.repository';
 import Game, {
   Ball,
   GameStatus,
@@ -14,177 +13,153 @@ import Game, {
 
 const EV_EMIT_GAME_DATA = 'emit_game_data';
 const EV_EMIT_GAME_FINISH = 'emit_game_finish';
+const EV_EMIT_LIVE_GAMES_UPDATED = 'emit_live_games_updated';
 
 @Injectable()
 export class GameService {
   constructor(
     private userService: UserService,
     private prisma: PrismaService,
-  ) {}
-
-  connectedUsers = new Map<string, Socket[]>();
-
-  // gameId => sockets (players and spectators)
-  games = new Map<string, Game>();
-
-  // userId => socket
-  players = new Map<string, Socket>();
-
-  // userId => socket
-  spectators = new Map<string, Socket>();
-
-  // userId => userId
-  requests = new Map<string, string>();
-
-  gameQueue = new Queue<string>();
+  ) { }
 
   getConnectedUsersIds(): string[] {
-    return [...this.connectedUsers.keys()];
+    return [...GameRepository.getInstance().connectedUsers.keys()];
   }
 
   getConnectedUserById(userId: string): Socket[] {
-    return this.connectedUsers.get(userId) ?? [];
+    return GameRepository.getInstance().connectedUsers.get(userId) ?? [];
   }
 
   getGameById(gameId: string): Game {
-    return this.games.get(gameId);
+    return GameRepository.getInstance().games.get(gameId);
   }
 
   getGameByUserIds(userId: string, otherId: string): Game {
-    const game = [...this.games.values()].find((game) => {
-      return game.players.includes(userId) && game.players.includes(otherId);
-    });
+    const game = [...GameRepository.getInstance().games.values()].find(
+      (game) => {
+        return game.players.includes(userId) && game.players.includes(otherId);
+      },
+    );
     return game;
   }
 
   getGameByUserId(userId: string): Game {
-    const game = [...this.games.values()].find((game) => {
-      return game.players.includes(userId);
-    });
+    const game = [...GameRepository.getInstance().games.values()].find(
+      (game) => {
+        return game.players.includes(userId);
+      },
+    );
     return game;
   }
 
-  async getCurrentFriendsGames(userId: string): Promise<Game[]> {
-    const friends = await this.userService.getFriends(userId);
-    const friendsIds = friends.map((friend) => friend.id);
-    const games = [...this.games.values()].filter((game) => {
-      return (
-        game.status === GameStatus.STARTED &&
-        game.players.some((player) => friendsIds.includes(player))
-      );
-    });
-    return games;
-  }
-
-  getCurrentGames(): Game[] {
-    return [...this.games.values()].filter((game) => {
-      return game.status === GameStatus.STARTED;
-    });
-  }
-
   getPlayerById(userId: string): Socket {
-    return this.players.get(userId);
+    return GameRepository.getInstance().players.get(userId);
   }
 
   getSpectatorById(userId: string): Socket {
-    return this.spectators.get(userId);
+    return GameRepository.getInstance().spectators.get(userId);
   }
 
   // Unsafe method.
   addConnectedUser(userId: string, socket: Socket) {
-    const sockets = this.connectedUsers.get(userId);
+    const sockets = GameRepository.getInstance().connectedUsers.get(userId);
     if (sockets) {
       sockets.push(socket);
     } else {
-      this.connectedUsers.set(userId, [socket]);
+      GameRepository.getInstance().connectedUsers.set(userId, [socket]);
     }
   }
 
   // Unsafe method.
   removeConnectedUser(userId: string, socket: Socket) {
-    const sockets = this.connectedUsers.get(userId);
+    const sockets = GameRepository.getInstance().connectedUsers.get(userId);
     if (!sockets) return;
     const newSockets = sockets.filter((s) => s.id !== socket.id);
     if (newSockets.length === 0) {
-      this.connectedUsers.delete(userId);
+      GameRepository.getInstance().connectedUsers.delete(userId);
     } else {
-      this.connectedUsers.set(userId, newSockets);
+      GameRepository.getInstance().connectedUsers.set(userId, newSockets);
     }
   }
 
   // Unsafe method.
   addPlayer(userId: string, socket: Socket) {
-    // if (this.players.has(userId))
-    //   throw new Error('You are already in a match.');
-    // if (this.spectators.has(userId))
-    //   throw new Error('You are spectating a match.');
-    this.players.set(userId, socket);
+    GameRepository.getInstance().players.set(userId, socket);
   }
 
   // Unsafe method.
   addSpectator(userId: string, socket: Socket) {
-    // if (this.spectators.has(userId))
-    //   throw new Error('You are already spectating a match.');
-    // if (this.players.has(userId)) throw new Error('You are playing a match.');
-    this.spectators.set(userId, socket);
+    GameRepository.getInstance().spectators.set(userId, socket);
   }
 
   // Unsafe method.
   addRequest(userId: string, opponentId: string) {
-    this.requests.set(userId, opponentId);
-    this.requests.set(opponentId, userId);
+    GameRepository.getInstance().requests.set(userId, opponentId);
+    GameRepository.getInstance().requests.set(opponentId, userId);
   }
 
   // Unsafe method.
   addToQueue(userId: string) {
-    this.gameQueue.push(userId);
+    GameRepository.getInstance().gameQueue.push(userId);
   }
 
   // Creates a new game in the ACCEPTED state.
-  createNewGame(userId: string, opponentId: string): Game {
+  async createNewGame(userId: string, opponentId: string): Promise<Game> {
+    const user = await this.userService.getUserById(userId, userId);
+    const opUser = await this.userService.getUserById(userId, opponentId);
+
     const newGame = new Game();
     const gameId = `${userId}_${opponentId}_${Date.now()}`;
     newGame.id = gameId;
     newGame.players = [userId, opponentId];
     newGame.spectators = [];
-    const newScore = new Map();
-    newScore.set(userId, 0);
-    newScore.set(opponentId, 0);
-    newGame.score = newScore;
-    newGame.status = GameStatus.ACCEPTED;
-    const newPlayerStatus = new Map();
-    newPlayerStatus.set(userId, PlayerStatus.PENDING);
-    newPlayerStatus.set(opponentId, PlayerStatus.PENDING);
-    newGame.playerStatus = newPlayerStatus;
+
+    newGame.usernames = new Map();
+    newGame.usernames.set(userId, user.username ?? 'Unknown');
+    newGame.usernames.set(opponentId, opUser.username ?? 'Unknown');
+
+    newGame.avatars = new Map();
+    newGame.avatars.set(userId, user.avatar);
+    newGame.avatars.set(opponentId, opUser.avatar);
+
+    newGame.score = new Map();
+    newGame.score.set(userId, 0);
+    newGame.score.set(opponentId, 0);
+
+    newGame.playerStatus = new Map();
+    newGame.playerStatus.set(userId, PlayerStatus.PENDING);
+    newGame.playerStatus.set(opponentId, PlayerStatus.PENDING);
 
     newGame.ball = new Ball();
     newGame.paddle = new Map<string, Paddle>();
+
+    newGame.status = GameStatus.ACCEPTED;
     return newGame;
   }
 
   // Unsafe method.
   // remove player from players map
   removePlayer(userId: string) {
-    this.players.delete(userId);
+    GameRepository.getInstance().players.delete(userId);
   }
 
   // Unsafe method.
   // remove spectator from spectators map
   removeSpectator(userId: string) {
-    this.spectators.delete(userId);
+    GameRepository.getInstance().spectators.delete(userId);
   }
 
   // Unsafe method.
   // remove request from requests map
   removeRequest(userId: string, opponentId: string) {
-    this.requests.delete(userId);
-    this.requests.delete(opponentId);
+    GameRepository.getInstance().requests.delete(userId);
+    GameRepository.getInstance().requests.delete(opponentId);
   }
 
   removeRequestByUserId(userId: string) {
-    const opponentId = this.requests.get(userId);
-    this.requests.delete(userId);
-    if (opponentId) this.requests.delete(opponentId);
+    const opponentId = GameRepository.getInstance().requests.get(userId);
+    GameRepository.getInstance().requests.delete(userId);
+    if (opponentId) GameRepository.getInstance().requests.delete(opponentId);
   }
 
   // remove players/spectators from players/spectators maps
@@ -201,28 +176,83 @@ export class GameService {
 
   // Get all player userIds
   getPlayerIds(): string[] {
-    return [...this.players.keys()];
+    return [...GameRepository.getInstance().players.keys()];
   }
 
   // Get all spectator userIds
   getSpectatorIds(): string[] {
-    return [...this.spectators.keys()];
+    return [...GameRepository.getInstance().spectators.keys()];
   }
 
   // Get list of friends (User) that are playing a game
   async getPlayingFriends(userId: string): Promise<any[]> {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     if (!friends) return [];
-    const players = friends.filter((friend) => this.players.has(friend.id));
+    const players = friends.filter((friend) =>
+      GameRepository.getInstance().players.has(friend.id),
+    );
     return players;
   }
 
   // Get list of friends (User) that are spectating a game
   async getSpectatingFriends(userId: string): Promise<any[]> {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     if (!friends) return [];
-    const players = friends.filter((friend) => this.spectators.has(friend.id));
+    const players = friends.filter((friend) =>
+      GameRepository.getInstance().spectators.has(friend.id),
+    );
     return players;
+  }
+
+  // Sends game data to all players and spectators
+  // Change the data being sent to aminimal object
+  private sendGameUpdateToClients(game: Game) {
+    const players = game.players;
+    const spectators = game.spectators;
+    players.forEach((p) => {
+      const s = this.getPlayerById(p);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToMinifyedJSON());
+      }
+    });
+    // in case there are spectators
+    spectators.forEach((sp) => {
+      const sock = this.getSpectatorById(sp);
+      if (sock) {
+        sock.volatile.emit(EV_EMIT_GAME_DATA, game.convertToMinifyedJSON());
+      } else {
+        game.spectators = game.spectators.filter((s) => s !== sp);
+      }
+    });
+  }
+
+  private sendGameFinishToClients(game: Game) {
+    const players = game.players;
+    const spectators = game.spectators;
+    players.forEach((p) => {
+      const s = this.getPlayerById(p);
+      if (s) {
+        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      }
+    });
+    // in case there are spectators
+    spectators.forEach((sp) => {
+      const sock = this.getSpectatorById(sp);
+      if (sock) {
+        sock.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
+      } else {
+        game.spectators = game.spectators.filter((s) => s !== sp);
+      }
+    });
+  }
+
+  private sendLiveGamesUpdatedToAll(server: Server) {
+    let gamesTotalScore = 0;
+    GameRepository.getInstance().games.forEach((game) => {
+      gamesTotalScore += game.score.get(game.players[0]);
+      gamesTotalScore += game.score.get(game.players[1]);
+    });
+    server.emit(EV_EMIT_LIVE_GAMES_UPDATED, gamesTotalScore);
   }
 
   // Join the auto-match queue
@@ -233,26 +263,30 @@ export class GameService {
   // In both cases you recieve a game object with status ACCEPTED or QUEUED
   // respectively, so either show a waiting screen or start the game.
   async playInQueue(userId: string, socket: Socket): Promise<Game> {
-    if (this.players.has(userId))
+    if (GameRepository.getInstance().players.has(userId))
       throw new Error('You are already in a match.');
-    if (this.spectators.has(userId))
+    if (GameRepository.getInstance().spectators.has(userId))
       throw new Error('You are spectating a match.');
-    if (this.requests.has(userId))
+    if (GameRepository.getInstance().requests.has(userId))
       throw new Error('You already have a pending request.');
-    if (this.gameQueue.contains(userId))
+    if (GameRepository.getInstance().gameQueue.contains(userId))
       throw new Error('You are already in the queue.');
-    if (!this.gameQueue.isEmpty()) {
-      const otherId = this.gameQueue.peek();
+    if (!GameRepository.getInstance().gameQueue.isEmpty()) {
+      const otherId = GameRepository.getInstance().gameQueue.peek();
       const blocked = await this.userService.getBlockedUsers(userId);
       const blockedUsersIds = blocked.map((user) => user.id);
       if (
         !blockedUsersIds.includes(otherId) &&
-        this.connectedUsers.has(otherId)
+        GameRepository.getInstance().connectedUsers.has(otherId)
       ) {
-        const opId = this.gameQueue.pop();
+        const opId = GameRepository.getInstance().gameQueue.pop();
         this.addPlayer(userId, socket);
-        this.addPlayer(otherId, this.connectedUsers.get(opId)[0]);
-        const newGame = this.createNewGame(userId, opId);
+        this.addPlayer(
+          otherId,
+          GameRepository.getInstance().connectedUsers.get(opId)[0],
+        );
+        const newGame = await this.createNewGame(userId, opId);
+        GameRepository.getInstance().games.set(newGame.id, newGame);
         return newGame;
       }
     }
@@ -267,7 +301,7 @@ export class GameService {
   // Should be called when the user cancels/leaves the waiting screen
   // It will be automatically called on disconnect
   async leaveQueue(userId: string): Promise<boolean> {
-    return this.gameQueue.remove(userId);
+    return GameRepository.getInstance().gameQueue.remove(userId);
   }
 
   // Start spectating a game
@@ -276,13 +310,13 @@ export class GameService {
     gameId: string,
     socket: Socket,
   ): Promise<Game> {
-    if (this.players.has(userId))
+    if (GameRepository.getInstance().players.has(userId))
       throw new Error('You are already in a match.');
-    if (this.spectators.has(userId))
+    if (GameRepository.getInstance().spectators.has(userId))
       throw new Error('You are already spectating a match.');
-    if (this.requests.has(userId))
+    if (GameRepository.getInstance().requests.has(userId))
       throw new Error('You have a pending request.');
-    if (this.gameQueue.contains(userId))
+    if (GameRepository.getInstance().gameQueue.contains(userId))
       throw new Error('You are in the queue.');
     const game = this.getGameById(gameId);
     if (!game) throw new Error('Game does not exist.');
@@ -294,19 +328,24 @@ export class GameService {
       if (blockedUsersIds.includes(pId))
         throw new Error('You cannot spectate this game.');
     });
+    const spectatingUser: User = await this.userService.getUserById(userId, userId);
     this.addSpectator(userId, socket);
     game.spectators.push(userId);
+    game.usernames.set(userId, spectatingUser.username);
+    game.avatars.set(userId, spectatingUser.avatar);
     return game;
   }
 
   // Quit spectating a game
   stopSpectatingGame(userId: string, gameId: string): Game {
-    if (!this.spectators.has(userId))
+    if (!GameRepository.getInstance().spectators.has(userId))
       throw new Error('You are not spectating a match.');
     const game = this.getGameById(gameId);
     if (!game) throw new Error('Game does not exist.');
     this.removeSpectator(userId);
     game.spectators = game.spectators.filter((pId) => pId !== userId);
+    game.usernames.delete(userId);
+    game.avatars.delete(userId);
     return game;
   }
 
@@ -325,87 +364,37 @@ export class GameService {
       return true;
     }
     return false;
-
-    // if (
-    //   paddle.x + paddle.width > objGame.ball.x &&
-    //   paddle.x < objGame.ball.x + objGame.ball.rad &&
-    //   paddle.y + paddle.height > objGame.ball.y &&
-    //   paddle.y < objGame.ball.dy + objGame.ball.rad
-    // ) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
   }
+
   // Checks if any player has disconnected
   // Sets other player as winner and sets game as finished
-  private checkGameDisconnection(game: Game): boolean {
+  private checkGameDisconnection(game: Game, server: Server): boolean {
     const p1Sock = this.getPlayerById(game.players[0]); // player 1
     const p2Sock = this.getPlayerById(game.players[1]); // player 2
     if (p1Sock && p2Sock) return true;
     if (!p1Sock) game.score.set(game.players[1], 10);
     else if (!p2Sock) game.score.set(game.players[0], 10);
-    this.finishGame(game);
+    this.finishGame(game, server);
     return false;
-  }
-
-  // Sends game data to all players and spectators
-  // Change the data being sent to aminimal object
-  private sendGameUpdateToClients(game: Game) {
-    const players = game.players;
-    const spectators = game.spectators;
-    players.forEach((p) => {
-      const s = this.getPlayerById(p);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
-      }
-    });
-    // in case there are spectators
-    spectators.forEach((sp) => {
-      const s = this.getSpectatorById(sp);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_DATA, game.convertToJSON());
-      }
-    });
-  }
-
-  private sendGameFinishToClients(game: Game) {
-    const players = game.players;
-    const spectators = game.spectators;
-    players.forEach((p) => {
-      const s = this.getPlayerById(p);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
-      }
-    });
-    // in case there are spectators
-    spectators.forEach((sp) => {
-      const s = this.getSpectatorById(sp);
-      if (s) {
-        s.volatile.emit(EV_EMIT_GAME_FINISH, game.convertToJSON());
-      }
-    });
   }
 
   // Updates game state
   // Called every frame (intervals of 1000ms / 30)
-
-  private updateGame(game: Game): Game {
+  private updateGame(game: Game, server: Server): Game {
     // check for disconnection and finish game.
-    if (!this.checkGameDisconnection(game)) return game;
-
-    // TODO: update ball position for game.
-    // TODO: check for collision and goals.
-    // TODO: update score for game.
-
+    if (!this.checkGameDisconnection(game, server)) return game;
     //ball handle
     if (game.ball.y < 0 || game.ball.y + game.ball.rad > 720) {
       game.ball.dy = -game.ball.dy;
     }
 
+    // check for scoring
     if (game.ball.x < 0) {
       //update points +1
       game.score.set(game.players[1], game.score.get(game.players[1]) + 1);
+      if (game.score.get(game.players[1]) < 10) {
+        this.sendLiveGamesUpdatedToAll(server);
+      }
       //Send the new point
 
       game.ball.x = 640;
@@ -416,6 +405,9 @@ export class GameService {
     } else if (game.ball.x + game.ball.rad > 1280) {
       //update points +1
       game.score.set(game.players[0], game.score.get(game.players[0]) + 1);
+      if (game.score.get(game.players[0]) < 10) {
+        this.sendLiveGamesUpdatedToAll(server);
+      }
       // Send the new score
 
       game.ball.x = 640;
@@ -441,28 +433,22 @@ export class GameService {
 
     game.ball.x += game.ball.dx;
     game.ball.y += game.ball.dy;
-    // console.log(game.ball);
-
-    // TODO: do other stuff
 
     // Check for win and finish game.
     if (
       game.score.get(game.players[0]) === 10 ||
       game.score.get(game.players[1]) === 10
     ) {
-      //send player points here
-      //Reset Player score to 0
-      //game.score[game.players[0]] = 0;
-      return this.finishGame(game);
+      return this.finishGame(game, server);
     }
     return game;
   }
 
   // Called when game starts.
   // Initializes game state
-  private initGame(game: Game): Game {
+  private initGame(game: Game, server: Server): Game {
     game.status = GameStatus.STARTED;
-    if (!this.checkGameDisconnection(game)) {
+    if (!this.checkGameDisconnection(game, server)) {
       return game;
     }
     // TODO: modify game/models/game.model.ts to add all needed properties for game logic
@@ -498,19 +484,19 @@ export class GameService {
 
   // Starts initial state of the game
   // Returns game object with status STARTED
-  private launchGame(game: Game): Game {
+  private launchGame(game: Game, server: Server): Game {
     // Initialize game state
-    game = this.initGame(game);
+    game = this.initGame(game, server);
     if (game.status === GameStatus.FINISHED) return game;
 
     // Start game loop
     const timer: NodeJS.Timer = setInterval(() => {
-      const updatedGame = this.updateGame(game);
+      const updatedGame = this.updateGame(game, server);
       if (updatedGame.status === GameStatus.FINISHED) return;
       this.sendGameUpdateToClients(updatedGame);
     }, 1000 / 60);
-
     // Save interval timer to game object to cancel it later
+    this.sendLiveGamesUpdatedToAll(server);
     game.timer = timer;
     return game;
   }
@@ -522,7 +508,7 @@ export class GameService {
   // after they open Game UI. and wait for other player to do the same.
   // When both players are ready, the game will start
   // and they will start receiving game data.
-  startGame(userId: string, otherId: string): Game {
+  startGame(userId: string, otherId: string, server: Server): Game {
     const game = this.getGameByUserIds(userId, otherId);
     if (!game) throw new Error('This game does not exist.');
     if (game.status === GameStatus.STARTED)
@@ -535,7 +521,7 @@ export class GameService {
       game.playerStatus[userId] === PlayerStatus.READY &&
       game.playerStatus[otherId] === PlayerStatus.READY
     ) {
-      return this.launchGame(game);
+      return this.launchGame(game, server);
     }
     return game;
   }
@@ -543,15 +529,11 @@ export class GameService {
   // Move paddle and do other stuff
   // The payload should contain the move data
   private moveGame(userId: string, game: Game, payload: any): Game {
-    // TODO: make move using payload content.
-    // TODO: update paddle position for game.
-    // NB: no need to update ball position here or send game update to clients
-    // TODO: do other stuff
-    if (payload.move === 'DOWN' && game.paddle.get(userId).y < 620)
-      game.paddle.get(userId).y += 40;
+    if (payload.move === 'DOWN' && (game.paddle.get(userId).y) < 620)
+      game.paddle.get(userId).y += ((game.paddle.get(userId).y + 40) > 620 ? (620 - game.paddle.get(userId).y) : 40);
 
     if (payload.move === 'UP' && game.paddle.get(userId).y > 0)
-      game.paddle.get(userId).y -= 40;
+      game.paddle.get(userId).y -= ((game.paddle.get(userId).y - 40) < 0 ? (game.paddle.get(userId).y) : 40);
 
     return game;
   }
@@ -578,24 +560,25 @@ export class GameService {
 
   // Deletes Game / Save in db.
   // Returns Game object with status FINISHED
-  leaveGame(userId: string, otherId: string): Game {
+  leaveGame(userId: string, otherId: string, server: Server): Game {
     const game = this.getGameByUserIds(userId, otherId);
     if (!game) throw new Error('This game does not exist.');
     if (game.status === GameStatus.FINISHED)
       throw new Error('This game has already finished.');
     game.score.set(otherId, 10);
-    this.finishGame(game);
+    this.finishGame(game, server);
     return game;
   }
 
   // Called when game is finished/aborted
-  private finishGame(game: Game): Game {
+  private finishGame(game: Game, server: Server): Game {
     clearInterval(game.timer);
     game.status = GameStatus.FINISHED;
     this.sendGameFinishToClients(game);
     this.removeGameMembers(game);
-    this.games.delete(game.id);
+    GameRepository.getInstance().games.delete(game.id);
     this.createGameHistory(game);
+    this.sendLiveGamesUpdatedToAll(server);
     return game;
   }
 
@@ -610,21 +593,21 @@ export class GameService {
     const blockedUsersIds = blocked.map((user) => user.id);
     if (blockedUsersIds.includes(otherId))
       throw new Error('You cannot play against this user.');
-    if (this.players.has(userId))
+    if (GameRepository.getInstance().players.has(userId))
       throw new Error('You are already in a match.');
-    if (this.spectators.has(userId))
+    if (GameRepository.getInstance().spectators.has(userId))
       throw new Error('You are spectating a match.');
-    if (this.players.has(otherId))
+    if (GameRepository.getInstance().players.has(otherId))
       throw new Error('This user is already in a match.');
-    if (this.spectators.has(otherId))
+    if (GameRepository.getInstance().spectators.has(otherId))
       throw new Error('This user is spectating a match.');
-    if (this.requests.has(userId))
+    if (GameRepository.getInstance().requests.has(userId))
       throw new Error('You already have a pending request.');
-    if (this.requests.has(otherId))
+    if (GameRepository.getInstance().requests.has(otherId))
       throw new Error('This user already has a pending request.');
-    if (this.gameQueue.contains(userId))
+    if (GameRepository.getInstance().gameQueue.contains(userId))
       throw new Error('You are already in the queue.');
-    if (this.gameQueue.contains(otherId))
+    if (GameRepository.getInstance().gameQueue.contains(otherId))
       throw new Error('This user already in the queue.');
     this.addRequest(userId, otherId);
     return true;
@@ -633,34 +616,41 @@ export class GameService {
   // Creates new Game.
   // Accepts Play Against request
   // Returns Game object with status ACCEPTED
-  acceptPlayAgainst(userId: string, otherId: string, userSocket: Socket): Game {
+  async acceptPlayAgainst(
+    userId: string,
+    otherId: string,
+    userSocket: Socket,
+  ): Promise<Game> {
     if (userId === otherId)
       throw new Error('You cannot play against yourself.');
-    if (this.players.has(userId))
+    if (GameRepository.getInstance().players.has(userId))
       throw new Error('You are already in a match.');
-    if (this.spectators.has(userId))
+    if (GameRepository.getInstance().spectators.has(userId))
       throw new Error('You are spectating a match.');
-    if (this.players.has(otherId))
+    if (GameRepository.getInstance().players.has(otherId))
       throw new Error('This user is already in a match.');
-    if (this.spectators.has(otherId))
+    if (GameRepository.getInstance().spectators.has(otherId))
       throw new Error('This user is spectating a match.');
-    if (!this.requests.has(userId))
+    if (!GameRepository.getInstance().requests.has(userId))
       throw new Error('You do not have a pending request.');
-    if (this.requests.get(userId) !== otherId)
+    if (GameRepository.getInstance().requests.get(userId) !== otherId)
       throw new Error('You do not have a pending request.');
     this.removeRequest(userId, otherId);
-    if (!this.connectedUsers.has(otherId)) {
+    if (!GameRepository.getInstance().connectedUsers.has(otherId)) {
       const cancelledGame = new Game();
       cancelledGame.players = [userId];
       cancelledGame.status = GameStatus.CANCELLED;
       return cancelledGame;
     }
     this.addPlayer(userId, userSocket);
-    this.addPlayer(otherId, this.connectedUsers.get(otherId)[0]);
+    this.addPlayer(
+      otherId,
+      GameRepository.getInstance().connectedUsers.get(otherId)[0],
+    );
     // Create new game object to track: players, spectators, score, etc.
-    const newGame = this.createNewGame(userId, otherId);
+    const newGame = await this.createNewGame(userId, otherId);
     // Add game to games map
-    this.games.set(newGame.id, newGame);
+    GameRepository.getInstance().games.set(newGame.id, newGame);
     // // Start game
     // await this.startGame(newGame);
     return newGame;
@@ -672,17 +662,17 @@ export class GameService {
   declinePlayAgainst(userId: string, otherId: string): Game {
     if (userId === otherId)
       throw new Error('You cannot play against yourself.');
-    if (this.players.has(userId))
+    if (GameRepository.getInstance().players.has(userId))
       throw new Error('You are already in a match.');
-    if (this.spectators.has(userId))
+    if (GameRepository.getInstance().spectators.has(userId))
       throw new Error('You are spectating a match.');
-    if (this.players.has(otherId))
+    if (GameRepository.getInstance().players.has(otherId))
       throw new Error('This user is already in a match.');
-    if (this.spectators.has(otherId))
+    if (GameRepository.getInstance().spectators.has(otherId))
       throw new Error('This user is spectating a match.');
-    if (!this.requests.has(userId))
+    if (!GameRepository.getInstance().requests.has(userId))
       throw new Error('You do not have a pending request.');
-    if (this.requests.get(userId) !== otherId)
+    if (GameRepository.getInstance().requests.get(userId) !== otherId)
       throw new Error('You do not have a pending request.');
     this.removeRequest(userId, otherId);
     const declinedGame = new Game();
@@ -697,13 +687,13 @@ export class GameService {
   cancelPlayAgainst(userId: string, otherId: string): Game {
     if (userId === otherId)
       throw new Error('You cannot play against yourself.');
-    if (this.players.has(userId))
+    if (GameRepository.getInstance().players.has(userId))
       throw new Error('You are already in a match.');
-    if (this.spectators.has(userId))
+    if (GameRepository.getInstance().spectators.has(userId))
       throw new Error('You are spectating a match.');
-    if (!this.requests.has(userId))
+    if (!GameRepository.getInstance().requests.has(userId))
       throw new Error('You do not have a pending request.');
-    if (this.requests.get(userId) !== otherId)
+    if (GameRepository.getInstance().requests.get(userId) !== otherId)
       throw new Error('You do not have a pending request.');
     this.removeRequest(userId, otherId);
     const cancelledGame = new Game();
@@ -738,10 +728,7 @@ export class GameService {
     return history;
   }
 
-  async getGameHistoryByUserId(
-    userId: string,
-    id: string,
-  ): Promise<GameHistory[]> {
+  async getGameHistoryByUserId(userId: string, id: string): Promise<any[]> {
     const blocked = await this.userService.getBlockedUsers(userId);
     const blockedUsersIds = blocked.map((user) => user.id);
     if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
@@ -750,37 +737,9 @@ export class GameService {
       where: {
         OR: [{ winnerId: id }, { loserId: id }],
       },
-    });
-    return history;
-  }
-
-  async getWonGamesByUserId(
-    userId: string,
-    id: string,
-  ): Promise<GameHistory[]> {
-    const blocked = await this.userService.getBlockedUsers(userId);
-    const blockedUsersIds = blocked.map((user) => user.id);
-    if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
-
-    const history = await this.prisma.gameHistory.findMany({
-      where: {
-        winnerId: id,
-      },
-    });
-    return history;
-  }
-
-  async getLostGamesByUserId(
-    userId: string,
-    id: string,
-  ): Promise<GameHistory[]> {
-    const blocked = await this.userService.getBlockedUsers(userId);
-    const blockedUsersIds = blocked.map((user) => user.id);
-    if (blockedUsersIds.includes(id)) throw new Error('User is blocked');
-
-    const history = await this.prisma.gameHistory.findMany({
-      where: {
-        loserId: id,
+      include: {
+        loser: true,
+        winner: true,
       },
     });
     return history;
@@ -805,5 +764,50 @@ export class GameService {
       throw new Error('User is blocked');
 
     return history;
+  }
+
+  async getLiveGames(userId: string): Promise<any[]> {
+    const blocked = await this.userService.getBlockedUsers(userId);
+    const blockedUsersIds = blocked.map((user) => user.id);
+
+    const liveGames = [];
+
+    GameRepository.getInstance().games.forEach((game) => {
+      if (game.status !== GameStatus.STARTED) return;
+      if (game.players.some((player) => blockedUsersIds.includes(player)))
+        return;
+      let spectators = [];
+      for (let i = 0; i < game.spectators.length; i++) {
+        if (blockedUsersIds.includes(game.spectators[i])) continue;
+        spectators.push({
+          id: game.spectators[i],
+          username: game.usernames.get(game.spectators[i]),
+          avatar: game.avatars.get(game.spectators[i]),
+        });
+      }
+      liveGames.push({
+        id: game.id,
+        players: [
+          {
+            id: game.players[0],
+            username: game.usernames.get(game.players[0]),
+            score: game.score.get(game.players[0]),
+            avatar: game.avatars.get(game.players[0]),
+          },
+          {
+            id: game.players[1],
+            username: game.usernames.get(game.players[1]),
+            score: game.score.get(game.players[1]),
+            avatar: game.avatars.get(game.players[1]),
+          },
+        ],
+        spectators: spectators,
+        numberOfSpectators:
+          game.spectators.length > 0
+            ? `${game.spectators.length} users are watching`
+            : `No one is watching`,
+      });
+    });
+    return liveGames;
   }
 }

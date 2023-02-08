@@ -12,6 +12,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { Socket } from 'socket.io';
+import ChatRepository from './chat.repository';
 
 @Injectable()
 export class ChatService {
@@ -20,16 +21,13 @@ export class ChatService {
     private userService: UserService,
   ) {}
 
-  // NOTE: userId -> [socketId]
-  connectedUsers: Map<string, Socket[]> = new Map();
-
   // Connected Users
   /**
    * return list of currently connected users ids from connectedUsers map
    * @returns list of string ids or empty list
    */
   getConnectedUsersIds(): string[] {
-    return [...this.connectedUsers.keys()];
+    return [...ChatRepository.getInstance().connectedUsers.keys()];
   }
 
   /**
@@ -38,10 +36,10 @@ export class ChatService {
    * @returns list of User objects or empty list
    */
   async getConnectedFriends(userId: string): Promise<any[]> {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     if (!friends) return [];
     const connectedUsers = friends.filter((friend) =>
-      this.connectedUsers.has(friend.id),
+      ChatRepository.getInstance().connectedUsers.has(friend.id),
     );
     return connectedUsers;
   }
@@ -52,7 +50,7 @@ export class ChatService {
    * @returns list of Socket objects or empty list
    */
   getConnectedUserById(userId: string): Socket[] {
-    return this.connectedUsers.get(userId) ?? [];
+    return ChatRepository.getInstance().connectedUsers.get(userId) ?? [];
   }
 
   /**
@@ -61,11 +59,11 @@ export class ChatService {
    * @param socket newly connected socket
    */
   addConnectedUser(userId: string, socket: Socket) {
-    const sockets = this.connectedUsers.get(userId);
+    const sockets = ChatRepository.getInstance().connectedUsers.get(userId);
     if (sockets) {
       sockets.push(socket);
     } else {
-      this.connectedUsers.set(userId, [socket]);
+      ChatRepository.getInstance().connectedUsers.set(userId, [socket]);
     }
   }
 
@@ -76,27 +74,24 @@ export class ChatService {
    * @param socket socket to remove when disconneted
    */
   removeConnectedUser(userId: string, socket: Socket) {
-    const sockets = this.connectedUsers.get(userId);
+    const sockets = ChatRepository.getInstance().connectedUsers.get(userId);
     if (!sockets) return;
     const newSockets = sockets.filter((s) => s.id !== socket.id);
     if (newSockets.length === 0) {
-      this.connectedUsers.delete(userId);
+      ChatRepository.getInstance().connectedUsers.delete(userId);
     } else {
-      this.connectedUsers.set(userId, newSockets);
+      ChatRepository.getInstance().connectedUsers.set(userId, newSockets);
     }
   }
 
   async getFriendsForRoom(userId: string, roomId: string) {
-    const friends = await this.userService.getFriends(userId);
+    const friends = await this.userService.getFriends(userId, userId);
     const members = await this.getRoomMembersByRoomId(userId, roomId);
 
     const membersUserIds = members?.map((m) => m.userId);
 
-    console.table(membersUserIds);
-
     const friendsNotInRoom = friends?.filter((friend) => {
       const res = !membersUserIds.includes(friend.id);
-      //console.log('ID: ', friend.id, ', ', res);
       return res;
     });
     return friendsNotInRoom ?? [];
@@ -113,8 +108,10 @@ export class ChatService {
     const _existingDm = await this.getDmByUserIds(userId, otherUserId, true);
     if (_existingDm) return await this.formatChat(userId, _existingDm, true);
 
+    if (userId === otherUserId)
+      throw new Error('Cannot apply this action on yourself');
+
     const otherUser = await this.userService.getUserById(userId, otherUserId);
-    // console.log('OTHER USER: ', otherUser);
     if (!otherUser) throw new Error('User does not exist or blocked');
 
     const _room = await this.prisma.room.create({
@@ -155,6 +152,10 @@ export class ChatService {
     const _existingRoom = await this.getRoomByName(name);
     if (_existingRoom) throw new Error('Room with same name already exists');
 
+    if (privacy === RoomPrivacy.PROTECTED && (!password || password === '')) {
+      throw new Error('Password cannot be empty for private rooms');
+    }
+
     if (privacy === RoomPrivacy.PROTECTED) {
       _hashed = await this.encryptRoomPassword(password);
     }
@@ -182,7 +183,6 @@ export class ChatService {
 
   /**
    * Utility: Deletes DM, when a user blocks a friend user,
-   * Only called from inside not accessible in API or Gateway.
    * @param roomId dm id to be deleted
    */
   async deleteDm(roomId: string) {
@@ -339,7 +339,7 @@ export class ChatService {
 
     if (_existingRoomUser) {
       if (_existingRoomUser.status !== RoomUserStatus.LEFT)
-        throw new Error('User already in room');
+        throw new Error('User already in room or is banned');
       const _roomUser = await this.prisma.roomUser.update({
         where: { id: _existingRoomUser.id },
         data: {
@@ -408,13 +408,16 @@ export class ChatService {
     if (_adminRoomUser.role === RoomRole.MEMBER)
       throw new Error('You are not an admin or owner');
 
+    if (adminId === userToAddId)
+      throw new Error('Cannot apply this action on yourself');
+
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
       userToAddId,
       roomId,
     );
     if (_existingRoomUser) {
       if (_existingRoomUser.status !== RoomUserStatus.LEFT)
-        throw new Error('User already in room');
+        throw new Error('User already in room or banned');
       const _roomUser = await this.prisma.roomUser.update({
         where: { id: _existingRoomUser.id },
         data: {
@@ -461,7 +464,9 @@ export class ChatService {
     if (_existingRoomUser.role === RoomRole.OWNER)
       throw new Error('Cannot leave room as owner');
 
-    // NEW METHOD: set status as left
+    if (_existingRoomUser.status !== RoomUserStatus.NORMAL)
+      throw new Error('Cannot leave room while banned/muted');
+
     const _leftRu = await this.prisma.roomUser.update({
       where: {
         id: _existingRoomUser.id,
@@ -471,69 +476,6 @@ export class ChatService {
       },
     });
     return _leftRu;
-    // OLD METHOD: Delete room user
-    // NEED TO DELETE ALL MESSAGES FROM USER IN ROOM
-    // await this.deleteAllMessagesOfRoomUser(_existingRoomUser.id);
-    // const _deletedRu = await this.prisma.roomUser.delete({
-    //   where: {
-    //     id: _existingRoomUser.id,
-    //   },
-    // });
-    // return _deletedRu;
-  }
-
-  /**
-   * Removes user from Room by an OWNER/ADMIN, by updating RoomUser status to LEFT,
-   * @param adminId User excuting the action | owner/admin user id
-   * @param userToRemoveId user to be removed from room
-   * @param roomId room id
-   * @returns true if user removed, false if not or throws error
-   */
-  async removeUserFromRoomByAdmin(
-    adminId: string,
-    userToRemoveId: string,
-    roomId: string,
-  ): Promise<boolean> {
-    const _room = await this.prisma.room.findUnique({ where: { id: roomId } });
-    if (!_room) throw new Error('Room does not exist');
-    if (_room.isDm) throw new Error('Cannot leave DM');
-
-    const _adminRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      adminId,
-      roomId,
-    );
-    if (!_adminRoomUser || _adminRoomUser.status === RoomUserStatus.LEFT)
-      throw new Error('User not in room');
-    if (_adminRoomUser.role === RoomRole.MEMBER)
-      throw new Error('You are not an admin or owner');
-
-    const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      userToRemoveId,
-      roomId,
-    );
-    if (!_existingRoomUser || _existingRoomUser.status === RoomUserStatus.LEFT)
-      throw new Error('User not in room');
-    if (_existingRoomUser.role === RoomRole.OWNER)
-      throw new Error('Cannot remove owner');
-
-    // NEW METHOD: set status as left
-    const _leftRu = await this.prisma.roomUser.update({
-      where: {
-        id: _existingRoomUser.id,
-      },
-      data: {
-        status: RoomUserStatus.LEFT,
-      },
-    });
-    return _leftRu ? true : false;
-    // OLD METHOD: Delete room user and messages
-    // await this.deleteAllMessagesOfRoomUser(_existingRoomUser.id);
-    // const _deletedRu = await this.prisma.roomUser.delete({
-    //   where: {
-    //     id: _existingRoomUser.id,
-    //   },
-    // });
-    // return _deletedRu ? true : false;
   }
 
   /**
@@ -554,16 +496,16 @@ export class ChatService {
   }
 
   /**
-   * Mute/Ban/Kick or Unmute/Unban/Unkick a user from room by an OWNER/ADMIN,
+   * Mute/Ban/Kick or Unmute/Unban a user from room by an OWNER/ADMIN,
    * @param adminId User excuting the action | owner/admin user id
-   * @param subjectedUserId user being affected by action
+   * @param targetUserId user being affected by action
    * @param roomId room id
    * @param newStatus one of (NORMAL, MUTED, BANNED, LEFT)
    * @returns RoomUser object or throws error
    */
   async updateUserStatusByAdmin(
     adminId: string,
-    subjectedUserId: string,
+    targetUserId: string,
     roomId: string,
     newStatus: RoomUserStatus,
   ): Promise<RoomUser> {
@@ -579,8 +521,11 @@ export class ChatService {
     if (_adminRoomUser.role === RoomRole.MEMBER)
       throw new Error('You are not an admin or owner');
 
+    if (adminId === targetUserId)
+      throw new Error('Cannot apply this action on yourself');
+
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      subjectedUserId,
+      targetUserId,
       roomId,
     );
     if (!_existingRoomUser || _existingRoomUser.status === RoomUserStatus.LEFT)
@@ -605,13 +550,13 @@ export class ChatService {
   /**
    * Makes a member an admin of room by an OWNER.
    * @param ownerId User excuting the action | owner/admin user id
-   * @param subjectedUserId user being affected by action
+   * @param targetUserId user being affected by action
    * @param roomId room id
    * @returns RoomUser object or throws error
    */
   async makeUserAdmin(
     ownerId: string,
-    subjectedUserId: string,
+    targetUserId: string,
     roomId: string,
   ): Promise<RoomUser> {
     const _room = await this.getRoomById(roomId);
@@ -626,8 +571,11 @@ export class ChatService {
     if (_ownerRoomUser.role !== RoomRole.OWNER)
       throw new Error('You are not an owner');
 
+    if (ownerId === targetUserId)
+      throw new Error('Cannot apply this action on yourself');
+
     const _existingRoomUser: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      subjectedUserId,
+      targetUserId,
       roomId,
     );
     if (!_existingRoomUser || _existingRoomUser.status === RoomUserStatus.LEFT)
@@ -796,6 +744,11 @@ export class ChatService {
    * @returns list of Room objects or empty list
    */
   async getRooms(userId: string): Promise<Room[]> {
+    // get blocked users
+    const _blockedUsersIds = (
+      await this.userService.getBlockedUsers(userId)
+    ).map((user) => user.id);
+
     const _rooms = await this.prisma.room.findMany({
       where: {
         isDm: false,
@@ -822,19 +775,29 @@ export class ChatService {
           },
         ],
       },
+      include: {
+        members: {
+          where: {
+            role: RoomRole.OWNER,
+          },
+        },
+      },
     });
-    return _rooms;
+    const _roomsFiltered = _rooms.filter((room) => {
+      return !_blockedUsersIds.includes(room.members[0].userId);
+    });
+    return _roomsFiltered;
   }
 
   async makeRoomProtected(
-    userId: string,
+    ownerId: string,
     roomId: string,
     password: string,
   ): Promise<any> {
     const room: Room = await this.getRoomById(roomId);
     if (!room) throw new Error('Room does not exist');
     const ru: RoomUser = await this.getRoomUserByUserIdAndRoomId(
-      userId,
+      ownerId,
       roomId,
     );
     if (!ru || ru.status === RoomUserStatus.LEFT)
@@ -866,7 +829,7 @@ export class ChatService {
       },
     });
 
-    return await this.formatChat(userId, r, true);
+    return await this.formatChat(ownerId, r, true);
   }
 
   /**
@@ -879,7 +842,7 @@ export class ChatService {
   async formatChat(userId: string, room: any, existing: boolean): Promise<any> {
     let _name: string = null;
     let _image: string = null;
-    const _members: User[] = room.members.map((ru) => {
+    const _members: User[] = room.members.map((ru: any) => {
       delete ru.user.two_factor_auth;
       delete ru.user.two_factor_auth_uri;
       delete ru.user.two_factor_auth_key;
@@ -1054,8 +1017,6 @@ export class ChatService {
     if (!room) throw new Error('Room does not exist');
 
     const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
-    //console.log('UID: ', userId);
-    //console.log('RU: \n', _roomUser);
     if (!_roomUser || _roomUser.status === RoomUserStatus.LEFT)
       throw new Error('You are not in room');
 

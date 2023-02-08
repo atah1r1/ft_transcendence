@@ -7,95 +7,202 @@ import { useContext, useEffect, useState } from "react";
 import MenuNav from "../../components/menuNav";
 import Logout from "../../components/logout";
 import requireAuthentication from "../../hooks/requiredAuthentication";
-import { DataContext } from "../_app";
+import { AchievementsContext, DataContext } from "../_app";
+import cn from "classnames";
+import axios from "axios";
 
-const History = () =>
-{
-  const [ data, setData ] = useContext( DataContext );
-  const [ menu, setMenu ] = useState( false );
+const History = () => {
+  const [{ achievements }, { setAchievments }] =
+    useContext(AchievementsContext);
+  const [data, setData] = useContext(DataContext);
+  const [menu, setMenu] = useState(false);
+  const [level, setLevel] = useState(0);
+
+  // achievements
+  const [history, setHistory] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/game/${data.id}/history`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setHistory(res.data.reverse());
+      })
+      .catch((error) => {
+      });
+  }, [data.id]);
+
+  useEffect(() => {
+    setAchievments({
+      ach1: false,
+      ach2: false,
+      ach3: false,
+      ach4: false,
+    });
+    if (history.length) {
+      let winCount = 0;
+      let score = 100;
+      let points = 0;
+      setAchievments((prev: any) => ({ ...prev, ach1: true }));
+      history.map((ele: any, i: any, arr: any) => {
+        points =
+          (arr[arr.length - 1 - i].winnerScore -
+            arr[arr.length - 1 - i].loserScore) *
+          10;
+        if (arr[arr.length - 1 - i].winnerId === data.id) {
+          winCount += 1;
+          score += points;
+        } else if (arr[arr.length - 1 - i].loserId === data.id) {
+          winCount = 0;
+          score -= points;
+        }
+        ele.score = score;
+        ele.points = points;
+        if (winCount === 3) {
+          setAchievments((prev: any) => ({ ...prev, ach3: true }));
+        }
+        if (score >= 350) {
+          setAchievments((prev: any) => ({ ...prev, ach2: true }));
+        }
+        if (score >= 1000) {
+          setAchievments((prev: any) => ({ ...prev, ach4: true }));
+        }
+      });
+      setLevel(Math.floor(score / 150));
+    }
+  }, [history]);
+
+  const winnerMaches = history.filter(
+    (ele: any) => ele.winnerId === data.id
+  ).length;
+  const loserMaches = history.filter(
+    (ele: any) => ele.loserId === data.id
+  ).length;
 
   return (
     <>
-      <MenuNav menu={ menu } setMenu={ setMenu } />
-      <div className={ styles_box.container }>
-        <SettingsNav selected={ "statistics" } menu={ menu } />
-        <div className={ styles_box.profile_details }>
+      <MenuNav menu={menu} setMenu={setMenu} />
+      <div className={styles_box.container}>
+        <SettingsNav selected={"statistics"} menu={menu} />
+        <div className={styles_box.profile_details}>
           <Logout />
-          <div className={ styles.statistics_box }>
-            <div className={ styles.part_one }>
-              <div className={ styles.left }>
-                <div className={ styles.avatar }>
+          <div className={styles.statistics_box}>
+            <div className={styles.part_one}>
+              <div className={styles.left}>
+                <div className={styles.avatar}>
                   <Image
-                    src={ data?.avatar ?? "https://picsum.photos/300/300" }
+                    src={data?.avatar ?? `https://api.dicebear.com/5.x/bottts/svg?seed=${data?.username ?? "User"}`}
                     alt="user_img"
-                    width={ "100px" }
-                    height={ "100px" }
-                    className={ styles_p.profile_avatar }
+                    width={"100px"}
+                    height={"100px"}
+                    className={styles_p.profile_avatar}
                   ></Image>
                 </div>
                 <div>
-                  <p className={ styles.user_name }>{ data.username }</p>
-                  <div className={ styles.level_box }>
-                    <div className={ styles.level_line }></div>
-                    <div className={ styles.level_number_box }>
-                      <p>LEVEL 2</p>
-                      <p>LEVEL 3</p>
+                  <p className={styles.user_name}>{data.username}</p>
+                  <div className={styles.level_box}>
+                    <div
+                      className={cn(
+                        styles.level_line,
+                        level >= 1 && styles.level_line_one_one,
+                        level >= 2 && styles.level_line_one_two,
+                        level >= 3 && styles.level_line_one_tree,
+                        level >= 4 && styles.level_line_one,
+                        level >= 8 && styles.level_line_two,
+                        level >= 12 && styles.level_line_tree,
+                        level >= 15 && styles.level_line_four,
+                        level >= 18 && styles.level_line_five,
+                        level >= 21 && styles.level_line_six,
+                        level >= 26 && styles.level_line_eight
+                      )}
+                    ></div>
+                    <div className={styles.level_number_box}>
+                      <p>
+                        level{" "}
+                        <span>
+                          {level > 0 ? (level >= 26 ? 26 : level) : 0}
+                        </span>
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className={ styles.right }>
-                <p className={ styles.title }>MATCH PLAYED</p>
-                <p className={ styles.match_number }>50</p>
-                <div className={ styles.def_vic_box }>
-                  <div className={ styles.defeat_box }>
-                    <p className={ styles.defeat_text }>DEFEAT</p>
-                    <p className={ styles.defeat_number }>20</p>
+              <div className={styles.right}>
+                <p className={styles.title}>MATCH PLAYED</p>
+                <p className={styles.match_number}>{history.length}</p>
+                <div className={styles.def_vic_box}>
+                  <div className={styles.defeat_box}>
+                    <p className={styles.defeat_text}>DEFEAT</p>
+                    <p className={styles.defeat_number}>{loserMaches}</p>
                   </div>
-                  <div className={ styles.victory_box }>
-                    <p className={ styles.victory_text }>VICTORY</p>
-                    <p className={ styles.victory_number }>30</p>
+                  <div className={styles.victory_box}>
+                    <p className={styles.victory_text}>VICTORY</p>
+                    <p className={styles.victory_number}>{winnerMaches}</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className={ styles.part_two }>
-              <p className={ styles.ach_text }>ACHIEVMENTS</p>
-              <div className={ styles.ach_medal }>
-                <div className={ styles.ach_medal_box }>
-                  <div className={ styles.ach_goal }>first match</div>
+            <div className={styles.part_two}>
+              <p className={styles.ach_text}>ACHIEVEMENTS</p>
+              <div className={styles.ach_medal}>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach1 && styles.medal}`
+                  )}
+                >
+                  <div className={styles.ach_goal}>First match</div>
                   <Image
+                    className={`${!achievements.ach1 && styles.non_medal}`}
                     src="/ach1.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
-                <div className={ styles.ach_medal_box }>
-                  <div className={ styles.ach_goal }></div>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach2 && styles.medal}`
+                  )}
+                >
+                  <div className={styles.ach_goal}>Reaching 350 points</div>
                   <Image
+                    className={`${!achievements.ach2 && styles.non_medal}`}
                     src="/ach2.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
-                <div className={ styles.ach_medal_box }>
-                  <div className={ styles.ach_goal }></div>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach3 && styles.medal}`
+                  )}
+                >
+                  <div className={styles.ach_goal}>Three consecutive wins</div>
                   <Image
+                    className={`${!achievements.ach3 && styles.non_medal}`}
                     src="/ach3.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
-                <div className={ styles.ach_medal_box }>
-                  <div className={ styles.ach_goal }></div>
+                <div
+                  className={cn(
+                    styles.ach_medal_box,
+                    `${achievements.ach4 && styles.medal}`
+                  )}
+                >
+                  <div className={styles.ach_goal}>1000 Points</div>
                   <Image
+                    className={`${!achievements.ach4 && styles.non_medal}`}
                     src="/ach4.png"
                     alt="medal_img"
-                    width="180%"
-                    height="180%"
+                    width="150%"
+                    height="150%"
                   ></Image>
                 </div>
               </div>
@@ -109,10 +216,8 @@ const History = () =>
 
 export default History;
 
-export const getServerSideProps = requireAuthentication( async () =>
-{
+export const getServerSideProps = requireAuthentication(async () => {
   return {
-    props: {
-    }, // will be passed to the page component as props
-  }
-} )
+    props: {}, // will be passed to the page component as props
+  };
+});

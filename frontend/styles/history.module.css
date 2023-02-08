@@ -5,6 +5,8 @@
   scrollbar-color: #d9d9d9 #d9d9d9;
   scrollbar-width: thin;
   padding-right: 1rem;
+  padding-top: 1.2rem;
+  font-size: 2rem;
 }
 
 .history::-webkit-scrollbar {
@@ -22,7 +24,7 @@
   padding: 1.2rem;
   border-top: 0.5px solid rgba(255, 255, 255, 0.07);
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
-  font-size: 1.8rem;
+  font-size: inherit;
   text-align: center;
   letter-spacing: 1.2px;
 }
@@ -54,7 +56,12 @@
 }
 
 .history_achievements {
-  width: 15rem;
+  width: 16rem;
+}
+
+.history_userName {
+  width: 16rem;
+  font-family: "Phosphate";
 }
 
 .history_score_points {
@@ -64,7 +71,7 @@
 
 .history_victory_defeat_box {
   font-size: 3rem;
-  width: 15rem;
+  width: 16rem;
   font-family: "Pixeboy";
 }
 
@@ -77,7 +84,7 @@
 
 .history_gameMode_time {
   text-align: right;
-  width: 26rem;
+  width: 16rem;
   font-family: "Phosphate";
 }
 
@@ -93,6 +100,10 @@
     width: 12rem;
   }
 
+  .history_userName {
+    width: 12rem;
+  }
+
   .history_score_points {
     width: 12rem;
   }
@@ -103,6 +114,6 @@
   }
 
   .history_gameMode_time {
-    width: 20rem;
+    width: 12rem;
   }
 }

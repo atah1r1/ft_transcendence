@@ -11,11 +11,16 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     super({
       clientID: process.env.FORTYTWO_CLIENT_ID,
       clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-      callbackURL: 'http://localhost:9000/api/auth/redirect',
+      callbackURL: `${process.env.HOST_BACK}/api/auth/redirect`,
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: any, done: any) {
+  async validate(
+    accessToken: string,
+    refreshToken: string,
+    profile: any,
+    done: any,
+  ) {
     done(null, profile);
   }
 }
