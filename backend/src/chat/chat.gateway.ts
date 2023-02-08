@@ -851,7 +851,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!('roomId' in payload) || typeof payload.roomId !== 'string') {
       throw new WsException({
         error: EV_LEAVE_ROOM,
-        message: 'Invalid leave room object',
+        message: 'Invalid room id or you have been removed from this room',
       });
     }
   }

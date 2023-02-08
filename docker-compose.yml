@@ -24,10 +24,13 @@ services:
             - 9000:9000
         depends_on:
             - db
+        links:
+            - db
         networks:
             - front-network
             - back-network
     db:
+        container_name: db
         restart: unless-stopped
         image: postgres:12.10
         volumes:
