@@ -24,7 +24,6 @@ const History = () => {
         setFriends(res.data);
       })
       .catch((err) => {
-        // console.log( err );
       });
   }, [lastBlockedId]);
 

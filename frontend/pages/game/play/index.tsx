@@ -175,7 +175,6 @@ function Game() {
       }
       else {
         socket.emit("stop_spectate_game", { gameId: game.id });
-        console.log("stop spectating");
         setGame(null);
       }
     };

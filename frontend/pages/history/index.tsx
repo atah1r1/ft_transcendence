@@ -24,7 +24,6 @@ const History = () => {
         setHistory(res.data.reverse());
       })
       .catch((error) => {
-        // console.log('error: ', error);
       });
   }, [data.id]);
 

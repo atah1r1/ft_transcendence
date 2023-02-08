@@ -85,7 +85,6 @@ export default function ConversationBody() {
         );
       })
       .catch((err) => {
-        // console.log( 'error: ', err );
       });
   }, [currentConv, memberStatus]);
 

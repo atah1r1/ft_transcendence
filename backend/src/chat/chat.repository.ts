@@ -5,9 +5,7 @@ export default class ChatRepository {
   connectedUsers: Map<string, Socket[]> = new Map();
 
   private static instance: ChatRepository;
-  private constructor() {
-    console.log('ChatRepository created');
-  }
+  private constructor() {}
   public static getInstance(): ChatRepository {
     if (!ChatRepository.instance) {
       ChatRepository.instance = new ChatRepository();

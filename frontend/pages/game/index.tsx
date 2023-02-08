@@ -42,10 +42,8 @@ function Home() {
       })
       .then((res) => {
         setLiveGames(res.data);
-        console.log(res.data);
       })
       .catch((err) => {
-        // console.log(err);
       });
   }, [gamesCount]);
 

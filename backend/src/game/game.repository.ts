@@ -20,9 +20,7 @@ export default class GameRepository {
   gameQueue = new Queue<string>();
 
   private static instance: GameRepository;
-  private constructor() {
-    console.log('GameRepository created');
-  }
+  private constructor() {}
   public static getInstance(): GameRepository {
     if (!GameRepository.instance) {
       GameRepository.instance = new GameRepository();

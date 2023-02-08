@@ -270,7 +270,6 @@ function Bot_game() {
   const keyboardevent = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if (e.key === "ArrowUp" && leftPaddle.y > 0) {
       leftPaddle.y -= 40;
-      // console.log(leftPaddle.y);
     } else if (e.key === "ArrowDown" && leftPaddle.y < 620) {
       leftPaddle.y += 40;
     }

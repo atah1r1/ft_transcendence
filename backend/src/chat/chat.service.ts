@@ -1017,8 +1017,6 @@ export class ChatService {
     if (!room) throw new Error('Room does not exist');
 
     const _roomUser = await this.getRoomUserByUserIdAndRoomId(userId, roomId);
-    //console.log('UID: ', userId);
-    //console.log('RU: \n', _roomUser);
     if (!_roomUser || _roomUser.status === RoomUserStatus.LEFT)
       throw new Error('You are not in room');
 

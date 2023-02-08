@@ -140,7 +140,6 @@ const Profile = () => {
         });
       })
       .catch((error) => {
-        // console.log('error: ', error);
         router.push("/auth");
       });
   };
@@ -159,10 +158,8 @@ const Profile = () => {
       })
       .then((res) => {
         setHistory(res.data.reverse());
-        // console.log('history: ', res.data);
       })
       .catch((error) => {
-        // console.log('error: ', error);
       });
   }, [data.id]);
 
@@ -179,7 +176,6 @@ const Profile = () => {
       let points = 0;
       setAchievments((prev: any) => ({ ...prev, ach1: true }));
       history.map((ele: any, i: any, arr: any) => {
-        // console.log(arr[arr.length - 1 - i].winnerScore, arr[arr.length - 1 - i].loserScore);
         points =
           (arr[arr.length - 1 - i].winnerScore -
             arr[arr.length - 1 - i].loserScore) *

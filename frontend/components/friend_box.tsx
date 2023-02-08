@@ -15,7 +15,6 @@ const Friends_box = ({ friends, inputForm }: any) => {
   const router = useRouter();
   const socket = useContext(SocketContext);
 
-  // console.log( 'fri: ', friends );
   const find = friends
     ? friends.filter((friend: any) =>
         friend.username.toLowerCase().includes(inputForm.toLowerCase())

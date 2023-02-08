@@ -59,7 +59,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       await this.verifyAndSave(client);
       // Add user to connectedUsers map.
-      // console.log('CONNECT ID: ', client.data.id);
       this.chatService.addConnectedUser(client.data.id, client);
       await this.joinIORooms(client);
       await this.sendChatsToClient(client);
@@ -75,7 +74,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.chatService.removeConnectedUser(client.data.id, client);
       await this.sendOnlineFriendsOfUserId(client.data.id);
     }
-    // console.log('disconnected: ', client.id);
   }
 
   /* *******************
@@ -554,7 +552,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const sockets = this.chatService.getConnectedUserById(userId);
     if (!sockets || sockets.length === 0) return;
     const chats = await this.chatService.getChatsByUserId(userId);
-    // console.log('NUM CHATS: ', chats.length);
     for (const socket of sockets) {
       this.server.to(socket.id).emit(EV_CHAT_LIST, chats);
     }
@@ -639,7 +636,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private async verifyAndSave(client: Socket) {
     const token: string = client.handshake.auth.token as string;
-    // console.log('token: ', token);
     const decoded = await this.authService.verifyToken(token);
     // save the user id in the socket
     client.data = decoded;

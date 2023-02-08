@@ -14,7 +14,6 @@ export default function requireAuthentication(gssp: any) {
             })
             data = await res.json()
         } catch (e) {
-            console.log(e)
         }
 
         if (data.statusCode === 477) {

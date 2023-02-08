@@ -15,12 +15,10 @@ export class UserService {
       process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME,
       user.two_factor_auth_key,
     );
-    // console.log(otpauthUrl);
     const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: { two_factor_auth: true, two_factor_auth_uri: otpauthUrl },
     });
-    // console.log(otpauthUrl);
     return {
       two_factor_auth_uri: otpauthUrl,
       two_factor_auth: updated.two_factor_auth,
@@ -62,7 +60,6 @@ export class UserService {
     const user = await this.prisma.user.findUnique({
       where: { username },
     });
-    //console.log(user);
     if (user) {
       return true;
     }
@@ -72,7 +69,6 @@ export class UserService {
   async updateProfile(user: any, body: any) {
     const currentUser = await this.getUserById(user.id, user.id);
     const { first_name, last_name, username } = body;
-    //console.log('body body', body);
     const data: any = {};
     if (first_name) data.first_name = first_name;
     if (last_name) data.last_name = last_name;

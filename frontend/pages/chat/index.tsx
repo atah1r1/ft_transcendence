@@ -117,7 +117,6 @@ const Chat = () => {
         setRoomMembers(res.data);
       })
       .catch((err) => {
-        // console.log( "error: ", err );
       });
   }, [currentConv, newMemberAdded, memberStatus]);
 
@@ -134,7 +133,6 @@ const Chat = () => {
         setFriends(res.data);
       })
       .catch((err) => {
-        // console.log( err );
       });
   }, [currentConv, newMemberAdded]);
 

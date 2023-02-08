@@ -75,10 +75,8 @@ const FriendProfile = () => {
       })
       .then((res) => {
         setHistory(res.data.reverse());
-        // console.log('history: ', res.data);
       })
       .catch((error) => {
-        // console.log('error: ', error);
       });
   }, [data.id]);
 
@@ -89,10 +87,8 @@ const FriendProfile = () => {
       })
       .then((res) => {
         setFriendHistory(res.data);
-        // console.log('fr_history: ', res.data);
       })
       .catch((error) => {
-        // console.log('error: ', error);
       });
   }, [id]);
 
@@ -106,7 +102,6 @@ const FriendProfile = () => {
         setNotFound(false);
       })
       .catch((err) => {
-        // console.log('error', err);
       })
       .finally(() => {
         setLoading(false);
@@ -123,7 +118,6 @@ const FriendProfile = () => {
         setFriends(res.data);
       })
       .catch((err) => {
-        // console.log(err);
       });
   }, [lastBlockedId]);
 

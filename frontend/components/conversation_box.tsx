@@ -30,7 +30,6 @@ const ConversationBox = ({ searchInput }: any) => {
         setChats(res.data);
       })
       .catch((err) => {
-        // console.log( err );
       });
   }, []);
 

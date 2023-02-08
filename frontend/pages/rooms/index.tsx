@@ -24,7 +24,6 @@ const History = () => {
         setRooms(res.data);
       })
       .catch((err) => {
-        // console.log( err )
       });
   }, [newRoom]);
 

@@ -29,7 +29,6 @@ const HistoryBox = ({ history, id, setLevel }: any) => {
       let points = 0;
       setOpAchievments((prev: any) => ({ ...prev, ach1: true }));
       history.map((ele: any, i: any, arr: any) => {
-        // console.log(arr[arr.length - 1 - i].winnerScore, arr[arr.length - 1 - i].loserScore);
         points =
           (arr[arr.length - 1 - i].winnerScore -
             arr[arr.length - 1 - i].loserScore) *
@@ -47,7 +46,6 @@ const HistoryBox = ({ history, id, setLevel }: any) => {
           setOpAchievments((prev: any) => ({ ...prev, ach3: true }));
         }
         if (score >= 350) {
-          // console.log("ach2");
           setOpAchievments((prev: any) => ({ ...prev, ach2: true }));
         }
         if (score >= 1000) {

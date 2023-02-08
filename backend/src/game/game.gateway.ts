@@ -46,7 +46,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private async verifyAndSave(client: Socket) {
     const token: string = client.handshake.auth.token as string;
-    // console.log('token: ', token);
     const decoded = await this.authService.verifyToken(token);
     // save the user id in the socket
     client.data = decoded;
@@ -57,9 +56,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       await this.verifyAndSave(client);
       this.gameService.addConnectedUser(client.data.id, client);
-      console.log('USER CONNECTED: ', client.data.id);
     } catch (err) {
-      console.log('USER DISCONNECTED ERROR: ', client.data.id);
       client.disconnect();
     }
   }
@@ -212,7 +209,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(EV_PLAY_AGAINST)
   async playAgainst(client: any, payload: any) {
-    console.log('PLAY AGAINST REQUEST: ', payload);
     this.validatePlayAgainst(payload);
     try {
       const reqAdded = await this.gameService.playAgainst(
@@ -220,7 +216,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         payload.userId,
       );
       if (reqAdded) {
-        console.log('PLAY AGAINST REQUEST ADDED');
         const user = await this.userService.getUserById(
           client.data.id,
           client.data.id,
@@ -238,7 +233,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(EV_PLAY_AGAINST_ACCEPT)
   async playAgainstAccept(client: any, payload: any) {
-    console.log('PLAY AGAINST ACCEPT: ', payload);
     this.validatePlayAgainst(payload);
     try {
       const game = await this.gameService.acceptPlayAgainst(
@@ -248,10 +242,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       if (game) {
         if (game.status === GameStatus.ACCEPTED) {
-          console.log('PLAY AGAINST GAME ACCEPTED');
           this.sendGameToClients(game, EV_EMIT_PLAY_AGAINST_ACCEPT);
         } else {
-          console.log('PLAY AGAINST GAME DECLINED');
           this.sendGameToConnectedClients(game, EV_EMIT_PLAY_AGAINST_ACCEPT);
         }
       }
