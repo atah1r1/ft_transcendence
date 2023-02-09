@@ -4,9 +4,9 @@ export const CloudinaryProvider = {
     provide: 'Cloudinary',
     useFactory: () => {
         return v2.config({
-            cloud_name: 'dnztzbjpw',
-            api_key: '585454721921359',
-            api_secret: 'JOw4uYo0RaQuh7XtcaMnpI9Honk',
+            cloud_name: 'cloud_name',
+            api_key: 'api_key',
+            api_secret: 'api_secret',
         });
     },
 };
